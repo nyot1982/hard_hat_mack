@@ -79,7 +79,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
     this.width = 28;
     this.height = 32;
     this.move = 0;
-    this.moveZ = 0;
     this.strafe = 0;
     this.turn = 0;
     this.lastShotFrame = -this.weapons [this.weapon].fireRate / this.weapons [this.weapon].rate;
@@ -133,27 +132,10 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
     }
     this.changeColor (color);
 
-    this.changeWeapon = function ()
-    {
-        if (this.z > 0) 
-        {
-            this.weapon = this.weapons.findIndex (weapon => weapon.active == true)
-            this.weapons [this.weapon].active = false;
-            this.weapon++;
-            if (this.weapon == this.weapons.length) this.weapon = 0;
-            while (this.weapons [this.weapon].power == 0)
-            {
-                this.weapon++;
-                if (this.weapon == this.weapons.length) this.weapon = 0;
-            }
-            this.weapons [this.weapon].active = true;
-        }
-    }
-
     this.firing = function (active)
     {
         if (gameModal == "menu" || gameScreen == "menu") this.fire = true;
-        else if (gameScreen == "game" && this.z == 500) this.fire = active
+        else if (gameScreen == "game") this.fire = active
     }
 
     this.turning = function (turn)
@@ -163,7 +145,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
             if (turn == 0) this.turn = 0;
             else if (this.turn == 0) this.turn = turn;
         }
-        else if (gameScreen == "game" && this.z > 0)
+        else if (gameScreen == "game")
         {
             if (turn == 0 || turn < 0 && !this.status.wing1 || turn > 0 && !this.status.wing2) this.turn = 0;
             else if (gameControls [this.idControl] == "gamepad") this.turn = turn * 10;
@@ -187,7 +169,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
 
     this.moving = function (direction)
     {
-        if (gameScreen == "game" && this.z > 0)
+        if (gameScreen == "game")
         {
             if (!this.status.engine1 && !this.status.engine2) direction = 0;
             if (direction < 0)
@@ -209,74 +191,58 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
         }
     }
 
-    this.movingZ = function ()
-    {
-        if (this.moveZ == 0 && this.life > 0)
-        {
-            if (this.z == 0 && this.fuel > 0 && this.repairing == null) this.moveZ = 10;
-            else if (this.z == 500)
-            {
-                this.fire = false;
-                this.moveZ = -10;
-            }
-        }
-    }
-
     this.strafing = function (direction)
     {
-        if (this.z > 0)
+        if (gameScreen == "menu" || gameModal == "menu")
         {
-            if (gameScreen == "menu" || gameModal == "menu")
+            if (gameScreen == "menu") this.menuItems = 8;
+            else if (gameModal == "menu") this.menuItems = 5;
+            if (direction == 0) this.strafe = 0;
+            else if (this.strafe == 0)
             {
-                if (gameScreen == "menu") this.menuItems = 8;
-                else if (gameModal == "menu") this.menuItems = 5;
-                if (direction == 0) this.strafe = 0;
-                else if (this.strafe == 0)
+                this.strafeSpeed = 2;
+                if (this.menuItem === undefined) this.menuItem = 0;
+                if (direction < 0 && this.menuItem > 0 || direction > 0 && this.menuItem < this.menuItems - 1)
                 {
-                    this.strafeSpeed = 2;
-                    if (this.menuItem === undefined) this.menuItem = 0;
-                    if (direction < 0 && this.menuItem > 0 || direction > 0 && this.menuItem < this.menuItems - 1)
-                    {
-                        this.endStrafe = this.y + 25 * direction;
-                        this.strafe = this.strafeSpeed * direction;
-                        this.menuItem += direction;
-                    }
-                    else
-                    {
-                        this.strafeSpeed = 6;
-                        this.endStrafe = this.y + (this.menuItems - 1) * 25 * direction * -1;
-                        this.strafe = this.strafeSpeed * direction * -1;
-                        if (this.menuItem == 0) this.menuItem = this.menuItems - 1;
-                        else if (this.menuItem == this.menuItems - 1) this.menuItem = 0;
-                    }
+                    this.endStrafe = this.y + 25 * direction;
+                    this.strafe = this.strafeSpeed * direction;
+                    this.menuItem += direction;
+                }
+                else
+                {
+                    this.strafeSpeed = 6;
+                    this.endStrafe = this.y + (this.menuItems - 1) * 25 * direction * -1;
+                    this.strafe = this.strafeSpeed * direction * -1;
+                    if (this.menuItem == 0) this.menuItem = this.menuItems - 1;
+                    else if (this.menuItem == this.menuItems - 1) this.menuItem = 0;
                 }
             }
-            else if (gameScreen == "game" && gameModal == null)
+        }
+        else if (gameScreen == "game" && gameModal == null)
+        {
+            if (!this.status.engine1 && !this.status.engine2) direction = 0;
+            if (direction < 0)
             {
-                if (!this.status.engine1 && !this.status.engine2) direction = 0;
-                if (direction < 0)
-                {
-                    if (this.strafeSpeed <= 0) this.strafe = -0.5;
-                    else if (this.strafeSpeed > 0) this.strafe = -1;
-                }
-                else if (direction > 0)
-                {
-                    if (this.strafeSpeed < 0) this.strafe = 1;
-                    else if (this.strafeSpeed >= 0) this.strafe = 0.5;
-                }
-                else if (direction == 0)
-                {
-                    if (this.strafeSpeed < 0) this.strafe = 0.5;
-                    else if (this.strafeSpeed > 0) this.strafe = -0.5;
-                    else if (this.strafeSpeed == 0) this.strafe = 0; 
-                }
+                if (this.strafeSpeed <= 0) this.strafe = -0.5;
+                else if (this.strafeSpeed > 0) this.strafe = -1;
+            }
+            else if (direction > 0)
+            {
+                if (this.strafeSpeed < 0) this.strafe = 1;
+                else if (this.strafeSpeed >= 0) this.strafe = 0.5;
+            }
+            else if (direction == 0)
+            {
+                if (this.strafeSpeed < 0) this.strafe = 0.5;
+                else if (this.strafeSpeed > 0) this.strafe = -0.5;
+                else if (this.strafeSpeed == 0) this.strafe = 0; 
             }
         }
     }
 
     this.shotsHit = function (path)
     {
-        if (gameScreen == "game" && gameModal == null && this.z == 500)
+        if (gameScreen == "game" && gameModal == null)
         {
             for (var gameShot in gameShots)
             {
@@ -342,7 +308,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
 
     this.playerDead = function ()
     {
-        if (gameControls [this.idControl] == "gamepad" && this.z >= 0) vibrate (this.idControl, 600);
+        if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
         if (this.lifes > 0) this.lifes--;
         if (this.lifes == 0 && gameModes.findIndex (mode => mode.active == true) < 2) fetchLoad ("high_score_save", "name=" + this.name + "&score=" + this.score);
         setTimeout
@@ -354,7 +320,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     if (gameModal != null) gameCloseModal ();
                     this.x = startPoints [startPoints.findIndex (startPoint => startPoint.ship == this.name)].x;
                     this.y = startPoints [startPoints.findIndex (startPoint => startPoint.ship == this.name)].y;
-                    this.z = startPoints [startPoints.findIndex (startPoint => startPoint.ship == this.name)].z;
                     this.heading = 0;
                     this.moveSpeed = 0;
                     this.strafeSpeed = 0;
@@ -438,7 +403,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
         else this.idControl = menuControl;
         if (this.life > 0)
         {
-            if (this.z > 0 || this.ground != "snow")
+            if (this.ground != "snow")
             {
                 if (this.turn != 0)
                 {
@@ -536,80 +501,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                 ctx.translate (this.x, this.y);
                 ctx.rotate (this.radians);
                 ctx.translate (-(this.width / 2), -(this.height / 2));
-                if (this.z < 0) ctx.globalAlpha = 0.5;
-                else ctx.globalAlpha = 1;
-                ctx.transform ((this.z / 10 + 50) / 100, 0, 0, (this.z / 10 + 50) / 100, (this.width / 2) - (this.width * (this.z / 10 + 50) / 100 / 2), (this.height / 2) - (this.height * (this.z / 10 + 50) / 100 / 2));
-                if (this.z > 0)
-                {
-                    if (this.status.engine1)
-                    {
-                        ctx.beginPath ();
-                        ctx.fillStyle = "#D88F95EE";
-                        ctx.ellipse (9, 33, 2, this.engine1, 0, 0, Math.PI);
-                        ctx.fill ();
-                        if (this.engine1inc)
-                        {
-                            this.engine1 += 0.25 * this.engine1max;
-                            if (this.engine1 >= this.engine1max)
-                            {
-                                this.engine1 = this.engine1max;
-                                this.engine1inc = false;
-                            }
-                        }
-                        else
-                        {
-                            this.engine1 -= 0.25 * this.engine1max;
-                            if (this.engine1 <= 0)
-                            {
-                                this.engine1 = 0;
-                                this.engine1inc = true;
-                            }
-                        }
-                    }
-                    if (this.status.engine2)
-                    {
-                        ctx.beginPath ();
-                        ctx.fillStyle = "#D88F95EE";
-                        ctx.ellipse (19, 33, 2, this.engine2, 0, 0, Math.PI);
-                        ctx.fill ();
-                        if (this.engine2inc)
-                        {
-                            this.engine2 += 0.25 * this.engine2max;
-                            if (this.engine2 >= this.engine2max)
-                            {
-                                this.engine2 = this.engine2max;
-                                this.engine2inc = false;
-                            }
-                        }
-                        else
-                        {
-                            this.engine2 -= 0.25 * this.engine2max;
-                            if (this.engine2 <= 0)
-                            {
-                                this.engine2 = 0;
-                                this.engine2inc = true;
-                            }
-                        }
-                    }
-                    if (this.moveSpeed != 0 || this.strafeSpeed != 0)
-                    {
-                        if (Math.abs (this.moveSpeed) >= Math.abs (this.strafeSpeed))
-                        {
-                            this.engine1max = Math.abs (this.moveSpeed) * 8;
-                            this.engine2max = Math.abs (this.moveSpeed) * 8;
-                        }
-                        else
-                        {
-                            this.engine1max = Math.abs (this.strafeSpeed) * 8;
-                            this.engine2max = Math.abs (this.strafeSpeed) * 8;
-                        }
-                    }
-                    else
-                    {
-                        this.engine1max = 4;
-                        this.engine2max = 4;
-                    }
-                }
+                ctx.globalAlpha = 1;
                 this.paths = [];
                 this.paths.cockpit = new Path2D ();
                 this.paths.cockpit.rect (9, 13, 10, 1);
@@ -676,7 +568,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     else if (this.colors.pattern) ctx.fillStyle = this.colors.shipFill;
                     else ctx.fillStyle = this.colors.negative;
                     ctx.fill (this.paths.engine1);
-                    if (this.z == 500) this.shotsHit ("engine1");
+                    this.shotsHit ("engine1");
                 }
                 if (this.status.engine2 || this.repairing != null && gameArea.frame % 100 >= 0 && gameArea.frame % 100 < 20)
                 {
@@ -685,7 +577,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     else if (this.colors.pattern) ctx.fillStyle = this.colors.shipFill;
                     else ctx.fillStyle = this.colors.negative;
                     ctx.fill (this.paths.engine2);
-                    if (this.z == 500) this.shotsHit ("engine2");
+                    this.shotsHit ("engine2");
                 }
                 if (this.status.gun || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 15)
                 {
@@ -694,7 +586,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
                     else ctx.fillStyle = this.colors.near;
                     ctx.fill (this.paths.gun);
-                    if (this.z == 500) this.shotsHit ("gun");
+                    this.shotsHit ("gun");
                 }
                 if (this.status.wing1 || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 25)
                 {
@@ -703,7 +595,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
                     else ctx.fillStyle = this.colors.near;
                     ctx.fill (this.paths.wing1);
-                    if (this.z == 500) this.shotsHit ("wing1");
+                    this.shotsHit ("wing1");
                 }
                 if (this.status.wing2 || this.repairing != null && gameArea.frame % 50 >= 0 && gameArea.frame % 50 < 25)
                 {
@@ -712,7 +604,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
                     else ctx.fillStyle = this.colors.near;
                     ctx.fill (this.paths.wing2);
-                    if (this.z == 500) this.shotsHit ("wing2");
+                    this.shotsHit ("wing2");
                 }
                 if (this.colors.hook1Fill != null && this.colors.hook1Fill != this.colors.shipFill)
                 {
@@ -726,7 +618,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                 }
                 ctx.fillStyle = this.colors.pattern || this.colors.shipFill;
                 ctx.fill (this.paths.cockpit);
-                if (this.z == 500) this.shotsHit ("cockpit");
+                this.shotsHit ("cockpit");
                 ctx.rotate (45 * Math.PI / 180);
                 ctx.fillStyle = this.colors.lightFill;
                 ctx.lineWidth = 1;
@@ -736,7 +628,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                 ctx.fill (this.paths.light);
                 ctx.stroke (this.paths.light);
                 ctx.rotate (-45 * Math.PI / 180);
-                if (this.shield > 0 && this.z > 0)
+                if (this.shield > 0)
                 {
                     this.paths.shield = new Path2D ();
                     this.paths.shield.arc (14, 19, 30, 0, 2 * Math.PI);
@@ -759,7 +651,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     ctx.translate (this.width / 2, this.height / 2);
                 }
                 ctx.restore ();
-                if (gameArea.frame % 50 == 0 && this.z > 0)
+                if (gameArea.frame % 50 == 0)
                 {
                     if (this.colors.lightFill == "#7B797B")
                     {
@@ -768,12 +660,12 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     }
                     else this.colors.lightFill = "#7B797B";
                 }
-                else if (this.z == 0) this.colors.lightFill = "#7B797B";
+                else this.colors.lightFill = "#7B797B";
             }
             if (this.name)
             {
                 var textMeasure = 0;
-                if (this.z > 0 || this.ground != "snow")
+                if (this.ground != "snow")
                 {
                     ctx.textBaseline = "middle";
                     if (this.xp != null)
@@ -828,230 +720,157 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                         ctx.fill ();
                     }
                 }
-                this.z += this.moveZ;
-                if (this.z == -500)
+                if (gameModes.findIndex (mode => mode.active == true) > 0)
                 {
-                    this.moveZ = 0;
-                    this.life = 0;
-                    this.playerDead ();
-                    return;
-                }
-                else if (this.z == 0)
-                {
-                    this.moveSpeed = 0;
-                    this.strafeSpeed = 0;
-                    this.turn = 0;
-                    this.move = 0;
-                    this.moveX = 0;
-                    this.moveY = 0;
-                    this.moveZ = 0;
-                    this.strafe = 0;
-                    if (this.ground == "base")
+                    for (var gameShip in gameShips)
                     {
-                        if (this.repairing == null && (!this.status.gun || !this.status.wing1 || !this.status.wing2 || !this.status.engine1 || !this.status.engine2) && (this.status.engine1 || this.status.engine2)) this.repairing = gameArea.frame;
-                        else if (this.repairing != null && gameArea.frame - this.repairing == 500)
+                        if (this.name != gameShips [gameShip].name)
                         {
-                            this.status.gun = true;
-                            this.status.wing1 = true;
-                            this.status.wing2 = true;
-                            this.status.engine1 = true;
-                            this.status.engine2 = true;
-                            this.repairing = null;
-                        }
-                    }
-                }
-                else if (this.z == 500)
-                {
-                    this.moveZ = 0;
-                    if (this.fuel == 0 || !this.status.engine1 && !this.status.engine2)
-                    {
-                        if (this.name == players [0].name) stopUserInteractions (0);
-                        this.moveZ = -10;
-                    }
-                    else if (this.fuel > 0)
-                    {
-                        if (gameArea.frame % (60 - (Math.abs (this.moveSpeed) > Math.abs (this.strafeSpeed) ? Math.abs (this.moveSpeed * 5) : Math.abs (this.strafeSpeed * 5))) == 0)
-                        {
-                            this.fuel--;
-                        }
-                    }
-                }
-                if (this.z == 0 && this.ground == "water")
-                {
-                    if (gameSound.active)
-                    {
-                        gameSound.sounds ["hit2"].stop ();
-                        gameSound.sounds ["hit2"].play ();
-                    }
-                    if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
-                    this.moveZ = -2.5;
-                }
-                else if (this.z == 0 && (this.ground == "lava" || this.fuel == 0 || !this.status.engine1 && !this.status.engine2))
-                {
-                    gameHits.push (new hit ("hit0", this.x, this.y, 20, 1));
-                    if (gameSound.active)
-                    {
-                        gameSound.sounds ["hit0"].stop ();
-                        gameSound.sounds ["hit0"].play ();
-                    }
-                    this.life = 0;
-                    this.playerDead ();
-                    return;
-                }
-                else
-                {
-                    if (gameModes.findIndex (mode => mode.active == true) > 0)
-                    {
-                        for (var gameShip in gameShips)
-                        {
-                            if (this.name != gameShips [gameShip].name && this.z == gameShips [gameShip].z)
+                            var dx = this.x - gameShips [gameShip].x;
+                            var dy = this.y - gameShips [gameShip].y;
+                            if (this.shield == 0 && gameShips [gameShip].shield == 0 && Math.sqrt (dx * dx + dy * dy) < 30)
                             {
-                                var dx = this.x - gameShips [gameShip].x;
-                                var dy = this.y - gameShips [gameShip].y;
-                                if (this.shield == 0 && gameShips [gameShip].shield == 0 && Math.sqrt (dx * dx + dy * dy) < 30)
+                                this.life = 0;
+                                this.score += 500;
+                                gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                                if (gameSound.active)
                                 {
-                                    this.life = 0;
-                                    this.score += 500;
-                                    gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                                    gameSound.sounds ["hit0"].stop ();
+                                    gameSound.sounds ["hit0"].play ();
+                                }
+                                if (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2)
+                                {
+                                    gameShips [gameShip].life = 0;
+                                    gameShips [gameShip].score += 500;
+                                    gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
                                     if (gameSound.active)
                                     {
                                         gameSound.sounds ["hit0"].stop ();
                                         gameSound.sounds ["hit0"].play ();
                                     }
-                                    if (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2)
+                                    gameShips [gameShip].playerDead ();
+                                }
+                                this.playerDead ();
+                                return;
+                            }
+                            else if (this.shield > 0 && gameShips [gameShip].shield > 0 && Math.sqrt (dx * dx + dy * dy) < 58)
+                            {
+                                this.shield -= 10;
+                                if (this.shield < 0) this.shield = 0;
+                                gameShips [gameShip].shield -= 10;
+                                if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;
+                                gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                                if (gameSound.active)
+                                {
+                                    gameSound.sounds ["hit0"].stop ();
+                                    gameSound.sounds ["hit0"].play ();
+                                }
+                            }
+                            else if (Math.sqrt (dx * dx + dy * dy) < 44)
+                            {
+                                if (this.shield > 0 && gameShips [gameShip].shield == 0)
+                                {
+                                    this.shield -= 10;
+                                    if (this.shield < 0) this.shield = 0;
+                                    this.score += 1000;
+                                    gameShips [gameShip].life = 0;
+                                    gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
+                                    if (gameSound.active)
                                     {
-                                        gameShips [gameShip].life = 0;
-                                        gameShips [gameShip].score += 500;
-                                        gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
-                                        if (gameSound.active)
-                                        {
-                                            gameSound.sounds ["hit0"].stop ();
-                                            gameSound.sounds ["hit0"].play ();
-                                        }
-                                        gameShips [gameShip].playerDead ();
+                                        gameSound.sounds ["hit0"].stop ();
+                                        gameSound.sounds ["hit0"].play ();
+                                    }
+                                    gameShips [gameShip].playerDead ();
+                                }
+                                else if (gameShips [gameShip].shield > 0 && this.shield == 0)
+                                {
+                                    gameShips [gameShip].shield -= 10;
+                                    if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;       
+                                    gameShips [gameShip].score += 1000;
+                                    this.life = 0;
+                                    gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                                    if (gameSound.active)
+                                    {
+                                        gameSound.sounds ["hit0"].stop ();
+                                        gameSound.sounds ["hit0"].play ();
                                     }
                                     this.playerDead ();
                                     return;
                                 }
-                                else if (this.shield > 0 && gameShips [gameShip].shield > 0 && Math.sqrt (dx * dx + dy * dy) < 58)
-                                {
-                                    this.shield -= 10;
-                                    if (this.shield < 0) this.shield = 0;
-                                    gameShips [gameShip].shield -= 10;
-                                    if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;
-                                    gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                                    if (gameSound.active)
-                                    {
-                                        gameSound.sounds ["hit0"].stop ();
-                                        gameSound.sounds ["hit0"].play ();
-                                    }
-                                }
-                                else if (Math.sqrt (dx * dx + dy * dy) < 44)
-                                {
-                                    if (this.shield > 0 && gameShips [gameShip].shield == 0)
-                                    {
-                                        this.shield -= 10;
-                                        if (this.shield < 0) this.shield = 0;
-                                        this.score += 1000;
-                                        gameShips [gameShip].life = 0;
-                                        gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
-                                        if (gameSound.active)
-                                        {
-                                            gameSound.sounds ["hit0"].stop ();
-                                            gameSound.sounds ["hit0"].play ();
-                                        }
-                                        gameShips [gameShip].playerDead ();
-                                    }
-                                    else if (gameShips [gameShip].shield > 0 && this.shield == 0)
-                                    {
-                                        gameShips [gameShip].shield -= 10;
-                                        if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;       
-                                        gameShips [gameShip].score += 1000;
-                                        this.life = 0;
-                                        gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                                        if (gameSound.active)
-                                        {
-                                            gameSound.sounds ["hit0"].stop ();
-                                            gameSound.sounds ["hit0"].play ();
-                                        }
-                                        this.playerDead ();
-                                        return;
-                                    }
-                                }
                             }
                         }
                     }
-                    if (enemies == 0 && gameBoss)
+                }
+                if (enemies == 0 && gameBoss)
+                {
+                    var dx = this.x - gameBoss.x;
+                    var dy = this.y - gameBoss.y;
+                    if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45)
                     {
-                        var dx = this.x - gameBoss.x;
-                        var dy = this.y - gameBoss.y;
-                        if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45 && this.z == gameBoss.z)
+                        if (gameSound.active)
                         {
-                            if (gameSound.active)
-                            {
-                                gameSound.sounds ["hit1"].stop ();
-                                gameSound.sounds ["hit1"].play ();
-                            }
-                            this.shield -= 5;
-                            if (this.shield < 0) this.shield = 0;
+                            gameSound.sounds ["hit1"].stop ();
+                            gameSound.sounds ["hit1"].play ();
                         }
-                        else if (Math.sqrt (dx * dx + dy * dy) < 31 && this.z == gameBoss.z)
-                        {
-                            if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == players [0].name) this.life = 0;
-                            gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                            if (gameSound.active)
-                            {
-                                gameSound.sounds ["hit0"].stop ();
-                                gameSound.sounds ["hit0"].play ();
-                            }
-                            this.playerDead ();
-                        }
+                        this.shield -= 5;
+                        if (this.shield < 0) this.shield = 0;
                     }
-                    else for (var gameEnemy in gameEnemies)
+                    else if (Math.sqrt (dx * dx + dy * dy) < 31)
                     {
-                        var dx = this.x - gameEnemies [gameEnemy].x;
-                        var dy = this.y - gameEnemies [gameEnemy].y;
-                        if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45 && this.z == gameEnemies [gameEnemy].z)
+                        if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == players [0].name) this.life = 0;
+                        gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                        if (gameSound.active)
                         {
-                            gameEnemies [gameEnemy].life = 0;
-                            gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
-                            if (gameSound.active)
-                            {
-                                gameSound.sounds ["hit0"].stop ();
-                                gameSound.sounds ["hit0"].play ();
-                            }
-                            if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 300);
-                            this.shield -= 5;
-                            if (this.shield < 0) this.shield = 0;
-                            if (gameEnemies [gameEnemy].type < 7)
-                            {
-                                gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
-                                if (enemies > 0) enemies--;
-                                this.score += 500;
-                            }
-                            if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
+                            gameSound.sounds ["hit0"].stop ();
+                            gameSound.sounds ["hit0"].play ();
                         }
-                        else if (Math.sqrt (dx * dx + dy * dy) < 31 && this.z == gameEnemies [gameEnemy].z)
+                        this.playerDead ();
+                    }
+                }
+                else for (var gameEnemy in gameEnemies)
+                {
+                    var dx = this.x - gameEnemies [gameEnemy].x;
+                    var dy = this.y - gameEnemies [gameEnemy].y;
+                    if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45)
+                    {
+                        gameEnemies [gameEnemy].life = 0;
+                        gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
+                        if (gameSound.active)
                         {
-                            this.life = 0;
-                            gameEnemies [gameEnemy].life = 0;
-                            gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                            gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
-                            if (gameSound.active)
-                            {
-                                gameSound.sounds ["hit0"].stop ();
-                                gameSound.sounds ["hit0"].play ();
-                            }
-                            if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
-                            if (gameEnemies [gameEnemy].type < 7)
-                            {
-                                gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
-                                if (enemies > 0) enemies--;
-                                this.score += 250;
-                            }
-                            if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
-                            this.playerDead ();
+                            gameSound.sounds ["hit0"].stop ();
+                            gameSound.sounds ["hit0"].play ();
                         }
+                        if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 300);
+                        this.shield -= 5;
+                        if (this.shield < 0) this.shield = 0;
+                        if (gameEnemies [gameEnemy].type < 7)
+                        {
+                            gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
+                            if (enemies > 0) enemies--;
+                            this.score += 500;
+                        }
+                        if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
+                    }
+                    else if (Math.sqrt (dx * dx + dy * dy) < 31)
+                    {
+                        this.life = 0;
+                        gameEnemies [gameEnemy].life = 0;
+                        gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                        gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
+                        if (gameSound.active)
+                        {
+                            gameSound.sounds ["hit0"].stop ();
+                            gameSound.sounds ["hit0"].play ();
+                        }
+                        if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
+                        if (gameEnemies [gameEnemy].type < 7)
+                        {
+                            gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
+                            if (enemies > 0) enemies--;
+                            this.score += 250;
+                        }
+                        if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
+                        this.playerDead ();
                     }
                 }
             }

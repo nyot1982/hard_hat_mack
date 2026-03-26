@@ -128,7 +128,7 @@ function gameLoadScreen (screen)
         else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
         for (var i = 0; i < players.length; i++)
         {
-            gameShips.push (new ship (players [i].name, players [i].color, startPoints [i].x, startPoints [i].y, startPoints [i].z));
+            gameShips.push (new ship (players [i].name, players [i].color, startPoints [i].x, startPoints [i].y));
             startPoints [i].ship = players [i].name;
         }
         if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
@@ -233,50 +233,42 @@ function generateGameMap (map)
             {
                 ship: null,
                 x: 510,
-                y: 250,
-                z: 0
+                y: 250
             },
             {
                 ship: null,
                 x: 510,
-                y: 210,
-                z: 0
+                y: 210
             },
             {
                 ship: null,
                 x: 546,
-                y: 210,
-                z: 0
+                y: 210
             },
             {
                 ship: null,
                 x: 546,
-                y: 250,
-                z: 0
+                y: 250
             },
             {
                 ship: null,
                 x: 510,
-                y: 345,
-                z: 0
+                y: 345
             },
             {
                 ship: null,
                 x: 510,
-                y: 305,
-                z: 0
+                y: 305
             },
             {
                 ship: null,
                 x: 546,
-                y: 305,
-                z: 0
+                y: 305
             },
             {
                 ship: null,
                 x: 546,
-                y: 345,
-                z: 0
+                y: 345
             }
         ];
     }
@@ -287,50 +279,42 @@ function generateGameMap (map)
             {
                 ship: null,
                 x: 510,
-                y: 250,
-                z: 0
+                y: 250
             },
             {
                 ship: null,
                 x: 510,
-                y: 210,
-                z: 0
+                y: 210
             },
             {
                 ship: null,
                 x: 546,
-                y: 210,
-                z: 0
+                y: 210
             },
             {
                 ship: null,
                 x: 546,
-                y: 250,
-                z: 0
+                y: 250
             },
             {
                 ship: null,
                 x: 3570,
-                y: 1750,
-                z: 0
+                y: 1750
             },
             {
                 ship: null,
                 x: 3570,
-                y: 1710,
-                z: 0
+                y: 1710
             },
             {
                 ship: null,
                 x: 3606,
-                y: 1710,
-                z: 0
+                y: 1710
             },
             {
                 ship: null,
                 x: 3606,
-                y: 1750,
-                z: 0
+                y: 1750
             }
         ];
     }

@@ -8,7 +8,6 @@ function boss (type, x, y)
     this.type = type;
     this.x = x;
     this.y = y;
-    this.z = 500;
     this.fire = false;
     this.weapon = 0;
     this.weapons =
@@ -48,40 +47,29 @@ function boss (type, x, y)
         this.moveY = 0;
     }
 
-    this.changeWeapon = function (weapon)
-    {
-        if (this.z == 500) this.weapon = weapon;
-    }
-
     this.firing = function (active)
     {
-        if (this.z == 500) this.fire = active;
+        this.fire = active;
     }
 
     this.movingX = function (direction)
     {   
-        if (this.z > 0)
-        {
-            this.engine1 = 0;
-            this.engine3 = 0;
-            this.engine1inc = true;
-            this.engine3inc = true;
-            if (direction == 0 || (this.engine1Life == 0 && this.engine3Life == 0) || (direction == -1 && this.engine3Life == 0) || (direction == 1 && this.engine1Life == 0)) this.moveX = 0;
-            else this.moveX = this.speed * direction;
-        }
+        this.engine1 = 0;
+        this.engine3 = 0;
+        this.engine1inc = true;
+        this.engine3inc = true;
+        if (direction == 0 || (this.engine1Life == 0 && this.engine3Life == 0) || (direction == -1 && this.engine3Life == 0) || (direction == 1 && this.engine1Life == 0)) this.moveX = 0;
+        else this.moveX = this.speed * direction;
     }
 
     this.movingY = function (direction)
-    {   
-        if (this.z > 0)
-        {
-            this.engine2 = 0;
-            this.engine4 = 0;
-            this.engine2inc = true;
-            this.engine4inc = true;
-            if (direction == 0 || (this.engine4Life == 0 && this.engine2Life == 0) || (direction == -1 && this.engine2Life == 0) || (direction == 1 && this.engine4Life == 0)) this.moveY = 0;
-            else this.moveY = this.speed * -direction;
-        }
+    {
+        this.engine2 = 0;
+        this.engine4 = 0;
+        this.engine2inc = true;
+        this.engine4inc = true;
+        if (direction == 0 || (this.engine4Life == 0 && this.engine2Life == 0) || (direction == -1 && this.engine2Life == 0) || (direction == 1 && this.engine4Life == 0)) this.moveY = 0;
+        else this.moveY = this.speed * -direction;
     }
 
     this.speeding = function (increment)
@@ -154,15 +142,6 @@ function boss (type, x, y)
                             break;
                         case 7:
                             this.firing (false);
-                            break;
-                        case 8:
-                            this.changeWeapon (0);
-                            break;
-                        case 9:
-                            this.changeWeapon (1);
-                            break;
-                        case 10:
-                            this.changeWeapon (2);
                             break;
                     }
                 }
@@ -360,11 +339,11 @@ function boss (type, x, y)
             {
                 if (gameShots [gameShot].name.substring (0, 6) != "enemy-" && gameShots [gameShot].name != "boss")
                 {
-                    if (gameShots [gameShot].x >= this.x - 27 && gameShots [gameShot].x <= this.x - 20 + gameShots [gameShot].speed / 2 && gameShots [gameShot].y >= this.y - 14 && gameShots [gameShot].y <= this.y + 14 && this.z == 500) bossHit (gameShot, 1);
-                    else if (gameShots [gameShot].x >= this.x - 14 && gameShots [gameShot].x <= this.x + 14 && gameShots [gameShot].y >= this.y - 27 && gameShots [gameShot].y <= this.y - 20 + gameShots [gameShot].speed / 2 && this.z == 500) bossHit (gameShot, 2);
-                    else if (gameShots [gameShot].x >= this.x + 20 - gameShots [gameShot].speed / 2 && gameShots [gameShot].x <= this.x + 27 && gameShots [gameShot].y >= this.y - 14 && gameShots [gameShot].y <= this.y + 14 && this.z == 500) bossHit (gameShot, 3);
-                    else if (gameShots [gameShot].x >= this.x - 14 && gameShots [gameShot].x <= this.x + 14 && gameShots [gameShot].y >= this.y + 20 - gameShots [gameShot].speed / 2 && gameShots [gameShot].y <= this.y + 27 && this.z == 500) bossHit (gameShot, 4);
-                    else if (gameShots [gameShot].x >= this.x - 20 && gameShots [gameShot].x <= this.x + 20 && gameShots [gameShot].y >= this.y - 20 && gameShots [gameShot].y <= this.y + 20 && this.z == 500) bossHit (gameShot, 0);
+                    if (gameShots [gameShot].x >= this.x - 27 && gameShots [gameShot].x <= this.x - 20 + gameShots [gameShot].speed / 2 && gameShots [gameShot].y >= this.y - 14 && gameShots [gameShot].y <= this.y + 14) bossHit (gameShot, 1);
+                    else if (gameShots [gameShot].x >= this.x - 14 && gameShots [gameShot].x <= this.x + 14 && gameShots [gameShot].y >= this.y - 27 && gameShots [gameShot].y <= this.y - 20 + gameShots [gameShot].speed / 2) bossHit (gameShot, 2);
+                    else if (gameShots [gameShot].x >= this.x + 20 - gameShots [gameShot].speed / 2 && gameShots [gameShot].x <= this.x + 27 && gameShots [gameShot].y >= this.y - 14 && gameShots [gameShot].y <= this.y + 14) bossHit (gameShot, 3);
+                    else if (gameShots [gameShot].x >= this.x - 14 && gameShots [gameShot].x <= this.x + 14 && gameShots [gameShot].y >= this.y + 20 - gameShots [gameShot].speed / 2 && gameShots [gameShot].y <= this.y + 27) bossHit (gameShot, 4);
+                    else if (gameShots [gameShot].x >= this.x - 20 && gameShots [gameShot].x <= this.x + 20 && gameShots [gameShot].y >= this.y - 20 && gameShots [gameShot].y <= this.y + 20) bossHit (gameShot, 0);
                 }
             }
             if (this.fire && (gameArea.frame - this.lastShotFrame >= this.weapons [this.weapon].fireRate))

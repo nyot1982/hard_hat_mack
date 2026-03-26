@@ -371,26 +371,6 @@ var fpsMonitor =
         },
         {
             screen: ["game"],
-            action: "change_weapon",
-            title: "Fire mode",
-            editable: true,
-            keyboard:
-            {
-                keys: [9] // Tabulator
-            },
-            gamepad:
-            {
-                buttons: [3, 8], // Y, Select
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [1],
-                axes: []
-            }
-        },
-        {
-            screen: ["game"],
             action: "fire",
             title: "Fire",
             editable: true,
@@ -409,26 +389,6 @@ var fpsMonitor =
                 axes: []
             }
         },
-        {
-            screen: ["game"],
-            action: "moveZ",
-            title: "Take off / Land",
-            editable: true,
-            keyboard:
-            {
-                keys: [17] // Control
-            },
-            gamepad:
-            {
-                buttons: [1, 2], // B, X
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [6],
-                axes: []
-            }
-        },        
         {
             screen: ["game"],
             action: "open_modal",
@@ -724,14 +684,13 @@ function updateGameArea ()
     }
     if (gameScreen == "game")
     {
-        gameItems = gameItems.filter (item => !item.taken || item.z > 0);
+        gameItems = gameItems.filter (item => !item.taken);
         gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
         if (gameModes.findIndex (mode => mode.active == true) == 1 && gameArea.frame % 250 == 0) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), 0, 0, Math.floor (Math.random () * 720) - 360));
         else if (gameModes.findIndex (mode => mode.active == true) == 2 && gameArea.frame % 500 == 0) gameItems.push (new item (0, Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height)));
         gameObjects = gameItems.concat (gameEnemies).concat (gameShips).concat (gameShots);
-        gameObjects.sort ((object1, object2) => object1.z - object2.z);
         if (enemies == 0 && gameModes.findIndex (mode => mode.active == true) < 2)
         {
             if (!gameBoss) gameBoss = new boss (0, gameMap.width / 2, gameMap.height / 2);

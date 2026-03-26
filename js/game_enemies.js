@@ -53,38 +53,26 @@ function enemy (type, x, y, heading)
     }
     if (this.type < 3)
     {
-        this.z = 500;
         this.move = this.speed;
         this.turn = 0;
         this.life = 10;
     }
-    else if (this.type == 7)
-    {
-        this.z = 500;
-        this.life = 10;
-    }
-    else
-    {
-        this.z = 0;
-        this.life = 100;
-    }
+    else if (this.type == 7) this.life = 10;
+    else this.life = 100;
 
     this.firing = function (active)
     {
-        if (this.z == 500) this.fire = active;
+        this.fire = active;
     }
 
     this.turning = function (turn)
     {
-        if (this.z > 0)
+        if (turn == 0) this.turn = 0;
+        else if (this.turn < 8 && this.turn > -8)
         {
-            if (turn == 0) this.turn = 0;
-            else if (this.turn < 8 && this.turn > -8)
-            {
-                if (turn < 0 && this.turn == 0) this.turn = -4;
-                else if (turn > 0 && this.turn == 0) this.turn = 4;
-                this.turn += turn;
-            }
+            if (turn < 0 && this.turn == 0) this.turn = -4;
+            else if (turn > 0 && this.turn == 0) this.turn = 4;
+            this.turn += turn;
         }
     }
 

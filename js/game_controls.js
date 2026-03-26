@@ -309,12 +309,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
                 case 'close_modal':
                     gameCloseModal ();
                 break;
-                case 'change_weapon':
-                    if (gameShip > -1) gameShips [gameShip].changeWeapon ();
-                break;
-                case 'moveZ':
-                    if (gameShip > -1) gameShips [gameShip].movingZ ();    
-                break;
                 case 'fire':
                     if (gameShip > -1) gameShips [gameShip].firing (true);
                 break;
@@ -399,7 +393,6 @@ function stopUserInteractions (gamePlayer)
             }
             gameShips [gameShip].firing (false);
             gameShips [gameShip].moving (0);
-            if (gameShips [gameShip].life == 0) gameShips [gameShip].movingZ (0);
             gameShips [gameShip].strafing (0);
             gameShips [gameShip].turning (0);
         }

@@ -64,7 +64,6 @@ function shot (name, weapon, color, x, y, width, height, speed, heading)
     this.color = color;
     this.x = x;
     this.y = y;
-    this.z = 50;
     this.width = width;
     this.height = height;
     this.speed = speed;
@@ -228,14 +227,13 @@ function item (enemy, x, y)
     else this.type = Math.floor (Math.random () * 6) + 4;
     this.x = x;
     this.y = y;
-    this.z = 500;
     this.taken = false;
     this.radius = 16;
     this.icons = ['solid/heart', 'solid/gas-pump', 'solid/crosshairs', 'solid/shield-halved', 'solid/clock', 'solid/burst', 'extra_life', 'P', 'K', 'H'];
 
     this.update = function ()
     {
-        if (!this.taken && this.z > 0)
+        if (!this.taken)
         {
             ctx = gameArea.ctx;
             ctx.lineWidth = 1;
@@ -263,7 +261,6 @@ function item (enemy, x, y)
                 ctx.fillStyle = "black";
                 ctx.fillText (this.icons [this.type], this.x, this.y);
             }
-            this.z--;
             this.radius -= (16 / 1000);
 
             for (var gameShip in gameShips)
@@ -295,15 +292,6 @@ function item (enemy, x, y)
                             if (gameShips [gameShip][vital] > 100) gameShips [gameShip][vital] = 100;        
                         }
                     }
-                }
-            }
-            if (this.z == 0)
-            {
-                gameHits.push (new hit ("hit0", this.x, this.y, 20, 1));
-                if (gameSound.active)
-                {
-                    gameSound.sounds ["hit1"].stop ();
-                    gameSound.sounds ["hit1"].play ();
                 }
             }
         }
