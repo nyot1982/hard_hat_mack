@@ -18,10 +18,6 @@ function ground (type, color, x, y, width, height)
     this.update = function ()
     {
         ctx = gameArea.ctx;
-        ctx.shadowColor = "transparent";
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
         ctx.beginPath ();
         if (this.type == "pattern")
         {
@@ -254,7 +250,6 @@ function ground (type, color, x, y, width, height)
 
 function squares (color1, color2, x, y, width, height, squareWidth, squareHeight, fill)
 {
-    ctx.shadowColor = "transparent";
     for (var i = 0, j = 0; j < height; i++)
     {
         if (i == width)

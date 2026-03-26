@@ -1,11 +1,10 @@
-function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weapons, engine1, engine2, engine1inc, engine2inc, shadowOffset, nameOffset, lifes, life, fuel, ammo, shield, score_xp, gunStatus, wing1Status, wing2Status, engine1Status, engine2Status, time)
+function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, engine1, engine2, engine1inc, engine2inc, lifes, life, fuel, ammo, shield, score_xp, gunStatus, wing1Status, wing2Status, engine1Status, engine2Status, time)
 {
     this.idShip = null;
     this.idControl = null;
     this.name = name || null;
     this.x = x || canvasWidth / 2;
     this.y = y || canvasHeight / 2;
-    this.z = z || 0;
     this.heading = heading || 0;
     this.moveSpeed = moveSpeed || 0;
     this.strafeSpeed = strafeSpeed || 0;
@@ -63,8 +62,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
     this.engine2max = 4;
     this.engine1inc = engine1inc || true;
     this.engine2inc = engine2inc || true;
-    this.shadowOffset = shadowOffset || (this.z == 500 ? 18 : 1);
-    this.nameOffset = nameOffset || (this.z == 500 ? 16 : 5);
     this.lifes = lifes || 5;
     this.life = life || 100;
     this.fuel = fuel || 100;
@@ -366,8 +363,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                     this.engine2 = 0;
                     this.engine1inc = true;
                     this.engine2inc = true;
-                    this.shadowOffset = 1;
-                    this.nameOffset = 5;  
                     this.life = 100;
                     this.fuel = 100;
                     this.ammo = 100;
@@ -537,10 +532,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 if (this.y < 0) this.y = 0;
                 else if (this.y > gameMap.height) this.y = gameMap.height;
                 ctx = gameArea.ctx;
-                ctx.shadowColor = "transparent";
-                ctx.shadowBlur = 3;
-                ctx.shadowOffsetX = this.shadowOffset;
-                ctx.shadowOffsetY = this.shadowOffset;
                 ctx.save ();
                 ctx.translate (this.x, this.y);
                 ctx.rotate (this.radians);
@@ -550,8 +541,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 ctx.transform ((this.z / 10 + 50) / 100, 0, 0, (this.z / 10 + 50) / 100, (this.width / 2) - (this.width * (this.z / 10 + 50) / 100 / 2), (this.height / 2) - (this.height * (this.z / 10 + 50) / 100 / 2));
                 if (this.z > 0)
                 {
-                    if (gameScreen == "game" && gameModal == null) ctx.shadowColor = "#00000044";
-                    else ctx.shadowColor = "transparent";
                     if (this.status.engine1)
                     {
                         ctx.beginPath ();
@@ -680,8 +669,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                     ctx.strokeStyle = engine2StrokeColor + "88";
                     ctx.stroke (this.paths.engine2);
                 }
-                if (gameScreen == "game" && gameModal == null) ctx.shadowColor = "#00000066";
-                else ctx.shadowColor = "transparent";
                 if (this.status.engine1 || this.repairing != null && gameArea.frame % 125 >= 0 && gameArea.frame % 50 < 10)
                 {
                     if (!this.status.engine1) ctx.fillStyle = engine1StrokeColor;
@@ -742,7 +729,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 if (this.z == 500) this.shotsHit ("cockpit");
                 ctx.rotate (45 * Math.PI / 180);
                 ctx.fillStyle = this.colors.lightFill;
-                ctx.shadowColor = "transparent";
                 ctx.lineWidth = 1;
                 if (this.colors.lightStroke != null) ctx.strokeStyle = this.colors.lightStroke;
                 else if (this.colors.pattern) ctx.strokeStyle = this.colors.negative + "66";
@@ -754,7 +740,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 {
                     this.paths.shield = new Path2D ();
                     this.paths.shield.arc (14, 19, 30, 0, 2 * Math.PI);
-                    ctx.shadowColor = "#00000022";
                     ctx.beginPath ();
                     ctx.lineWidth = 4;
                     ctx.strokeStyle = this.colors.shields [this.colors.shield] + "FF";
@@ -788,7 +773,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
             if (this.name)
             {
                 var textMeasure = 0;
-                ctx.shadowColor = "transparent";
                 if (this.z > 0 || this.ground != "snow")
                 {
                     ctx.textBaseline = "middle";
@@ -803,21 +787,21 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                     var nameMeasure = ctx.measureText (this.name);
                     nameMeasure = nameMeasure.width + textMeasure;
                     ctx.beginPath ();    
-                    ctx.rect (this.x - nameMeasure / 2 - 2, this.y - this.height / 2 - this.nameOffset, nameMeasure + 4, 10);
+                    ctx.rect (this.x - nameMeasure / 2 - 2, this.y - this.height / 2, nameMeasure + 4, 10);
                     ctx.fillStyle = this.colors.negative;
                     ctx.fill ();
                     ctx.fillStyle = this.colors.shipFill;
-                    ctx.fillText (this.name, this.x + (textMeasure == 0 ? 0 : textMeasure / 2 + 1), this.y - this.height / 2 - (this.nameOffset - 6));
+                    ctx.fillText (this.name, this.x + (textMeasure == 0 ? 0 : textMeasure / 2 + 1), this.y - this.height / 2);
                     if (this.xp != null)
                     {
                         ctx.textAlign = "left";
                         ctx.font = "5px PressStart2P";
                         ctx.beginPath ();
-                        ctx.rect (this.x - nameMeasure / 2 - 1, this.y - this.height / 2 - this.nameOffset + 1, textMeasure, 8);
+                        ctx.rect (this.x - nameMeasure / 2 - 1, this.y - this.height / 2, textMeasure, 8);
                         ctx.fillStyle = this.colors.shipFill;
                         ctx.fill ();
                         ctx.fillStyle = this.colors.negative;
-                        ctx.fillText (Math.floor (this.xp / 100), this.x - nameMeasure / 2 - 1, this.y - this.height / 2 - this.nameOffset + 5.5);
+                        ctx.fillText (Math.floor (this.xp / 100), this.x - nameMeasure / 2 - 1, this.y - this.height / 2);
                     }
                     if (this.name == players [0].name)
                     {
@@ -835,11 +819,11 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                     if (this.repairing != null)
                     {
                         ctx.beginPath ();
-                        ctx.rect (this.x - 50 / 2, this.y + this.nameOffset + 10, 50, 5);
+                        ctx.rect (this.x - 50 / 2, this.y + 10, 50, 5);
                         ctx.fillStyle = this.colors.negative;
                         ctx.fill ();
                         ctx.beginPath ();
-                        ctx.rect (this.x - 50 / 2, this.y + this.nameOffset + 10, Math.round ((gameArea.frame - this.repairing) * 50 / 500), 5);
+                        ctx.rect (this.x - 50 / 2, this.y + 10, Math.round ((gameArea.frame - this.repairing) * 50 / 500), 5);
                         ctx.fillStyle = this.colors.shipFill;
                         ctx.fill ();
                     }
@@ -886,23 +870,11 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                     }
                     else if (this.fuel > 0)
                     {
-                        ctx.shadowOffsetX = this.shadowOffset;
-                        ctx.shadowOffsetY = this.shadowOffset;
                         if (gameArea.frame % (60 - (Math.abs (this.moveSpeed) > Math.abs (this.strafeSpeed) ? Math.abs (this.moveSpeed * 5) : Math.abs (this.strafeSpeed * 5))) == 0)
                         {
                             this.fuel--;
                         }
                     }
-                }
-                else if (this.z < 500 && this.moveZ > 0)
-                {
-                    this.shadowOffset += (18 / 50);
-                    this.nameOffset += (16 / 50);
-                }
-                else if (this.z > 0 && this.moveZ < 0)
-                {
-                    this.shadowOffset -= (18 / 50);
-                    this.nameOffset -= (16 / 50);
                 }
                 if (this.z == 0 && this.ground == "water")
                 {

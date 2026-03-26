@@ -85,11 +85,6 @@ function shot (name, weapon, color, x, y, width, height, speed, heading)
             this.y -= this.move * Math.cos (this.radians);
 
             ctx = gameArea.ctx;
-            if (gameModal != "menu" && gameScreen != "menu") ctx.shadowColor = "#00000022";
-            else ctx.shadowColor = "transparent";
-            ctx.shadowBlur = 3;
-            ctx.shadowOffsetX = 18;
-            ctx.shadowOffsetY = 18;
             ctx.save ();
             ctx.translate (this.x, this.y);
             ctx.rotate (this.radians);
@@ -132,7 +127,6 @@ function shot (name, weapon, color, x, y, width, height, speed, heading)
                 ctx.arc (0, 0, this.width, 0, 2 * Math.PI);
                 ctx.fillStyle = "#4A4A4A";
                 ctx.fill ();
-                ctx.shadowColor = "transparent";
                 ctx.beginPath ();
                 ctx.lineWidth = this.width / 2;
                 ctx.arc (0, 0, this.width / 2, 0, 2 * Math.PI);
@@ -214,10 +208,6 @@ function hit (name, x, y, radius, add)
             else if (this.r < this.radius) this.r += this.add;
             else this.reverse = true;
             ctx = gameArea.ctx;
-            ctx.shadowColor = "transparent";
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
             ctx.beginPath ();
             ctx.arc (this.x, this.y, this.r, 0, 2 * Math.PI);
             ctx.fillStyle = this.colors [this.color];
@@ -241,7 +231,6 @@ function item (enemy, x, y)
     this.z = 500;
     this.taken = false;
     this.radius = 16;
-    this.shadowOffset = 18;
     this.icons = ['solid/heart', 'solid/gas-pump', 'solid/crosshairs', 'solid/shield-halved', 'solid/clock', 'solid/burst', 'extra_life', 'P', 'K', 'H'];
 
     this.update = function ()
@@ -251,11 +240,6 @@ function item (enemy, x, y)
             ctx = gameArea.ctx;
             ctx.lineWidth = 1;
             ctx.strokeStyle = "#000000CC";
-            if (gameModal != "menu" && gameScreen != "menu") ctx.shadowColor = "#00000066";
-            else ctx.shadowColor = "transparent";
-            ctx.shadowBlur = 3;
-            ctx.shadowOffsetX = this.shadowOffset;
-            ctx.shadowOffsetY = this.shadowOffset;
             ctx.beginPath ();
             ctx.arc (this.x, this.y, this.radius, 0, 2 * Math.PI);
             var grad = ctx.createRadialGradient (this.x, this.y, this.radius / 2, this.x, this.y, this.radius);
@@ -264,7 +248,6 @@ function item (enemy, x, y)
             ctx.fillStyle = grad;
             ctx.fill ();
             ctx.stroke ();
-            ctx.shadowColor = "transparent";
             if (this.type < 7)
             {
                 this.image = new Image ();
@@ -282,7 +265,6 @@ function item (enemy, x, y)
             }
             this.z--;
             this.radius -= (16 / 1000);
-            this.shadowOffset -= (18 / 500);
 
             for (var gameShip in gameShips)
             {
@@ -357,10 +339,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
     this.update = function (idComponent)
     {
         ctx = gameArea.ctx;
-        ctx.shadowColor = "transparent";
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
         if (this.type == "image") ctx.drawImage (this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         else if (this.type == "rect")
         {

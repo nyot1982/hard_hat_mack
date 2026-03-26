@@ -187,10 +187,6 @@ function boss (type, x, y)
                     else this.y += this.moveY;
                 }
                 ctx = gameArea.ctx;
-                ctx.shadowColor = "transparent";
-                ctx.shadowBlur = 3;
-                ctx.shadowOffsetX = 18;
-                ctx.shadowOffsetY = 18;
                 ctx.save ();
                 ctx.translate (this.x, this.y);
                 ctx.translate (-(this.width / 2), -(this.height / 2));
@@ -202,10 +198,8 @@ function boss (type, x, y)
                 this.ctx = this.canvas.getContext ("2d");
                 this.canvas.width = 7;
                 this.canvas.height = 28;
-                this.ctx.shadowColor = "#00000066";
                 this.ctx.fillStyle = "#000";
                 this.ctx.fillRect (0, 0, 7, 28);
-                this.ctx.shadowColor = "transparent";
                 this.ctx.fillStyle = "#4A4A4A";
                 this.ctx.fillRect (0, 14, 7, 14);
                 if (this.engine1Life == 0)
@@ -221,10 +215,8 @@ function boss (type, x, y)
                 this.ctx = this.canvas.getContext ("2d");
                 this.canvas.width = 28;
                 this.canvas.height = 7;
-                this.ctx.shadowColor = "#00000066";
                 this.ctx.fillStyle = "#000";
                 this.ctx.fillRect (0, 0, 28, 7);
-                this.ctx.shadowColor = "transparent";
                 this.ctx.fillStyle = "#4A4A4A";
                 this.ctx.fillRect (14, 0, 14, 7);
                 if (this.engine2Life == 0) this.ctx.clearRect (0, 4, 7, 3);
@@ -233,7 +225,6 @@ function boss (type, x, y)
                 ctx.fill (this.paths.engine2);
                 this.paths.boss = new Path2D ();
                 this.paths.boss.rect (15, 15, 40, 40);
-                ctx.shadowColor = "#00000066";
                 ctx.fillStyle = "#8C3C94";
                 ctx.fill (this.paths.boss);
                 this.paths.engine3 = new Path2D ();
@@ -241,10 +232,8 @@ function boss (type, x, y)
                 this.ctx = this.canvas.getContext ("2d");
                 this.canvas.width = 7;
                 this.canvas.height = 28;
-                this.ctx.shadowColor = "#00000066";
                 this.ctx.fillStyle = "#000";
                 this.ctx.fillRect (0, 0, 7, 28);
-                this.ctx.shadowColor = "transparent";
                 this.ctx.fillStyle = "#4A4A4A";
                 this.ctx.fillRect (0, 14, 7, 14);
                 if (this.engine3Life == 0) this.ctx.clearRect (0, 4, 7, 3);
@@ -256,17 +245,14 @@ function boss (type, x, y)
                 this.ctx = this.canvas.getContext ("2d");
                 this.canvas.width = 28;
                 this.canvas.height = 7;
-                this.ctx.shadowColor = "#00000066";
                 this.ctx.fillStyle = "#000";
                 this.ctx.fillRect (0, 0, 28, 7);
-                this.ctx.shadowColor = "transparent";
                 this.ctx.fillStyle = "#4A4A4A";
                 this.ctx.fillRect (14, 0, 14, 7);
                 if (this.engine4Life == 0) this.ctx.clearRect (7, 0, 7, 3);
                 this.pattern = ctx.createPattern (this.canvas, "repeat");
                 ctx.fillStyle = this.pattern;
                 ctx.fill (this.paths.engine4);
-                ctx.shadowColor = "transparent";
                 ctx.fillStyle = "#4A4A4A";
                 ctx.fillRect (22, 22, 26, 26);
                 ctx.lineWidth = 6;
@@ -287,7 +273,6 @@ function boss (type, x, y)
                 ctx.strokeStyle = "#8C3C94";
                 ctx.stroke ();
                 ctx.beginPath ();
-                ctx.shadowColor = "#00000066";
                 ctx.moveTo (53, 17);
                 ctx.lineTo (70, 0);
                 ctx.moveTo (17, 53);
@@ -296,7 +281,6 @@ function boss (type, x, y)
                 ctx.lineTo (70, 70);
                 ctx.stroke ();
                 ctx.beginPath ();
-                ctx.shadowColor = "transparent";
                 ctx.strokeStyle = "#000";
                 ctx.lineWidth = 3;
                 ctx.moveTo (69, -1);
@@ -336,7 +320,6 @@ function boss (type, x, y)
                         if (this.engine2 == 0) this.engine2inc = true;
                     }
                 }
-                ctx.shadowColor = "#00000044";
                 if (this.engine3Life > 0)
                 {
                     ctx.beginPath ();

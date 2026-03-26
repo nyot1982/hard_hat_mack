@@ -133,10 +133,6 @@ function enemy (type, x, y, heading)
                         this.enginemax = this.speed / 1.5 * 8;
                     }
                 }
-                ctx.shadowColor = "#00000066";
-                ctx.shadowBlur = 3;
-                ctx.shadowOffsetX = 18;
-                ctx.shadowOffsetY = 18;    
             }
             else
             {
@@ -149,7 +145,6 @@ function enemy (type, x, y, heading)
                         else this.fire = true;
                     } 
                 }
-                ctx.shadowColor = "transparent";
             }
             ctx.save ();
             ctx.translate (this.x, this.y);
@@ -176,7 +171,6 @@ function enemy (type, x, y, heading)
                 ctx.stroke ();
                 ctx.fillStyle = "#4A4A4A";
                 ctx.fill ();
-                ctx.shadowColor = "transparent";
                 ctx.beginPath ();
                 ctx.arc (12, 18, 3, 0, 2 * Math.PI);
                 ctx.strokeStyle = "#C2C2C2";
@@ -184,7 +178,6 @@ function enemy (type, x, y, heading)
                 ctx.fillStyle = "black";
                 ctx.fill ();
                 ctx.beginPath ();
-                ctx.shadowColor = "#00000044";
                 ctx.fillStyle = "#D88F95EE";
                 ctx.ellipse (12, 29, 2, this.engine, 0, 0, Math.PI);
                 ctx.fill ();
@@ -209,7 +202,6 @@ function enemy (type, x, y, heading)
                 ctx.fillStyle = "#4A4A4A";
                 ctx.fill ();
                 ctx.beginPath ();
-                ctx.shadowColor = "transparent";
                 ctx.lineWidth = 0;
                 ctx.moveTo (10.5, 6);
                 ctx.lineTo (13, 6);
@@ -241,7 +233,6 @@ function enemy (type, x, y, heading)
                 ctx.strokeStyle = "black";
                 ctx.stroke ();
                 ctx.beginPath ();
-                ctx.shadowColor = "#00000044";
                 ctx.fillStyle = "#D88F95EE";
                 ctx.ellipse (9, 33, 2, this.engine, 0, 0, Math.PI);
                 ctx.ellipse (17, 33, 2, this.engine, 0, 0, Math.PI);
@@ -281,7 +272,6 @@ function enemy (type, x, y, heading)
                 ctx.lineTo (22, 12);
                 ctx.lineTo (26, 22);
                 ctx.stroke ();
-                ctx.shadowColor = "transparent";
                 ctx.beginPath ();
                 ctx.lineWidth = 5;
                 ctx.arc (17, 17, 13, 0, 2 * Math.PI);
@@ -367,7 +357,6 @@ function enemy (type, x, y, heading)
             }
             else if (this.type == 4)
             {
-                ctx.shadowColor = "transparent";
                 ctx.translate (-8, 10);
                 ctx.rotate (-(45 * Math.PI / 180));
                 ctx.beginPath ();
@@ -540,7 +529,6 @@ function enemy (type, x, y, heading)
             }
             else if (this.type == 5)
             {
-                ctx.shadowColor = "transparent";
                 ctx.beginPath ();
                 ctx.lineWidth = 0;
                 ctx.moveTo (20, 0);
@@ -645,7 +633,6 @@ function enemy (type, x, y, heading)
             }
             else if (this.type == 6)
             {
-                ctx.shadowColor = "transparent";
                 ctx.beginPath ();
                 ctx.lineWidth = 8;
                 ctx.moveTo (0, 2);
@@ -720,13 +707,11 @@ function enemy (type, x, y, heading)
             else if (this.type == 7)
             {
                 ctx.translate  (this.width / 2, this.height / 2);
-                ctx.shadowColor = "transparent";
                 ctx.beginPath ();
                 ctx.lineWidth = 4;
                 ctx.arc (0, 0, 8, 0, 2 * Math.PI);
                 ctx.strokeStyle = "#4A4A4A";
                 ctx.stroke ();
-                ctx.shadowColor = "#00000066";
                 ctx.fillStyle = "#000";
                 ctx.fill ();
                 ctx.beginPath ();
@@ -751,7 +736,6 @@ function enemy (type, x, y, heading)
                 ctx.beginPath ();
                 ctx.lineWidth = 0;
                 ctx.arc (0, 0, 2, 0, 2 * Math.PI);
-                ctx.shadowColor = "transparent";
                 ctx.fillStyle = "#4A4A4A";
                 ctx.fill ();
             }
