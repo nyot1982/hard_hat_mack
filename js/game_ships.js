@@ -975,11 +975,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 else if (this.x > gameMap.width) this.x = gameMap.width;
                 if (this.y < 0) this.y = 0;
                 else if (this.y > gameMap.height) this.y = gameMap.height;
-                if (gameScreen == "game" && gameModal == null)
-                {
-                    if (this.name == players [0].name) mapHud ("mapItemPlayer", this.x, this.y, this.heading);
-                    else mapHud ("mapItem", this.x, this.y, this.heading);
-                }
                 ctx = gameArea.ctx;
                 ctx.shadowColor = "transparent";
                 ctx.shadowBlur = 3;

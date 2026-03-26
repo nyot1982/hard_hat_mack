@@ -186,7 +186,6 @@ function boss (type, x, y)
                     else if (this.y + this.moveY > gameMap.height - 70) this.y = gameMap.height - 70;
                     else this.y += this.moveY;
                 }
-                if (gameScreen == "game" && gameModal == null) mapHud ('bossItem', this.x, this.y);
                 ctx = gameArea.ctx;
                 ctx.shadowColor = "transparent";
                 ctx.shadowBlur = 3;

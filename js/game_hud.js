@@ -76,26 +76,6 @@ function usersPlayingHud ()
     }
 }
 
-function mapHud (itemClass, x, y, heading)
-{
-    var mapHud = document.getElementById ("mapHud"),
-        mapItem = document.createElement ('div'),
-        offSetX = 5.45,
-        offSetY = 5.5;
-    
-    if (itemClass == "mapItem") offSetX = 6.17;
-    else if (itemClass == "enemyItem") offSetX = 5.65;
-    else if (itemClass == "enemyItem2" || itemClass == "enemyItem3" || itemClass == "bossItem") mapItem.setAttribute ('class', itemClass);
-    if (itemClass != "enemyItem2" && itemClass != "enemyItem3" && itemClass != "bossItem")
-    {
-        mapItem.setAttribute ('class', 'fa fa-location-arrow ' + itemClass);
-        mapItem.style.transform = 'rotate(' + (heading - 45) + 'deg)';
-    }
-    mapItem.style.left = (x / (gameMap.width / (canvasWidth * 4 / 29)) + offSetX) + "px";
-    mapItem.style.top = (y / (gameMap.height / (canvasHeight * 4 / 29)) + offSetY) + "px";
-    mapHud.appendChild (mapItem, mapHud.childNodes [0]);
-}
-
 function gameModeHud (gameMode)
 {
     $("#mode").addClass ("change");

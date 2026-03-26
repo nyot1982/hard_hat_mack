@@ -948,8 +948,6 @@ function updateGameArea ()
 {
     if (fpsMonitor.time > 0) fpsHud ("update");
     controls ();
-    var mapHud = document.getElementById ("mapHud");
-    mapHud.innerHTML = '<table cellspacing="0"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table>';
     gameArea.clear ();
     for (var ground in gameGround) gameGround [ground].update ();
     if (gameScreen == "start")

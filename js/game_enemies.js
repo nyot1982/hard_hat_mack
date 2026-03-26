@@ -151,7 +151,6 @@ function enemy (type, x, y, heading)
                 }
                 ctx.shadowColor = "transparent";
             }
-            if (gameScreen == "game" && gameModal == null) mapHud ((this.type < 3 ? 'enemyItem' : this.type < 7 ? 'enemyItem2' : 'enemyItem3'), this.x, this.y, this.heading);
             ctx.save ();
             ctx.translate (this.x, this.y);
             if (this.type == 6) ctx.translate (4, 4);
