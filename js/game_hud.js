@@ -22,60 +22,6 @@ function resetHuds ()
     if (gameModes.findIndex (mode => mode.active == true) > -1) gameModeHud (-1);
 }
 
-function usersPlayingHud ()
-{
-    var element = document.getElementById ("lifesHud");
-    if (element.innerHTML == "")
-    {
-        element.style.minWidth = null;
-        element.style.display = null;
-        element.style.gridTemplateColumns = null;
-        element.style.padding = null;
-        element.style.cursor = "pointer";
-        element.innerHTML = '<img title="Number of players in game" src="svgs/ship.svg"/> <span id="usersPlaying" title="Number of players in game">' + gameShips.length + '</span> <a id="mouse_interaction" title="Mouse interaction" class="fa fa-mouse fa-beat interaction" style="color: var(--color10); cursor: pointer;"></a>';
-        usersPlayingDetails = 0;
-    }
-    else
-    {
-        if (usersPlayingDetails == 0 && gameShips.length != document.getElementById ("usersPlaying").textContent * 1)
-        {
-            if (gameShips.length > document.getElementById ("usersPlaying").textContent * 1) document.getElementById ("usersPlaying").style.color = "var(--color-7)";
-            else document.getElementById ("usersPlaying").style.color = "var(--color-6)";
-            document.getElementById ("usersPlaying").className = "change";
-            document.getElementById ("usersPlaying").textContent = gameShips.length;
-            setTimeout
-            (
-                () =>
-                {
-                    document.getElementById ("usersPlaying").style.color = null;
-                    document.getElementById ("usersPlaying").className = "";
-                },
-                250
-            );
-        }
-        else if (usersPlayingDetails == 1)
-        {
-            element.innerHTML = '<span id="usersPlayingDiv"></span> <a id="mouse_interaction" title="Mouse interaction" class="fa fa-mouse fa-beat interaction" style="color: var(--color10); cursor: pointer;"></a>';
-            element.style.height = (23 * gameShips.length) + "px";
-            usersPlayingDetails = 2;
-        }
-        else if (usersPlayingDetails == 2)
-        {
-            element = document.getElementById ("usersPlayingDiv");
-            element.innerHTML = '';
-            gameShipsXP = gameShips;
-            gameShipsXP.sort ((ship1, ship2) => ship2.xp - ship1.xp);
-            for (var ship in gameShipsXP) element.innerHTML += (ship > 0 ? '<br>' : '') + gameShipsXP [ship].shipHuds ("userPlaying" + ship, "Ship") + ' <span style="color: var(--color1);" title="Level">' + Math.floor (gameShipsXP [ship].xp / 100) + '</span> <span title="Name">' + gameShipsXP [ship].name + '</span>';
-        }
-        else if (usersPlayingDetails == -1)
-        {
-            element.innerHTML = '<img title="Number of players in game" src="svgs/ship.svg"/> <span id="usersPlaying" title="Number of players in game">' + gameShips.length + '</span> <a id="mouse_interaction" title="Mouse interaction" class="fa fa-mouse fa-beat interaction" style="color: var(--color10); cursor: pointer;"></a>';
-            element.style.height = "23px";
-            usersPlayingDetails = 0;
-        }
-    }
-}
-
 function gameModeHud (gameMode)
 {
     $("#mode").addClass ("change");

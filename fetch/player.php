@@ -7,6 +7,6 @@
     else header ("Content-type: application/json");
 
     $return ["error"] = 'name_exists';
-    $return ["player"] = [ 'name' => $_POST ['name'], 'color' => $_POST ['color'], 'skin' => $_POST ['skin'] ];
+    $return ["player"] = [ 'name' => $_POST ['name'], 'color' => $_POST ['color'] ];
          
     echo json_encode ($return);

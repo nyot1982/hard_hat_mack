@@ -22,7 +22,6 @@
         <script type="text/javascript" src="js/game_scripts.js"></script>
         <script type="text/javascript" src="js/game_screen.js"></script>
         <script type="text/javascript" src="js/game_controls.js"></script>
-        <script type="text/javascript" src="js/game_multiplayer.js"></script>
         <script type="text/javascript" src="js/game_ground.js"></script>
         <script type="text/javascript" src="js/game_ships.js"></script>
         <script type="text/javascript" src="js/game_enemies.js"></script>

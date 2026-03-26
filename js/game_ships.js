@@ -132,25 +132,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 "#73CFCE",
                 "#A53C9A"
             ],
-            skin: null,
             pattern: null
-        }
-        if (this.colors.shipFill.substring (0, 4) == "skin")
-        {
-            this.colors.skin = this.colors.shipFill.substring (4, this.colors.shipFill.length);
-            this.colors.shipFill = skins [this.colors.skin].shipFill;
-            this.colors.gunFill = skins [this.colors.skin].gunFill;
-            this.colors.hook1Fill = skins [this.colors.skin].hook1Fill;
-            this.colors.hook2Fill = skins [this.colors.skin].hook2Fill;
-            this.colors.wing1Fill = skins [this.colors.skin].wing1Fill;
-            this.colors.wing2Fill = skins [this.colors.skin].wing2Fill;
-            this.colors.engine1Fill = skins [this.colors.skin].engine1Fill;
-            this.colors.engine2Fill = skins [this.colors.skin].engine2Fill;
-            this.colors.shipStroke = skins [this.colors.skin].shipStroke;
-            this.colors.engine1Stroke = skins [this.colors.skin].engine1Stroke;
-            this.colors.engine2Stroke = skins [this.colors.skin].engine2Stroke;
-            this.colors.lightStroke = skins [this.colors.skin].lightStroke;
-            if (skins [this.colors.skin].image != null) this.colors.pattern = ctx.createPattern (skins [this.colors.skin].image, "repeat");
         }
         if (tinycolor (this.colors.shipFill).isDark ()) this.colors.near = tinycolor (this.colors.shipFill).lighten (15).toHexString ();
         else this.colors.near = tinycolor (this.colors.shipFill).darken (15).toHexString ();
@@ -187,7 +169,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
 
     this.turning = function (turn)
     {
-        if (gameScreen == "menu" || gameScreen == "skins")
+        if (gameScreen == "menu")
         {
             if (turn == 0) this.turn = 0;
             else if (this.turn == 0) this.turn = turn;
@@ -606,43 +588,6 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
         }
     }
 
-    this.shipHuds = function (id, title)
-    {
-        if (gameModes.findIndex (mode => mode.active == true) == 0) return '<img id="' + id + '"' + (title != null ? ' title="' + title + '"' : '') + ' src="svgs/ship.svg"/>';
-        else
-        {
-            if (this.colors.skin)
-            {
-                if (skins [this.colors.skin].image != null)
-                {
-                    var skin = '<defs><pattern id="skin-' + id + '" patternUnits="userSpaceOnUse" width="27" height="30"><image href="skins/' + this.colors.skin + '.png" x="0" y="0" width="27" height="30" /></pattern></defs>';
-                    var shipFill = 'url(#skin-' + id + ')';
-                }
-                else
-                {
-                    var skin = "";
-                    var shipFill = null;
-                }
-            }
-            else
-            {
-                var skin = "";
-                var shipFill = this.colors.shipFill;
-            }
-            if (shipFill != null) skin += '<g><path fill="' + shipFill + '" d="m12 3c0 1.7-0.5 3-1 3-0.6 0-1 1.2-1 2.8 0 1.6-0.8 3.3-2 4.2-1.1 0.8-2 2.3-2 3.3 0 0.9-0.4 1.7-1 1.7-0.6 0-1-2.3-1-5 0-2.8-0.4-5-1-5-0.6 0-1 0.9-1 2 0 1.1-0.4 2-1 2-0.6 0-1 3.7-1 9 0 5 0.3 9 0.8 9 0.4 0 1.4-0.9 2.2-2 0.8-1.1 1.8-2 2.3-2 0.4 0 0.7 0.9 0.7 2q0 2 2 2c1.1 0 2-0.5 2-1 0-0.5 1.6-1 3.5-1 1.9 0 3.5 0.5 3.5 1 0 0.5 0.9 1 2 1q2 0 2-2c0-1.1 0.3-2 0.8-2 0.4 0 1.4 0.9 2.2 2 0.8 1.1 1.8 2 2.3 2 0.4 0 0.7-4 0.7-9 0-5.3-0.4-9-1-9-0.5 0-1-0.9-1-2 0-1.1-0.5-2-1-2-0.5 0-1 2.3-1 5 0 2.8-0.5 5-1 5-0.5 0-1-0.8-1-1.7 0-1-0.9-2.5-2-3.3-1.2-0.9-2-2.6-2-4.3 0-1.5-0.5-2.7-1-2.7-0.5 0-1-1.3-1-3q0-3-1.5-3-1.5 0-1.5 3 z"/>';
-            else skin = '<g><path fill="' + skins [this.colors.skin].engine1Fill + '" d="m 6 28 q 0 2 2 2 c 1.1 0 2 -0.5 2 -2 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].engine2Fill + '" d="m 17 28 c 0 1.5 1 2 2 2 q 2 0 2 -2 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].hook1Fill + '" d="m 6 16.3 c 0 0.9 -0.4 1.7 -1 1.7 c -0.6 0 -1 -2.3 -1 -5 l 0 13.8 c 0 0 0.8 -0.8 1.3 -0.8 c 0.4 0 0.7 0.9 0.7 2 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].hook2Fill + '" d="m 21 28 c 0 -1.1 0.3 -2 0.8 -2 c 0.4 0 1.2 0.7 1.2 0.7 l 0 -13.7 c 0 2.8 -0.5 5 -1 5 c -0.5 0 -1 -0.8 -1 -1.7 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].gunFill + '" d="m 12 3 c 0 1.7 -0.5 3 -1 3 c -0.6 0 -1 1.2 -1 2.8 c 0 1.6 -0.8 3.3 -2 4.2 L 19 13 c -1.2 -0.9 -2 -2.6 -2 -4.3 c 0 -1.5 -0.5 -2.7 -1 -2.7 c -0.5 0 -1 -1.3 -1 -3 q 0 -3 -1.5 -3 q -1.5 0 -1.5 3 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].shipFill + '" d="m 8 13 c -1.1 0.8 -2 2.3 -2 3.3 l 0 11.7 l 15 0 l 0 -11.7 c 0 -1 -0.9 -2.5 -2 -3.3 l -11 0 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].wing1Fill + '" d="m 4 13 c 0 -2.8 -0.4 -5 -1 -5 c -0.6 0 -1 0.9 -1 2 c 0 1.1 -0.4 2 -1 2 c -0.6 0 -1 3.7 -1 9 c 0 5 0.3 9 0.8 9 c 0.4 0 1.4 -0.9 2.2 -2 l 1 -1.2 z"/>' +
-                        '<path fill="' + skins [this.colors.skin].wing2Fill + '" d="m 23 26.8 l 1 1.3 c 0.8 1.1 1.8 2 2.3 2 c 0.4 0 0.7 -4 0.7 -9 c 0 -5.3 -0.4 -9 -1 -9 c -0.5 0 -1 -0.9 -1 -2 c 0 -1.1 -0.5 -2 -1 -2 c -0.5 0 -1 2.3 -1 5 z"/>';
-            return '<svg id="' + id + '" version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27 30" style="background-color: ' + this.colors.negative + '; border: solid 2px ' + this.colors.negative + ';">' + (title != null ? '<title>' + title + '</title>' : '') +
-                    skin + '<path fill="#7b797b" d="m10.3 16.6c-1.3 1.3-2.3 2.8-2.3 3.4 0 0.5 1.1 2.1 2.5 3.5 1.4 1.4 2.7 2.5 3 2.5 0.3 0 1.7-1.1 3-2.5 1.4-1.4 2.5-3 2.5-3.5 0-0.6-1.1-2.1-2.5-3.5-1.4-1.4-2.8-2.5-3.3-2.4-0.4 0-1.7 1.1-3 2.5 z"/></g></svg>';
-        }
-    }
-
     this.scoreHud = function ()
     {
         var element = document.getElementById ("score-" + this.name + "-span");
@@ -984,11 +929,10 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 ctx.translate (this.x, this.y);
                 ctx.rotate (this.radians);
                 ctx.translate (-(this.width / 2), -(this.height / 2));
-                if (gameScreen == "skins" && players [0].skins.findIndex (skin => skin == this.colors.skin) == -1) ctx.globalAlpha = 0.25;
-                else if (this.z < 0) ctx.globalAlpha = 0.5;
+                if (this.z < 0) ctx.globalAlpha = 0.5;
                 else ctx.globalAlpha = 1;
                 ctx.transform ((this.z / 10 + 50) / 100, 0, 0, (this.z / 10 + 50) / 100, (this.width / 2) - (this.width * (this.z / 10 + 50) / 100 / 2), (this.height / 2) - (this.height * (this.z / 10 + 50) / 100 / 2));
-                if (this.z > 0 && (gameScreen != "skins" || this.colors.skin == skinSel))
+                if (this.z > 0)
                 {
                     if (gameScreen == "game" && gameModal == null) ctx.shadowColor = "#00000044";
                     else ctx.shadowColor = "transparent";
@@ -1218,7 +1162,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 {
                     if (this.colors.lightFill == "#7B797B")
                     {
-                        if (gameModal == "menu" || gameScreen == "menu" || gameScreen == "skins") this.colors.lightFill = this.colors.weapons [4];
+                        if (gameModal == "menu" || gameScreen == "menu") this.colors.lightFill = this.colors.weapons [4];
                         else this.colors.lightFill = this.colors.weapons [this.weapon];
                     }
                     else this.colors.lightFill = "#7B797B";

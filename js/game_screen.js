@@ -83,7 +83,6 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [6].y + 25, "left", 10));
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [7].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
-        gameText.push (new component ("traffic", "", "", 645, 295, 12, 28, null, null, ""));
         menuShip = new ship (null, playerColors [0], 450, gameText [0].y + 15, 500, 90);
         if (gameScreen == "menu")
         {
@@ -100,34 +99,6 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
         fetchLoad ("high_scores");
         changeTab ("alert");
-    }
-    else if (gameScreen == "skins")
-    {
-        var x = 60, y = 42, color = null;
-        gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        for (var skin in skins)
-        {
-            gameShips.push (new ship (null, "skin" + skin, x, y - 23, 500));
-            if (skin == skinSel)
-            {
-                gameShips [gameShips.length - 1].turning (-1);
-                if (players [0].skins.findIndex (skin2 => skin2 == skin) > -1) color = "#0C0";
-                else color = "red";
-            }
-            else
-            {
-                if (players [0].skins.findIndex (skin2 => skin2 == skin) > -1) color = "white";
-                else color = "yellow";
-            }
-            gameText.push (new component ("text", skins [skin].name, color, x, y, "center", 8, 80));
-            x += 100;
-            if (x % 1060 == 0)
-            {
-                x = 60;
-                y += 50;
-            }
-        }
-        changeTab ("skins");
     }
     else if (gameScreen == "intro" || gameScreen == "game_over" || gameScreen == "game_completed")
     {

@@ -339,7 +339,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
         this.image.src = this.src;
     }
     else if (this.type == "type") this.typeFrame = 1;
-    else if (this.type == "traffic") this.traffic = [];
     this.x = x;
     this.y = y;
     this.width = width;
@@ -351,8 +350,7 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
     if (this.rollover != null)
     {
         var rollovers = document.getElementById ("rollovers");
-        if (this.rollover == "") this.idRollover = "traffic";
-        else this.idRollover = rollovers.childElementCount;
+        this.idRollover = rollovers.childElementCount;
         rollovers.innerHTML += '<div class="rollover" id="rollover_' + this.idRollover + '" style="background-color: ' + (this.rolloverColor || "#FFFFFF") + 'DD; border-color: ' + (this.rolloverColor  || "white" ) + ';">' + this.rollover + '</div>';
     }
 
@@ -378,70 +376,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
             ctx.fillStyle = this.color;
             ctx.fill ();
         }
-        else if (this.type == "traffic")
-        {
-            if (wss != null && wss.readyState == WebSocket.OPEN)
-            {
-                this.traffic = ["#300", "#330", "#0C0"];
-                this.rollover = "Server is up";
-                this.rolloverColor = "#00CC00";
-                if (gameText [gameText.length - 1].type == "traffic")
-                {
-                    gameText.push (new component ("image", "svgs/user.svg", "", 661, 295, 10, 10, null, null, "Number of players in game", "#FFA500"));
-                    gameText.push (new component ("text", "usersPlaying", "orange", 670, 295, "left", 10, null, null, "Number of players in game", "#FFA500"));
-                }
-            }
-            else
-            {
-                if (wss >= 1000)
-                {
-                    this.traffic = ["red", "#330", "#030"];
-                    this.rollover = "Server is down";
-                    this.rolloverColor = "#FF0000";
-                }
-                else
-                {
-                    if (this.traffic.length == 0) this.traffic = ["#300", "yellow", "#030"];
-                    if (gameArea.frame % 20 == 0)
-                    {
-                        if (this.traffic [1] == "yellow") this.traffic = ["#300", "#330", "#030"];
-                        else if (this.traffic [1] == "#330") this.traffic = ["#300", "yellow", "#030"];
-                    }
-                    this.rollover = "Starting server...";
-                    this.rolloverColor = "#FFFF00";
-                }
-                if (gameText [gameText.length - 1].src == "usersPlaying")
-                {
-                    gameText.pop ();
-                    gameText.pop ();
-                }
-            }
-            var rollover = document.getElementById ("rollover_" + this.idRollover);
-            rollover.innerHTML = this.rollover;
-            rollover.style.borderColor = this.rolloverColor;
-            rollover.style.backgroundColor = this.rolloverColor+ "DD";
-            this.path = new Path2D ();
-            this.path.roundRect (this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, 2 * Math.PI);
-            ctx.fillStyle = "#888";
-            ctx.fill (this.path);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "#333";
-            ctx.beginPath ();
-            ctx.arc (this.x - this.width / 2 + 6, this.y - this.height / 2 + 6, 3, 0, 2 * Math.PI);
-            ctx.fillStyle = this.traffic [0];
-            ctx.fill ();
-            ctx.stroke ();
-            ctx.beginPath ();
-            ctx.arc (this.x - this.width / 2 + 6, this.y - this.height / 2 + 14, 3, 0, 2 * Math.PI);
-            ctx.fillStyle = this.traffic [1];
-            ctx.fill ();
-            ctx.stroke ();
-            ctx.beginPath ();
-            ctx.arc (this.x - this.width / 2 + 6, this.y - this.height / 2 + 22, 3, 0, 2 * Math.PI);
-            ctx.fillStyle = this.traffic [2];
-            ctx.fill ();
-            ctx.stroke ();
-        }
         else
         {
             ctx.textAlign = this.width;
@@ -461,29 +395,20 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
             }
             else if (this.type != "type")
             {
-                if (this.type == "text" && this.src == "usersPlaying")
+                if (this.backColor != null)
                 {
-                    ctx.fillStyle = this.color;
-                    ctx.fillText (usersPlaying, this.x, this.y + 1);
-                    var textMeasure = ctx.measureText (usersPlaying);
+                    ctx.beginPath ();
+                    var textMeasure = ctx.measureText (this.src);
+                    ctx.roundRect (this.x - textMeasure.width / 2 - (this.height < 10 ? 4 : 6), this.y - this.height / 2 - (this.height < 10 ? 2 : 4), textMeasure.width + (this.height < 10 ? 8 : 12), this.height + (this.height < 10 ? 4 : 8), 2 * Math.PI);
+                    ctx.fillStyle = this.backColor;
+                    ctx.fill ();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = this.color + "CC";
+                    ctx.stroke ();
                 }
-                else
-                {
-                    if (this.backColor != null)
-                    {
-                        ctx.beginPath ();
-                        var textMeasure = ctx.measureText (this.src);
-                        ctx.roundRect (this.x - textMeasure.width / 2 - (this.height < 10 ? 4 : 6), this.y - this.height / 2 - (this.height < 10 ? 2 : 4), textMeasure.width + (this.height < 10 ? 8 : 12), this.height + (this.height < 10 ? 4 : 8), 2 * Math.PI);
-                        ctx.fillStyle = this.backColor;
-                        ctx.fill ();
-                        ctx.lineWidth = 1;
-                        ctx.strokeStyle = this.color + "CC";
-                        ctx.stroke ();
-                    }
-                    ctx.fillStyle = this.color;
-                    if (this.max != null) ctx.fillText (this.src, this.x, this.y + 1, this.max);
-                    else ctx.fillText (this.src, this.x, this.y + 1);
-                }
+                ctx.fillStyle = this.color;
+                if (this.max != null) ctx.fillText (this.src, this.x, this.y + 1, this.max);
+                else ctx.fillText (this.src, this.x, this.y + 1);
             }
         }
         if (this.rollover != null)
@@ -493,7 +418,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
 
             if (this.type == "image" && mouse.x >= this.x - this.width / 2 && mouse.x <= this.x + this.width / 2 && mouse.y >= this.y - this.height / 2 && mouse.y <= this.y + this.height / 2) mouseOver = true;
             else if (this.type == "text" && mouse.x >= this.x && mouse.x <= this.x + textMeasure.width && mouse.y >= this.y - this.height / 2 && mouse.y <= this.y + this.height / 2) mouseOver = true;
-            else if (this.type == "traffic" && (ctx.isPointInStroke (this.path, mouse.x, mouse.y) || ctx.isPointInPath (this.path, mouse.x, mouse.y))) mouseOver = true;
             if (mouseOver)
             {
                 rollover.style.top = (mouse.y - 18) + "px";

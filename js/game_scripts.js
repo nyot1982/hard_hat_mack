@@ -66,8 +66,6 @@ var fpsMonitor =
     players = [],
     storedPlayers = [],
     playerColors = ["#A5FF9A", "#FF9AA5", "#9AA5FF", "#FFFF9A", "#9AFFFF", "#9A9A9A", "#FF9AFF", "#FFFFFF"],
-    skins = [],
-    skinSel = 0,
     changingButton = null,
     userActions =
     [
@@ -236,114 +234,6 @@ var fpsMonitor =
         {
             screen: ["input"],
             action: "input_exit",
-            keyboard:
-            {
-                keys: [27] // Escape
-            },
-            gamepad:
-            {
-                buttons: [2, 8], // X, Select
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [2],
-                axes: []
-            }
-        },
-        {
-            screen: ["skins"],
-            action: "skin_left",
-            keyboard:
-            {
-                keys: [37] // Left
-            },
-            gamepad:
-            {
-                buttons: [14], // Left
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [0]
-            }
-        },
-        {
-            screen: ["skins"],
-            action: "skin_right",
-            keyboard:
-            {
-                keys: [39] // Right
-            },
-            gamepad:
-            {
-                buttons: [15], // Right
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [0]
-            }
-        },
-        {
-            screen: ["skins"],
-            action: "skin_up",
-            keyboard:
-            {
-                keys: [40] // Up
-            },
-            gamepad:
-            {
-                buttons: [13], // Up
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [1]
-            }
-        },
-        {
-            screen: ["skins"],
-            action: "skin_down",
-            keyboard:
-            {
-                keys: [38] // Down
-            },
-            gamepad:
-            {
-                buttons: [12], // Down
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [1]
-            }
-        },
-        {
-            screen: ["skins"],
-            action: "unlock_skin",
-            keyboard:
-            {
-                keys: [13, 32] // Enter, Space
-            },
-            gamepad:
-            {
-                buttons: [0], // A
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [0],
-                axes: []
-            }
-        },
-        {
-            screen: ["skins"],
-            action: "skins_exit",
             keyboard:
             {
                 keys: [27] // Escape
@@ -652,11 +542,7 @@ var fpsMonitor =
         {
             this.ctx.clearRect (0, 0, this.canvas.width, this.canvas.height);
         }
-    },
-    usersPlaying = 0,
-    usersPlayingDetails = 0,
-    playersConnecting = 0,
-    wss = null;
+    };
 
 $(document).ready (function ()
 {
@@ -801,18 +687,6 @@ function fetchLoad (cont, param)
             {
                 gameText.pop ();
                 players [0] = responseJSON ["player"];
-                if (players [0].color.substring (0, 4) == "skin") players [0].skin = players [0].color.substring (4, players [0].color.length) * 1;
-                else players [0].skin = -1;
-                if (players [0].skins == "") players [0].skins = []; 
-                else 
-                {
-                    players [0].skins = players [0].skins.split (",");
-                    players [0].skins.forEach (Str2Int);
-                    function Str2Int (item, index, arr)
-                    {
-                        arr [index] = item * 1;
-                    }
-                }
                 players [0].xp = players [0].xp * 1;
                 gameSound.active = players [0].game_sound == 1 ? true : false;
                 document.getElementById ("sound").innerHTML = gameSound.active ? "On" : "Off";
@@ -832,7 +706,6 @@ function fetchLoad (cont, param)
                 gameText.pop ();
                 players [0].name = responseJSON ["player"].name;
                 players [0].color = responseJSON ["player"].color;
-                players [0].skin = responseJSON ["player"].skin;
                 const data =
                 {
                     action: "ship",
@@ -850,11 +723,6 @@ function fetchLoad (cont, param)
                 if (responseJSON ["email"]["error"]) gameAlert.push (new component ("text", responseJSON ["email"]["error"], "red", 745, 370, "left", 10));
                 else if (responseJSON ["email"]["ok"]) gameAlert.push (new component ("text", responseJSON ["email"]["ok"], "#0C0", 745, 370, "left", 10));
                 changeTab ("alert");
-            }
-            else if (cont == "unlock_skin")
-            {
-                players [0].skins.push (responseJSON ["skin"]);
-                gameText [responseJSON ["skin"]].color = "#0C0";
             }
             else if (cont == "config_save")
             {
@@ -899,7 +767,6 @@ function submitForm (form)
                 {
                     name: form.elements [i].value || "Player" + (i > 0 ? (" " + (i * 1 + 1)) : ""),
                     color: playerColors [i],
-                    skin: i - 1,
                     control: (gameModes.findIndex (mode => mode.active == true) != 1 && gameModes.findIndex (mode => mode.active == true) != 2 ? menuControl : form.elements [i].id)
                 };
             }
@@ -924,25 +791,12 @@ function submitForm (form)
 
 function changeColor (color)
 {
-    if (document.getElementById ("skin").value == -1)
-    {
-        menuShip.changeColor (color);
-        gameXP [0].backColor = menuShip.colors.negative;
-        gameXP [0].color = menuShip.colors.shipFill;
-        gameXP [1].backColor = menuShip.colors.shipFill;
-        gameXP [1].color = menuShip.colors.negative;
-    }
-}
-
-function changeSkin (skin)
-{
-    if (skin == -1) menuShip.changeColor (document.getElementById ("color").value);
-    else menuShip.changeColor ('skin' + skin);
+    menuShip.changeColor (color);
     gameXP [0].backColor = menuShip.colors.negative;
     gameXP [0].color = menuShip.colors.shipFill;
     gameXP [1].backColor = menuShip.colors.shipFill;
     gameXP [1].color = menuShip.colors.negative;
-} 
+}
 
 function updateGameArea ()
 {
@@ -979,19 +833,11 @@ function updateGameArea ()
         gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        if (gameModes.findIndex (mode => mode.active == true) == 3 && wss != null && wss.readyState == WebSocket.OPEN)
-        {
-            usersPlayingHud ();
-            wssSend ();
-        }
-        else
-        {
-            enemiesHud ();
-            if (gameModes.findIndex (mode => mode.active == true) == 1 && gameArea.frame % 250 == 0) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), 0, 0, Math.floor (Math.random () * 720) - 360));
-            else if (gameModes.findIndex (mode => mode.active == true) == 2 && gameArea.frame % 500 == 0) gameItems.push (new item (0, Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height)));
-            gameObjects = gameItems.concat (gameEnemies).concat (gameShips).concat (gameShots);
-            gameObjects.sort ((object1, object2) => object1.z - object2.z);
-        }
+        enemiesHud ();
+        if (gameModes.findIndex (mode => mode.active == true) == 1 && gameArea.frame % 250 == 0) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), 0, 0, Math.floor (Math.random () * 720) - 360));
+        else if (gameModes.findIndex (mode => mode.active == true) == 2 && gameArea.frame % 500 == 0) gameItems.push (new item (0, Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height)));
+        gameObjects = gameItems.concat (gameEnemies).concat (gameShips).concat (gameShots);
+        gameObjects.sort ((object1, object2) => object1.z - object2.z);
         if (enemies == 0 && gameModes.findIndex (mode => mode.active == true) < 2)
         {
             if (!gameBoss) gameBoss = new boss (0, gameMap.width / 2, gameMap.height / 2);
