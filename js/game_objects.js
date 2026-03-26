@@ -457,7 +457,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                             form.style.display = "block";
                             form.elements [0].focus ();
                             form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
-                            changeTab ("input");
                         break;
                         case "Cooperative":
                             if (typeof (localStorage.players1) !== "undefined" && localStorage.players1.length > 0) storedPlayers = JSON.parse (localStorage.players1);
@@ -466,7 +465,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                             form.style.display = "block";
                             form.elements [0].focus ();
                             form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
-                            changeTab ("input");
                         break;
                         case "Versus":
                             if (typeof (localStorage.players2) !== "undefined" && localStorage.players2.length > 0) storedPlayers = JSON.parse (localStorage.players2);
@@ -475,7 +473,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                             form.style.display = "block";
                             form.elements [0].focus ();
                             form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
-                            changeTab ("input");
                         break;
                         case "Sound":
                             if (gameSound.active)
@@ -572,7 +569,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                         break;
                         case "Exit":
                             gameConfirm.push (new component ("text", ">>> Are you sure?", "yellow", startPoint.x + 705, gameText [gameText.length - 2].y, "left", 10));
-                            changeTab ("confirm");
                         break;
                     }
                 }

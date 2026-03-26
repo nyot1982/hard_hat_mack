@@ -77,18 +77,13 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "One Player", "white", 575, gameText [0].y + 15, "left", 10));
         gameText.push (new component ("text", "Cooperative", "white", 575, gameText [1].y + 25, "left", 10));
         gameText.push (new component ("text", "Versus", "white", 575, gameText [2].y + 25, "left", 10));
-        gameText.push (new component ("text", "Online", "white", 575, gameText [3].y + 25, "left", 10));
-        gameText.push (new component ("text", "Sound", "white", 575, gameText [4].y + 25, "left", 10));
-        gameText.push (new component ("text", "Music", "white", 575, gameText [5].y + 25, "left", 10));
-        gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [6].y + 25, "left", 10));
-        gameText.push (new component ("text", "High Scores", "white", 575, gameText [7].y + 25, "left", 10));
+        gameText.push (new component ("text", "Sound", "white", 575, gameText [3].y + 25, "left", 10));
+        gameText.push (new component ("text", "Music", "white", 575, gameText [4].y + 25, "left", 10));
+        gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [5].y + 25, "left", 10));
+        gameText.push (new component ("text", "High Scores", "white", 575, gameText [6].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
         menuShip = new ship (null, playerColors [0], 450, gameText [0].y + 15, 500, 90);
-        if (gameScreen == "menu")
-        {
-            changeTab ("menu");
-        }
-        else gameScreen = "menu";
+        gameScreen = "menu";
     }
     else if (gameScreen == "high_scores")
     {
@@ -96,23 +91,11 @@ function gameLoadScreen (screen)
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
         fetchLoad ("high_scores");
-        changeTab ("alert");
     }
     else if (gameScreen == "intro" || gameScreen == "game_over" || gameScreen == "game_completed")
     {
         gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         var textMeasure = ctx.measureText (" ");
-        document.getElementById ("scoreHud").style.height = "0px";
-        document.getElementById ("highScoreHud").style.height = "0px";
-        document.getElementById ("lifesHud").style.height = "0px";
-        setTimeout
-        (
-            () =>
-            {
-                $(document.getElementById ("lifesHud")).removeClass ("lifesRotate");
-            },
-            400
-        );
 
         if (gameScreen == "intro")
         {
@@ -138,32 +121,16 @@ function gameLoadScreen (screen)
             gameText.push (new component ("type", "SUCCEEDED.", "white", canvasWidth / 2, 270, "center", 10));
         }
         if (gameSound.active) gameSound.sounds ["type"].play ();
-        changeTab ("alert");
     }
     else if (gameScreen == "game")
     {
         if (gameModes.findIndex (mode => mode.active == true) == 0) generateGameMap ("level1");
         else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
-        fetchLoad ("high_score_hud");
-        document.getElementById ("highScoreHud").style.height = "23px";
-        document.getElementById ("lifesHud").innerHTML = '';
-        document.getElementById ("scoreHud").innerHTML = '';
         for (var i = 0; i < players.length; i++)
         {
             gameShips.push (new ship (players [i].name, players [i].color, startPoints [i].x, startPoints [i].y, startPoints [i].z));
             startPoints [i].ship = players [i].name;
         }
-        document.getElementById ("scoreHud").style.height = (23 * gameShips.length) + "px";
-        if (gameShips.length > 2) document.getElementById ("lifesHud").style.height = (23 * Math.round (gameShips.length / 2)) + "px";
-        else document.getElementById ("lifesHud").style.height = "23px";
-        setTimeout
-        (
-            () =>
-            {
-                $(document.getElementById ("lifesHud")).addClass ("lifesRotate");
-            },
-            100
-        );
         if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
         else
         {
@@ -189,13 +156,11 @@ function gameLoadScreen (screen)
             }
             localStorage ["players" + gameModes.findIndex (mode => mode.active == true)] = JSON.stringify (storedPlayers);
         }
-        if (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2) changeHuds (true);
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
             gameMusic.musics.game.play ();
         }
-        changeTab ("game");
     }
     if (document.getElementById ("blackScreen").style.display == 'block')
     {
@@ -223,22 +188,7 @@ function gameOpenModal (modal, text)
         x: gameArea.centerPoint.x - canvasWidth / 2,
         y: gameArea.centerPoint.y - canvasHeight / 2
     }
-    if (gameModal == null)
-    {
-        document.getElementById ("scoreHud").style.height = "0px";
-        document.getElementById ("highScoreHud").style.height = "0px";
-        document.getElementById ("lifesHud").style.height = "0px";
-        setTimeout
-        (
-            () =>
-            {
-                $(document.getElementById ("lifesHud")).removeClass ("lifesRotate");
-            },
-            400
-        );
-        modalGround = new ground ("menu", "#000000DD", startPoint.x, startPoint.y, canvasWidth, canvasHeight);
-        changeTab ("menu");
-    }
+    if (gameModal == null) modalGround = new ground ("menu", "#000000DD", startPoint.x, startPoint.y, canvasWidth, canvasHeight);
     gameModal = modal;
 
     if (gameModal == "menu")
@@ -271,19 +221,6 @@ function gameCloseModal ()
     menuShots = [];
     menuHits = [];
     gameModal = null;
-    if (document.getElementById ("highScoreHud").innerHTML.length > 0) document.getElementById ("highScoreHud").style.height = "23px";
-    document.getElementById ("scoreHud").style.height = (23 * gameShips.length) + "px";
-    if (gameShips.length > 2) document.getElementById ("lifesHud").style.height = (23 * Math.round (gameShips.length / 2)) + "px";
-    else document.getElementById ("lifesHud").style.height = "23px";
-    setTimeout
-    (
-        () =>
-        {
-            $(document.getElementById ("lifesHud")).addClass ("lifesRotate");
-        },
-        100
-    );
-    changeTab ("game");
 }
 
 function generateGameMap (map)

@@ -620,11 +620,7 @@ function fetchLoad (cont, param)
                         form.password.setCustomValidity ("Wrong Password.");
                         form.password.reportValidity ();
                     }
-                    else
-                    {
-                        gameAlert.push (new component ("text", responseJSON ["error"], "red", 745, 395, "left", 10));
-                        changeTab ("alert");
-                    }
+                    else gameAlert.push (new component ("text", responseJSON ["error"], "red", 745, 395, "left", 10));
                 }
                 else console.error ("Error! ", responseJSON ["error"]);
             }
@@ -645,7 +641,6 @@ function submitForm (form)
     {
         gameAlert.push (new component ("text", "Connect other controllers", "red", 745, 300, "left", 10));
         gameAlert.push (new component ("text", "to add more players.", "red", 745, 325, "left", 10));
-        changeTab ("alert");
     }
     else
     {
@@ -661,7 +656,6 @@ function submitForm (form)
                     {
                         players = [];
                         gameAlert.push (new component ("text", "All names must be diferent.", "red", 745, 255 + (form.length * 25), "left", 10));
-                        changeTab ("alert");
                         return;
                     }
                 }
@@ -734,7 +728,6 @@ function updateGameArea ()
         gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        enemiesHud ();
         if (gameModes.findIndex (mode => mode.active == true) == 1 && gameArea.frame % 250 == 0) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), 0, 0, Math.floor (Math.random () * 720) - 360));
         else if (gameModes.findIndex (mode => mode.active == true) == 2 && gameArea.frame % 500 == 0) gameItems.push (new item (0, Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height)));
         gameObjects = gameItems.concat (gameEnemies).concat (gameShips).concat (gameShots);

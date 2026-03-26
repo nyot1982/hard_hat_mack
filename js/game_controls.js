@@ -61,12 +61,7 @@ function gamepadConnected (e)
     else
     {
         changeControl (newControl, e.gamepad.index * 1);
-        if (gameAlert.length > 0)
-        {
-            gameAlert = [];
-            if (document.getElementById ("players").style.display == "block" || document.getElementById ("player").style.display == "block" || document.getElementById ("sign").style.display == "block") changeTab ("input");
-            else changeTab ("menu");
-        }
+        if (gameAlert.length > 0) gameAlert = [];
     }
 }
 
@@ -218,12 +213,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
             );
         }
     }
-    else if (gameAlert.length > 0)
-    {
-        gameAlert = [];
-        if (document.getElementById ("players").style.display == "block" || document.getElementById ("player").style.display == "block" || document.getElementById ("sign").style.display == "block") changeTab ("input");
-        else changeTab ("menu");
-    }
+    else if (gameAlert.length > 0) gameAlert = [];
     else
     {
         if (gameConfirm.length > 0) var screen = "confirm";
@@ -253,7 +243,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
                 break;
                 case 'confirm_no':
                     gameConfirm = [];
-                    changeTab ("menu");
                 break;
                 case 'confirm_yes':
                     if (!blackScreen)

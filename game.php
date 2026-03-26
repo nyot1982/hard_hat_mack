@@ -38,6 +38,10 @@
         <preloader><div class="spinner"></div></preloader>
         <main>
             <article>
+                <div id="fps_monitor">
+                    frame rate: <span id="frame_rate">0</span> <span title="Frames per second" style="cursor: default;">fps</span><br>
+                    frame time: <span id="frame_time">0</span> <span title="Milliseconds" style="cursor: default;">ms</span>
+                </div>
                 <div id="rollovers"></div>
                 <div id="blackScreen"></div>
             </article>
