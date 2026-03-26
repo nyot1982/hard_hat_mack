@@ -87,8 +87,6 @@ function gameLoadScreen (screen)
         if (gameScreen == "menu")
         {
             changeTab ("menu");
-            resetHuds ();
-            if (wss == null || wss == 1000 || wss == 3000) wssOpen ();
         }
         else gameScreen = "menu";
     }
@@ -150,49 +148,46 @@ function gameLoadScreen (screen)
         document.getElementById ("highScoreHud").style.height = "23px";
         document.getElementById ("lifesHud").innerHTML = '';
         document.getElementById ("scoreHud").innerHTML = '';
-        if (gameModes.findIndex (mode => mode.active == true) < 3)
+        for (var i = 0; i < players.length; i++)
         {
-            for (var i = 0; i < players.length; i++)
+            gameShips.push (new ship (players [i].name, players [i].color, startPoints [i].x, startPoints [i].y, startPoints [i].z));
+            startPoints [i].ship = players [i].name;
+        }
+        document.getElementById ("scoreHud").style.height = (23 * gameShips.length) + "px";
+        if (gameShips.length > 2) document.getElementById ("lifesHud").style.height = (23 * Math.round (gameShips.length / 2)) + "px";
+        else document.getElementById ("lifesHud").style.height = "23px";
+        setTimeout
+        (
+            () =>
             {
-                gameShips.push (new ship (players [i].name, players [i].color, startPoints [i].x, startPoints [i].y, startPoints [i].z));
-                startPoints [i].ship = players [i].name;
+                $(document.getElementById ("lifesHud")).addClass ("lifesRotate");
+            },
+            100
+        );
+        if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
+        else
+        {
+            if (gameModes.findIndex (mode => mode.active == true) == 0)
+            {
+                storedPlayers =
+                [
+                    {
+                        name: players [0].name,
+                    }
+                ];
             }
-            document.getElementById ("scoreHud").style.height = (23 * gameShips.length) + "px";
-            if (gameShips.length > 2) document.getElementById ("lifesHud").style.height = (23 * Math.round (gameShips.length / 2)) + "px";
-            else document.getElementById ("lifesHud").style.height = "23px";
-            setTimeout
-            (
-                () =>
-                {
-                    $(document.getElementById ("lifesHud")).addClass ("lifesRotate");
-                },
-                100
-            );
-            if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
             else
             {
-                if (gameModes.findIndex (mode => mode.active == true) == 0)
+                storedPlayers = [];
+                for (var player in players)
                 {
-                    storedPlayers =
-                    [
-                        {
-                            name: players [0].name,
-                        }
-                    ];
-                }
-                else
-                {
-                    storedPlayers = [];
-                    for (var player in players)
+                    storedPlayers [player] =
                     {
-                        storedPlayers [player] =
-                        {
-                            name: players [player].name
-                        };
-                    }
+                        name: players [player].name
+                    };
                 }
-                localStorage ["players" + gameModes.findIndex (mode => mode.active == true)] = JSON.stringify (storedPlayers);
             }
+            localStorage ["players" + gameModes.findIndex (mode => mode.active == true)] = JSON.stringify (storedPlayers);
         }
         if (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2) changeHuds (true);
         if (gameMusic.active)
@@ -237,8 +232,7 @@ function gameOpenModal (modal, text)
         (
             () =>
             {
-                if (gameModes.findIndex (mode => mode.active == true) == 3) $(document.getElementById ("mouse_interaction")).removeClass ("fa-beat");
-                else $(document.getElementById ("lifesHud")).removeClass ("lifesRotate");
+                $(document.getElementById ("lifesHud")).removeClass ("lifesRotate");
             },
             400
         );
@@ -252,11 +246,8 @@ function gameOpenModal (modal, text)
         gameTitle = new component ("image", "svgs/title.svg", "", gameArea.centerPoint.x, startPoint.y + 100, 203, 92);
         gameText.push (new component ("text", "Options:", "white", startPoint.x + 310, gameTitle.y + 105, "left", 10));
         var startMenu = startPoint.y + 255;
-        if (gameModes.findIndex (mode => mode.active == true) < 3)
-        {
-            gameText.push (new component ("text", "Pause", "white", startPoint.x + 575, startMenu, "left", 10));
-            startMenu += 25;
-        }
+        gameText.push (new component ("text", "Pause", "white", startPoint.x + 575, startMenu, "left", 10));
+        startMenu += 25;
         gameText.push (new component ("text", "Sound", "white", startPoint.x + 575, startMenu, "left", 10));
         gameText.push (new component ("text", "Music", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "FPS Monitor", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
@@ -280,7 +271,7 @@ function gameCloseModal ()
     menuShots = [];
     menuHits = [];
     gameModal = null;
-    if (gameModes.findIndex (mode => mode.active == true) != 3 || document.getElementById ("highScoreHud").innerHTML.length > 0) document.getElementById ("highScoreHud").style.height = "23px";
+    if (document.getElementById ("highScoreHud").innerHTML.length > 0) document.getElementById ("highScoreHud").style.height = "23px";
     document.getElementById ("scoreHud").style.height = (23 * gameShips.length) + "px";
     if (gameShips.length > 2) document.getElementById ("lifesHud").style.height = (23 * Math.round (gameShips.length / 2)) + "px";
     else document.getElementById ("lifesHud").style.height = "23px";
@@ -288,8 +279,7 @@ function gameCloseModal ()
     (
         () =>
         {
-            if (gameModes.findIndex (mode => mode.active == true) == 3) $(document.getElementById ("mouse_interaction")).addClass ("fa-beat");
-            else $(document.getElementById ("lifesHud")).addClass ("lifesRotate");
+            $(document.getElementById ("lifesHud")).addClass ("lifesRotate");
         },
         100
     );

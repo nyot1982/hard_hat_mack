@@ -444,7 +444,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                     switch (this.src)
                     {
                         case "One Player":
-                            gameModeHud (0);
                             if (typeof (localStorage.players0) !== "undefined" && localStorage.players0.length > 0) storedPlayers = JSON.parse (localStorage.players0);
                             var form = document.getElementById ("players");
                             if (form.length > 2)
@@ -461,7 +460,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                             changeTab ("input");
                         break;
                         case "Cooperative":
-                            gameModeHud (1);
                             if (typeof (localStorage.players1) !== "undefined" && localStorage.players1.length > 0) storedPlayers = JSON.parse (localStorage.players1);
                             if (controlTab != "keyboard") changeControl ("keyboard", 99);
                             var form = document.getElementById ("players");
@@ -471,7 +469,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                             changeTab ("input");
                         break;
                         case "Versus":
-                            gameModeHud (2);
                             if (typeof (localStorage.players2) !== "undefined" && localStorage.players2.length > 0) storedPlayers = JSON.parse (localStorage.players2);
                             if (controlTab != "keyboard") changeControl ("keyboard", 99);
                             var form = document.getElementById ("players");
@@ -479,22 +476,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                             form.elements [0].focus ();
                             form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
                             changeTab ("input");
-                        break;
-                        case "Online":
-                            if (wss != null && wss.readyState == WebSocket.OPEN)
-                            {
-                                gameModeHud (3);
-                                if (controlTab != "keyboard") changeControl ("keyboard", 99);
-                                var form = document.getElementById ("sign");
-                                form.style.display = "block";
-                                form.elements [0].focus ();
-                                changeTab ("input");
-                            }
-                            else
-                            {
-                                gameAlert.push (new component ("text", ">>> Server is down.", "red", 705, 295, "left", 10));
-                                changeTab ("alert");
-                            }
                         break;
                         case "Sound":
                             if (gameSound.active)

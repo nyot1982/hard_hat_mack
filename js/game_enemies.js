@@ -814,15 +814,7 @@ function enemy (type, x, y, heading)
                             if (players [0].name == gameShots [gameShot].name && this.type < 7)
                             {
                                 if (enemies > 0) enemies--;
-                                if (gameShip > -1)
-                                {
-                                    if (gameModes.findIndex (mode => mode.active == true) == 3)
-                                    {
-                                        gameShips [gameShip].xp++;
-                                        if (gameShips [gameShip].xp > 10000) gameShips [gameShip].xp = 10000;
-                                    }
-                                    else gameShips [gameShip].score += 100;
-                                }
+                                if (gameShip > -1) gameShips [gameShip].score += 100;
                             }
                         }
                     }

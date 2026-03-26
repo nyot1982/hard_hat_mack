@@ -572,18 +572,7 @@ $(document).ready (function ()
 
 function fetchLoad (cont, param)
 {
-    if (cont == "high_score_hud") document.getElementById ("highScoreHud").innerHTML = '<preloader><div class="spinner"></div></preloader>';
-    else if (cont == "high_scores") gameText.push (new component ("text", "Loading...", "yellow", 400, 255, "left", 10));
-    else if (cont == "sign_in" || cont == "sign_up")
-    {
-        if (cont != "sign_up") gameText.push (new component ("text", "Loading...", "yellow", 745, 345, "left", 10));
-        if (cont != "sign_in")
-        {
-            param += '&client_id=686557513597-2vmk1vfsjgre9fabt7r450kms0es58cb.apps.googleusercontent.com&client_secret=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';
-            if (cont == "sign_up") param += '&user_name=marcpinyot@gmail.com&game_music=' + (gameMusic.active ? '1' : '0') + '&game_sound=' + (gameSound.active ? '1' : '0') + '&fps_monitor=' + ($("#fps_monitor").hasClass ("active") ? '1' : '0') + '&user_actions=' + JSON.stringify (userActions);
-        }
-    }
-    else if (cont == "player" || cont == "config_save")
+    if (cont == "player" || cont == "config_save")
     {
         gameText.push (new component ("text", cont == "player" ? "Loading..." : "Saving...", "yellow", 745, 395, "left", 10));
         if (cont == "config_save") param = 'game_music=' + (gameMusic.active ? '1' : '0') + '&game_sound=' + (gameSound.active ? '1' : '0') + '&fps_monitor=' + ($("#fps_monitor").hasClass ("active") ? '1' : '0') + '&user_actions=' + JSON.stringify (userActions);
@@ -617,37 +606,7 @@ function fetchLoad (cont, param)
         {
             if (responseJSON ["error"])
             {
-                if (cont == "sign_in" || cont == "sign_up")
-                {
-                    gameText.pop ();
-                    var form = document.getElementById ("sign");
-                    if (responseJSON ["error"] == "email_ko")
-                    {
-                        form.email.setCustomValidity ("Wrong e.mail.");
-                        form.email.reportValidity ();
-                    }
-                    else if (responseJSON ["error"] == "password_ko")
-                    {
-                        form.password.setCustomValidity ("Wrong Password.");
-                        form.password.reportValidity ();
-                    }
-                    else if (responseJSON ["error"] == "email_exists")
-                    {
-                        form.email.setCustomValidity ("E.mail already exists.");
-                        form.email.reportValidity ();
-                    }
-                    else if (responseJSON ["error"] == "email_not_validated")
-                    {
-                        form.email.setCustomValidity ("E.mail not validated.");
-                        form.email.reportValidity ();
-                    }
-                    else
-                    {
-                        gameAlert.push (new component ("text", responseJSON ["error"], "red", 745, 345, "left", 10));
-                        changeTab ("alert");
-                    }
-                }
-                else if (cont == "player" || cont == "config_save")
+                if (cont == "player")
                 {
                     gameText.pop ();
                     var form = document.getElementById ("player");
@@ -669,68 +628,11 @@ function fetchLoad (cont, param)
                 }
                 else console.error ("Error! ", responseJSON ["error"]);
             }
-            else if (cont == "high_score_hud")
-            {
-                document.getElementById ("highScoreHud").innerHTML = "High Score: " + responseJSON [cont];
-                if (gameModes.findIndex (mode => mode.active == true) == 3)
-                {
-                    document.getElementById ("highScoreHud").innerHTML = '';
-                    document.getElementById ("highScoreHud").style.height = '0px';
-                }
-            }
-            else if (cont == "high_scores") gameHighScores (responseJSON ["max_high_scores"], responseJSON ["high_scores"]);
-            else if (cont == "high_score_save")
-            {
-                if (responseJSON ["high_score_save"] > 0) highScoreSave.push (responseJSON ["high_score_save"]);
-            }
-            else if (cont == "sign_in")
-            {
-                gameText.pop ();
-                players [0] = responseJSON ["player"];
-                players [0].xp = players [0].xp * 1;
-                gameSound.active = players [0].game_sound == 1 ? true : false;
-                document.getElementById ("sound").innerHTML = gameSound.active ? "On" : "Off";
-                gameMusic.active = players [0].game_music == 1 ? true : false;
-                document.getElementById ("music").innerHTML = gameMusic.active ? "On" : "Off";
-                if (players [0].fps_monitor == 1 && !$("#fps_monitor").hasClass ("active") || players [0].fps_monitor == 0 && $("#fps_monitor").hasClass ("active")) fpsHud ("toggle");
-                if (players [0].user_actions) userActions = JSON.parse (players [0].user_actions);
-                const json =
-                {
-                    action: "connect",
-                    player_id: playerId
-                };
-                wss.send (JSON.stringify (json));       
-            }
             else if (cont == "player")
             {
-                gameText.pop ();
-                players [0].name = responseJSON ["player"].name;
-                players [0].color = responseJSON ["player"].color;
-                const data =
-                {
-                    action: "ship",
-                    player_id: playerId,
-                    name: players [0].name,
-                    color: players [0].color,
-                    xp: players [0].xp
-                };
-                wss.send (JSON.stringify (data));       
+                
             }
-            else if (cont == "sign_up")
-            {
-                gameText.pop ();
-                gameAlert.push (new component ("text", ">>> " + responseJSON ["ok"], "#0C0", 705, 345, "left", 10));
-                if (responseJSON ["email"]["error"]) gameAlert.push (new component ("text", responseJSON ["email"]["error"], "red", 745, 370, "left", 10));
-                else if (responseJSON ["email"]["ok"]) gameAlert.push (new component ("text", responseJSON ["email"]["ok"], "#0C0", 745, 370, "left", 10));
-                changeTab ("alert");
-            }
-            else if (cont == "config_save")
-            {
-                gameText.pop ();
-                gameAlert.push (new component ("text", ">>> " + responseJSON ["ok"], "#0C0", 705, 395, "left", 10));
-                changeTab ("alert");
-            }
-            else if (cont != "xp_save") document.getElementById (cont).innerHTML += responseJSON [cont];
+            else document.getElementById (cont).innerHTML += responseJSON [cont];
         }
     )
     .catch (error => console.error ("Error! ", error.message));
@@ -779,7 +681,6 @@ function submitForm (form)
             (
                 () =>
                 {
-                    if (wss != null && wss.readyState === 1) wss.close (3000);
                     if (gameModes.findIndex (mode => mode.active == true) == 2) gameLoadScreen ("game");
                     else gameLoadScreen ("intro");
                 },
@@ -852,7 +753,6 @@ function updateGameArea ()
     }
     if (gameModal != null || gameScreen != "game")
     {
-        if (gameScreen == "menu" && wss != null && wss.readyState == WebSocket.OPEN) wssSend ();
         if (modalGround) modalGround.update ();
         menuShots = menuShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         for (var shot in menuShots) menuShots [shot].update ();

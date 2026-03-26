@@ -51,7 +51,7 @@ function gamepadConnected (e)
     if (newControl && document.getElementById (newControl).style.display == 'none') $('#' + newControl).fadeIn (1000);
     pressed.buttons [e.gamepad.index * 1] = [];
     pressed.axes [e.gamepad.index * 1] = [];
-    if (gameScreen == "game" && gameModes.findIndex (mode => mode.active == true) != 0 && gameModes.findIndex (mode => mode.active == true) != 3)
+    if (gameScreen == "game" && gameModes.findIndex (mode => mode.active == true) != 0)
     {
         for (var player in players)
         {
@@ -79,7 +79,7 @@ function gamepadDisconnected (e)
     pressed.buttons.splice (pressed.buttons.indexOf (e.gamepad.index * 1), 1);
     pressed.axes.splice (pressed.axes.indexOf (e.gamepad.index * 1), 1);
 
-    if (gameScreen == "menu" && gameModes.findIndex (mode => mode.active == true) != 0 && gameModes.findIndex (mode => mode.active == true) != 3 && form.length > 2)
+    if (gameScreen == "menu" && gameModes.findIndex (mode => mode.active == true) != 0 && form.length > 2)
     {
         for (var i = 0; i < form.length; i++)
         {
@@ -258,30 +258,16 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
                 case 'confirm_yes':
                     if (!blackScreen)
                     {
-                        if (gameModes.findIndex (mode => mode.active == true) == 3)
-                        {
-                            gameShip = gameShips.findIndex (ship => ship.name == players [0].name);
-                            fetchLoad ("xp_save", "name=" + gameShips [gameShip].name + "&xp=" + gameShips [gameShip].xp);
-                            const data =
+                        blackScreen = true;
+                        $("#blackScreen").fadeIn (1000);
+                        setTimeout
+                        (
+                            () =>
                             {
-                                action: "menu",
-                                player_id: playerId,
-                            };
-                            wss.send (JSON.stringify (data));
-                        }
-                        else
-                        {
-                            blackScreen = true;
-                            $("#blackScreen").fadeIn (1000);
-                            setTimeout
-                            (
-                                () =>
-                                {
-                                    gameLoadScreen ("menu");
-                                },
-                                1000
-                            );
-                        }
+                                gameLoadScreen ("menu");
+                            },
+                            1000
+                        );
                     }
                 break;
                 case 'input_change':
@@ -311,16 +297,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
                     }
                 break;
                 case 'input_exit':
-                    if (gameModes.findIndex (mode => mode.active == true) == 3)
-                    {
-                        const data =
-                        {
-                            action: "menu",
-                            player_id: playerId
-                        };
-                        wss.send (JSON.stringify (data));    
-                    }
-                    else gameLoadScreen ("menu");
+                    gameLoadScreen ("menu");
                 break;
                 case 'open_modal':
                     gameOpenModal ("menu");
@@ -427,7 +404,7 @@ function stopUserInteractions (gamePlayer)
             }
             else
             {
-                if (player == 0 || gameModes.findIndex (mode => mode.active == true) == 3) pressed.keys [players [player].control] = [];
+                if (player == 0) pressed.keys [players [player].control] = [];
                 pressed.buttons [players [player].control] = [];
                 pressed.axes [players [player].control] = [];
             }

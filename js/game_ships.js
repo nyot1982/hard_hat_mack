@@ -87,16 +87,8 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
     this.turn = 0;
     this.lastShotFrame = -this.weapons [this.weapon].fireRate / this.weapons [this.weapon].rate;
     this.repairing = null;
-    if (gameModes.findIndex (mode => mode.active == true) == 3)
-    {
-        this.score = null;
-        this.xp = score_xp || 0;
-    }
-    else
-    {
-        this.xp = null;
-        this.score = score_xp || 0;
-    }
+    this.xp = null;
+    this.score = score_xp || 0;
 
     this.changeColor = function (color)
     {
@@ -240,8 +232,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
             if (gameScreen == "menu" || gameModal == "menu")
             {
                 if (gameScreen == "menu") this.menuItems = 8;
-                else if (gameModal == "menu" && gameModes.findIndex (mode => mode.active == true) < 3) this.menuItems = 5;
-                else if (gameModal == "menu" && gameModes.findIndex (mode => mode.active == true) == 3) this.menuItems = 4;
+                else if (gameModal == "menu") this.menuItems = 5;
                 if (direction == 0) this.strafe = 0;
                 else if (this.strafe == 0)
                 {
@@ -330,15 +321,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                             if (gameModes.findIndex (mode => mode.active == true) != 1 && gameModes.findIndex (mode => mode.active == true) != 2 && players [0].name == this.name && path != "shield")
                             {
                                 var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
-                                if (gameShip > -1)
-                                {
-                                    if (gameModes.findIndex (mode => mode.active == true) == 3)
-                                    {
-                                        gameShips [gameShip].xp++;
-                                        if (gameShips [gameShip].xp > 10000) gameShips [gameShip].xp = 10000;
-                                    }
-                                    else gameShips [gameShip].score += 100;
-                                }
+                                if (gameShip > -1) gameShips [gameShip].score += 100;
                             }
                             if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 300);
                         }
@@ -351,15 +334,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                                 gameSound.sounds ["hit0"].play ();
                             }
                             var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
-                            if (gameShip > -1)
-                            {
-                                if (gameModes.findIndex (mode => mode.active == true) == 3)
-                                {
-                                    gameShips [gameShip].xp += 10;
-                                    if (gameShips [gameShip].xp > 10000) gameShips [gameShip].xp = 10000;
-                                }
-                                else gameShips [gameShip].score += 1000;
-                            }
+                            if (gameShip > -1) gameShips [gameShip].score += 1000;
                             this.playerDead ();
                         }
                     }
@@ -371,7 +346,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
     this.playerDead = function ()
     {
         if (gameControls [this.idControl] == "gamepad" && this.z >= 0) vibrate (this.idControl, 600);
-        if (this.lifes > 0 && gameModes.findIndex (mode => mode.active == true) < 3) this.lifes--;
+        if (this.lifes > 0) this.lifes--;
         if (this.lifes == 0 && gameModes.findIndex (mode => mode.active == true) < 2) fetchLoad ("high_score_save", "name=" + this.name + "&score=" + this.score);
         setTimeout
         (
@@ -431,7 +406,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                         }
                     }
                 }
-                else if (gameModes.findIndex (mode => mode.active == true) < 3)
+                else
                 {
                     if (gameModes.findIndex (mode => mode.active == true) != 0) players.splice (players.findIndex (player => player.name == this.name), 1);
                     gameShips.splice (this.idShip, 1);
@@ -598,33 +573,27 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                 document.getElementById ("scoreHud").style.lineHeight = "23px";
                 document.getElementById ("scoreHud").innerHTML = '<span id="score-' + this.name + '-span" title="' + this.name + ' Score">0</span>';
             }
-            else if (gameModes.findIndex (mode => mode.active == true) == 3)
-            {
-                document.getElementById ("scoreHud").style.lineHeight = "23px";
-                document.getElementById ("scoreHud").innerHTML = '<div title="' + this.name + ' XP"><span id="score-' + this.name + '-span">' + (this.xp == 10000 ? 100 : this.xp - Math.floor (this.xp / 100) * 100) + '</span>/100</div>';
-            }
             else
             {
                 document.getElementById ("scoreHud").style.lineHeight = null;
                 document.getElementById ("scoreHud").innerHTML += '<div id="score-' + this.name + '-div">' + this.shipHuds ("score-" + this.name, this.name + " Score") + ' <span id="score-' + this.name + '-span">0</span></div>';
             }
         }
-        else if ((element.textContent * 1 != this.score && gameModes.findIndex (mode => mode.active == true) != 3) || (element.textContent * 1 != (this.xp == 10000 ? 100 : this.xp - Math.floor (this.xp / 100) * 100) && gameModes.findIndex (mode => mode.active == true) == 3))
+        else if (element.textContent * 1 != this.score)
         {
             element.className = "change";
-            if (gameModes.findIndex (mode => mode.active == true) == 3) element.textContent = (this.xp == 10000 ? 100 : this.xp - Math.floor (this.xp / 100) * 100);
-            else element.textContent = this.score;
+            element.textContent = this.score;
             setTimeout
             (
                 () =>
                 {
                     element.className = "";
-                    if (gameShips.length > 1 && gameModes.findIndex (mode => mode.active == true) != 0 && gameModes.findIndex (mode => mode.active == true) != 3) this.scoreHudSort ("score-" + this.name + "-div");
+                    if (gameShips.length > 1 && gameModes.findIndex (mode => mode.active == true) != 0) this.scoreHudSort ("score-" + this.name + "-div");
                 },
                 250
             );
         }
-        else if (this.lifes == 0 && gameModes.findIndex (mode => mode.active == true) != 0 && gameModes.findIndex (mode => mode.active == true) != 3 && !document.getElementById ("score-" + this.name + "-div").style.display && !document.getElementById ("score-" + this.name + "-div").style.opacity)
+        else if (this.lifes == 0 && gameModes.findIndex (mode => mode.active == true) != 0 && !document.getElementById ("score-" + this.name + "-div").style.display && !document.getElementById ("score-" + this.name + "-div").style.opacity)
         {
             $(document.getElementById ("score-" + this.name + "-div")).fadeOut (1000);
             setTimeout
@@ -736,7 +705,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
 
     this.updateHuds = function ()
     {
-        if (gameModes.findIndex (mode => mode.active == true) != 0 && gameModes.findIndex (mode => mode.active == true) != 3)
+        if (gameModes.findIndex (mode => mode.active == true) != 0)
         {
             this.scoreHud ();
             this.lifesHud ();
@@ -1323,12 +1292,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                                 if (this.shield == 0 && gameShips [gameShip].shield == 0 && Math.sqrt (dx * dx + dy * dy) < 30)
                                 {
                                     this.life = 0;
-                                    if (gameModes.findIndex (mode => mode.active == true) == 3)
-                                    {
-                                        this.xp += 5;
-                                        if (this.xp > 10000) this.xp = 10000;
-                                    }
-                                    else this.score += 500;
+                                    this.score += 500;
                                     gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
                                     if (gameSound.active)
                                     {
@@ -1369,12 +1333,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                                     {
                                         this.shield -= 10;
                                         if (this.shield < 0) this.shield = 0;
-                                        if (gameModes.findIndex (mode => mode.active == true) == 3)
-                                        {
-                                            this.xp += 10;
-                                            if (this.xp > 10000) this.xp = 10000;
-                                        }
-                                        else this.score += 1000;
+                                        this.score += 1000;
                                         gameShips [gameShip].life = 0;
                                         gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
                                         if (gameSound.active)
@@ -1388,12 +1347,7 @@ function ship (name, color, x, y, z, heading, moveSpeed, strafeSpeed, fire, weap
                                     {
                                         gameShips [gameShip].shield -= 10;
                                         if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;       
-                                        if (gameModes.findIndex (mode => mode.active == true) == 3)
-                                        {
-                                            gameShips [gameShip].xp += 10;
-                                            if (gameShips [gameShip].xp > 10000) gameShips [gameShip].xp = 10000;
-                                        }
-                                        else gameShips [gameShip].score += 1000;
+                                        gameShips [gameShip].score += 1000;
                                         this.life = 0;
                                         gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
                                         if (gameSound.active)
