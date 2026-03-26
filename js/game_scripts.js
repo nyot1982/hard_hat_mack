@@ -599,7 +599,7 @@ var fpsMonitor =
         canvas: document.createElement ("canvas"),
         start: function ()
         {
-            this.canvas.id = "lastMission";
+            this.canvas.id = "hardHatMack";
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
             this.canvas.innerText = "Este navegador no soporta la etiqueta de canvas.";
