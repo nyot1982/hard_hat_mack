@@ -82,7 +82,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [5].y + 25, "left", 10));
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [6].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
-        menuShip = new ship (null, playerColors [0], 450, gameText [0].y + 15, 500, 90);
+        menuShip = new ship (null, playerColors [0], 450, gameText [0].y + 15, 90);
         gameScreen = "menu";
     }
     else if (gameScreen == "high_scores")
@@ -203,7 +203,7 @@ function gameOpenModal (modal, text)
         gameText.push (new component ("text", "FPS Monitor", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Exit", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, startPoint.y + 445, "center", 10));
-        menuShip = new ship (null, playerColors [0], startPoint.x + 450, startPoint.y + 255, 500, 90);
+        menuShip = new ship (null, playerColors [0], startPoint.x + 450, startPoint.y + 255, 90);
     }
     else
     {
