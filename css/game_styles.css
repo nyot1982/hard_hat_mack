@@ -1,0 +1,1401 @@
+@charset "UTF-8";
+
+/* VARIABLES */
+
+:root
+{
+    --colorShip: #a5ff9a;
+    --colorLight: #a53c9a;
+    --colorHuds: #000000CC;
+    --colorSpeed: #444;
+    --colorKph: #282828;
+    --colorWeapons1: #333;
+    --colorWeapons2: #1B1B1B;
+    --colorKeys1: #600;
+    --colorKeys2: #F88;
+    --colorKeys3: #FBB;
+    --color0: transparent;
+    --color1: #c66d73;
+    --color2: #52ae4a;
+    --color3: #eff373;
+    --color4: #73cfce;
+    --color5: black;
+    --color6: red;
+    --color7: #0C0;
+    --color8: blue;
+    --color9: orange;
+    --color10: white;
+    --color11: silver;
+    --color12: gray;
+    --color13: yellow;
+    --color14: #555;
+    --colorFluor1: #F03;
+    --colorFluor2: #FC3;
+    --colorFluor3: #CF0;
+    --colorFluor4: #0F3;
+    --colorFluor5: #0CF;
+    --colorFluor6: #03F;
+    --colorFluor7: #C0F;
+    --colorFluor8: #F0C;
+}
+
+/* INICIALS */
+
+@font-face
+{
+    font-family: "PressStart2P";
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url(../webfonts/PressStart2P-Regular.ttf) format("truetype");
+}
+
+html
+{
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+body
+{
+    margin: 0;
+    padding: 0;
+    background-color: var(--color11);
+    font-size: 6pt;
+    font-family: "PressStart2P";
+    text-align: left;
+}
+
+/* PRECÀRREGA + SPINNER */
+
+preloader
+{
+	background-color: var(--color10);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.floatHuds preloader
+{
+	background-color: var(--color0);
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: auto;
+}
+.spinner
+{
+    display: inline-flex;
+    border: 20px solid var(--color5);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border-left-color: var(--color6);
+    animation: spin 1.0s ease 0s infinite normal none running;
+}
+.floatHuds .spinner
+{
+    border: 3px solid var(--color10);
+    border-left-color: var(--color6);
+    width: 15px;
+    height: 15px;
+}
+@keyframes spin
+{
+    0%
+    {
+        transform: rotate(0deg);
+    }
+    100%
+    {
+        transform: rotate(360deg);
+    }
+}
+
+/* COMUNS */
+
+.left
+{
+    text-align: left;
+}
+.center
+{
+    text-align: center;
+}
+.right
+{
+    text-align: right;
+}
+.uppercase
+{
+    text-transform: uppercase;
+}
+.lowercase
+{
+    text-transform: lowercase;
+}
+.capitalize
+{
+    text-transform: capitalize;
+}
+
+/* MAIN */
+
+main
+{
+    display: flex;
+    height: 100vh;
+}
+article
+{
+    position: relative;
+    width: 1024px;
+    height: 740px;
+    margin: auto;
+    background-color: var(--color10);
+    -webkit-box-shadow: 0px 0px 25px 5px var(--color5);
+    -moz-box-shadow: 0px 0px 25px 5px var(--color5);
+    box-shadow: 0px 0px 25px 5px var(--color5);
+}
+article i
+{
+    font-style: italic;
+}
+article u
+{
+    text-decoration: underline;
+}
+article b,
+article strong
+{
+    font-weight: bold;
+}
+article hr
+{
+    width: 100%;
+    box-sizing: border-box;
+    border-color: var(--color6);
+}
+article h1
+{
+    color: var(--color10);
+    font-size: 1.5em;
+    margin: 0.25em 0 0.5em 0;
+}
+article h2
+{
+    color: var(--color6);
+    font-size: 1.4em;
+    margin: 0;
+}
+article h3
+{
+    color: var(--color9);
+    font-size: 1.3em;
+    margin: 0 0 0.3em 0;
+}
+article h4
+{
+    color: var(--color7);
+    font-size: 1.2em;
+    margin: 0 0 0.2em 0;
+}
+article h5
+{
+    color: var(--color8);
+    font-size: 1.1em;
+    margin: 0 0 0.1em 0;
+}
+article p
+{
+    color: var(--color5);
+    font-size: 1.0em;
+    margin: 1em 0.5em;
+    padding: 0;
+}
+.cont-cols
+{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: row;
+    box-sizing: border-box;
+    justify-content: center;
+}
+.col
+{
+    margin: 0 2.5em;
+}
+.col.no-margin
+{
+    margin: 0;
+}
+.margin-2 .col
+{
+    margin: 0 2em;
+}
+.margin-1 .col
+{
+    margin: 0 1em;
+}
+.margin-05 .col
+{
+    margin: 0 0.5em;
+}
+.no-margin .col
+{
+    margin: 0;
+}
+.col:first-child
+{
+    margin-left: 0;
+}
+.col:last-child
+{
+    margin-right: 0;
+}
+.e1
+{
+    color: var(--color6);
+}
+.e2
+{
+    color: var(--color7);
+}
+.e3
+{
+    color: var(--color8);
+}
+.e4
+{
+    color: var(--color9);
+}
+.e5
+{
+    color: var(--color10);
+}
+#lastMission
+{
+    margin: 1px;
+    width: calc(100% - 2px);
+    height: 502px;
+    background-color: var(--color12);
+    border: solid 1px var(--color12);
+    box-sizing: border-box;
+}
+#ship .ship
+{
+    fill: var(--colorShip);
+} 
+#ship .light
+{
+    fill: var(--colorLight);
+}
+.floatHuds
+{
+    position: absolute;
+    top: 2px;
+    height: 0px;
+    padding: 0 2em;
+    border-radius: 0 0 1em 1em;
+    background-color: var(--colorHuds);
+    overflow: hidden;
+    vertical-align: middle;
+    transition: all 0.5s ease 0s;
+}
+.floatHuds svg
+{
+    display: inline-block;
+    height: 15px;
+    border-radius: 5px;
+    margin: 2px 0;
+    overflow-clip-margin: content-box;
+    overflow: clip;
+}
+#scoreHud
+{
+    left: 20px;
+    color: var(--color4);
+}
+#scoreHud svg
+{
+    vertical-align: middle;
+}
+#scoreHud span
+{
+    display: inline-block;
+    transition: all 0.5s ease-in-out 0s;
+}
+#scoreHud span.change
+{
+    color: var(--color7);
+    transition-duration: 0s;
+    transform: scale(2);
+}
+#scoreHud div.exchange
+{
+    transition: all 0.5s ease 0s;
+    transform: translateY(-23px);
+}
+*:has(+ .exchange)
+{
+    transition: all 0.5s ease 0s;
+    transform: translateY(23px);
+}
+#highScoreHud
+{
+    line-height: 23px;
+    min-width: 104px;
+    color: var(--color1);
+    left: calc(50%);
+    transform: translateX(-50%);
+    text-align: center;
+}
+#lifesHud
+{
+    right: 20px;
+}
+#lifesHud div
+{
+    margin: 0 0.5em;
+    min-width: 87.5px;
+}
+#lifesHud img
+{
+    padding: 4px 0;
+    height: 15px;
+    margin: 0 2px;
+}
+#lifesHud span
+{
+    display: inline-block;
+    transition: all 0.5s ease-in-out 0s;
+    color: var(--color4);
+}
+#lifesHud span.change
+{
+    transition-duration: 0s;
+    transform: scale(2);
+}
+#lifesHud img,
+#lifesHud svg
+{
+    transform-style: preserve-3d;
+    vertical-align: middle;
+}
+.lifesRotate img,
+.lifesRotate svg
+{
+    animation: rotation 5.0s linear 0s infinite normal none running;
+}
+@keyframes rotation
+{
+    100%
+    {
+        transform: rotateY(360deg);
+    }
+}
+.huds
+{
+    height: 165px;
+    background-color: var(--color10);
+    word-spacing: -0.25em;
+}
+.huds p
+{
+    margin: 1em 0 0.25em 0;
+}
+.blackHud
+{
+    display: inline-block;
+    border-radius: 1em;
+    padding: 1em;
+    background-color: var(--color5);
+    color: var(--color10);
+    text-align: left;
+}
+.blackHud p
+{
+    color: var(--color10);
+    margin: 0.5em 0;
+}
+.whiteHud
+{
+    display: inline-block;
+    padding: 1em;
+    border: solid 1px var(--color5);
+    border-radius: 1em;
+    background-color: var(--color10);
+    color: var(--color5);
+    text-align: left;
+}
+#speedHud
+{
+    height: 50px;
+}
+#speedHud #fons
+{
+    fill: var(--color5);
+}
+#speedHud .speed
+{
+    fill: var(--colorSpeed);
+}
+#speedHud #speed0.active
+{
+    fill: var(--color10);
+}
+#speedHud #speed1.active,
+#speedHud #speed2.active,
+#speedHud #speed3.active
+{
+    fill: var(--color7);
+}
+#speedHud #speed4.active
+{
+    fill: var(--color13);
+}
+#speedHud #speed5.active
+{
+    fill: var(--color9);
+}
+#speedHud #speed6.active
+{
+    fill: var(--color6);
+}
+#speedHud #meterHud
+{
+    fill: var(--color10);
+    transform-origin: 50% 89%;
+    transition: all 0.25s ease 0s;
+    transform: rotate(0deg);
+}
+#speedHud #axis
+{
+    fill: var(--color12);
+}
+#speedHud .kphud
+{
+    fill: var(--colorKph);
+}
+#speedHud .kph0 path,
+#speedHud .kph1 path,
+#speedHud .kph2 path,
+#speedHud .kph3 path,
+#speedHud .kph4 path,
+#speedHud .kph5 path,
+#speedHud .kph6 path,
+#speedHud .kph0 .kmh,
+#speedHud .kph1 .kmh,
+#speedHud .kph2 .kmh,
+#speedHud .kph3 .kmh,
+#speedHud .kph4 .kmh,
+#speedHud .kph5 .kmh,
+#speedHud .kph6 .kmh
+{
+    display: block;
+    fill: var(--color5);
+}
+#speedHud #kph .kmh
+{
+    font-size: 50pt;
+    font-family: system-ui;
+}
+#speedHud .kph0 path.on,
+#speedHud .kph0 .kmh
+{
+    fill: var(--color10);
+}
+#speedHud .kph1 path.on,
+#speedHud .kph2 path.on,
+#speedHud .kph3 path.on,
+#speedHud .kph1 .kmh,
+#speedHud .kph2 .kmh,
+#speedHud .kph3 .kmh
+{
+    fill: var(--color7);
+}
+#speedHud .kph4 path.on,
+#speedHud .kph4 .kmh
+{
+    fill: var(--color13);
+}
+#speedHud .kph5 path.on,
+#speedHud .kph5 .kmh
+{
+    fill: var(--color9);
+}
+#speedHud .kph6 path.on,
+#speedHud .kph6 .kmh
+{
+    fill: var(--color6);
+}
+#zHud
+{
+    width: 60px;
+    text-align: right;
+    letter-spacing: 2px;
+}
+.weaponsHud
+{
+    display: block;
+    margin: 0 0.5em;
+    font-weight: bold;
+    color: var(--colorWeapons1);
+    border: solid 1px var(--colorWeapons2);
+    border-radius: 0.5em;
+    padding: 0.5em;
+    line-height: 1;
+    width: 7em;
+    box-sizing: border-box;
+    text-align: center;
+    transition: all 0.75s ease 0s;
+}
+.weaponExtra
+{
+    display: inline-block;
+    color: var(--colorWeapons1);
+    background-color: var(--colorWeapons2);
+    margin: 0 0.3em 0.3em 0.3em;
+    font-size: 1.4em;
+    border-radius: 0.75em;
+    padding: 0.2em 0.1em;
+    transition: all 0.75s ease 0s;
+}
+.weaponsHud.fire0.enable
+{
+    color: var(--color1);
+    border-color: var(--color1);
+}
+.weaponsHud.fire0.active,
+.weaponExtra.fire0.active
+{
+    color: var(--color5);
+    background-color: var(--color1);
+}
+.weaponsHud.fire1.enable
+{
+    color: var(--color2);
+    border-color: var(--color2);
+}
+.weaponsHud.fire1.active,
+.weaponExtra.fire1.active
+{
+    color: var(--color5);
+    background-color: var(--color2);
+}
+.weaponsHud.fire2.enable
+{
+    color: var(--color3);
+    border-color: var(--color3);
+}
+.weaponsHud.fire2.active,
+.weaponExtra.fire2.active
+{
+    color: var(--color5);
+    background-color: var(--color3);
+}
+.weaponsHud.fire3.enable
+{
+    color: var(--color4);
+    border-color: var(--color4);
+}
+.weaponsHud.fire3.active,
+.weaponExtra.fire3.active
+{
+    color: var(--color5);
+    background-color: var(--color4);
+}
+#enemiesHud,
+#enemiesHud2
+{
+    -webkit-mask-image: url("../svgs/star.svg");
+    -webkit-mask-repeat: repeat-x;
+    mask-image: url("../svgs/star.svg");
+    mask-repeat: repeat-x;
+    width: 270px;
+    height: 16px;
+}
+#enemiesHud
+{
+    position: relative;
+    background-color: var(--color11);
+}
+#enemiesHud2
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--color6);
+    transition: all 1s linear 0s;
+}
+#enemiesHud2.change
+{
+    background-color: var(--color6);
+}
+.lifeHud,
+.lifeHud2,
+.fuelHud,
+.fuelHud2,
+.ammoHud,
+.ammoHud2,
+.shieldHud,
+.shieldHud2
+{
+    height: 16px;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 16px 16px;
+    -webkit-mask-position: top left;
+    mask-repeat: no-repeat;
+    mask-size: 16px 16px;
+    mask-position: top left;
+}
+.lifeHud,
+.fuelHud,
+.ammoHud,
+.shieldHud
+{
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    background-color: var(--color12);
+}
+.lifeHud2,
+.fuelHud2,
+.ammoHud2,
+.shieldHud2
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 1s linear 0s;
+}
+.lifeHud,
+.lifeHud2
+{
+    -webkit-mask-image: url("../svgs/solid/heart.svg");
+    mask-image: url("../svgs/solid/heart.svg");
+}
+.fuelHud,
+.fuelHud2
+{
+    -webkit-mask-image: url("../svgs/solid/gas-pump.svg");
+    mask-image: url("../svgs/solid/gas-pump.svg");
+}
+.ammoHud,
+.ammoHud2
+{
+    -webkit-mask-image: url("../svgs/solid/crosshairs.svg");
+    mask-image: url("../svgs/solid/crosshairs.svg");
+}
+.shieldHud,
+.shieldHud2
+{
+    -webkit-mask-image: url("../svgs/solid/shield-halved.svg");
+    mask-image: url("../svgs/solid/shield-halved.svg");
+}
+.multiHud
+{
+    vertical-align: top;
+    font-size: 16px;
+    /*text-shadow: 0 1px 0 var(--color6);*/
+}
+.multiHud2
+{
+    display: inline-block;
+    width: 18px;
+    height: 16px;
+    line-height: 16px;
+    font-size: 8px;
+    vertical-align: top;
+    text-align: center;
+    color: var(--color5);
+    border-radius: 50%;
+    letter-spacing: -0.5px;
+}
+.multiHud3
+{
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 16px;
+    line-height: 16px;
+    font-size: 8px;
+    text-align: center;
+    color: var(--color5);
+    margin-right: 1px;
+    box-sizing: border-box;
+    vertical-align: top;
+    background-color: var(--color12);
+}
+.multiHud3.first
+{
+    border-radius: 3px 0 0 3px;
+}
+.multiHud3.last
+{
+    border-radius: 0 3px 3px 0;
+}
+.multiHud3 .fa-burst
+{
+    position: absolute;
+    top: 4px;
+    left: 3px;
+}
+.multiHud3 .fa-clock
+{
+    position: absolute;
+    top: 4px;
+    right: 3px;
+}
+.levelHud
+{
+    display: inline-block;
+    height: 10px;
+    margin: 3px 0;
+    background-color: var(--color2);
+    box-sizing: border-box;
+    transition: width 1s linear 0s, background-color 0.5s linear 0s;
+}
+.level2Hud
+{
+    display: inline-block;
+    width: 100px;
+    height: 4px;
+    margin: 2px 0 2px 18px;
+    border-left: solid 4px var(--color2);
+    border-right: solid 4px var(--color2);
+    border-bottom: solid 2px var(--color2);
+    box-sizing: border-box;
+}
+.levelIcon
+{
+    font-size: 1.5em;
+    margin: 0px 0.25em 2px 0;
+    color: var(--color2);
+    vertical-align: bottom;
+}
+.turnHud
+{
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 180px;
+    height: 30px;
+    color: var(--color12);
+    background-color: var(--color5);
+    overflow: hidden;
+    padding: 12px 0;
+    border-radius: 1em;
+}
+.turnHud::before
+{
+    position: absolute;
+    font-family: "Font Awesome 6 Pro";
+    font-weight: bold;
+    font-size: 2em;
+    content: "\f0d7";
+    margin-left: -5.5px;
+    margin-top: -18px;
+    color: var(--color7);
+}
+.turnHud::after
+{
+    position: absolute;
+    font-family: "Font Awesome 6 Pro";
+    font-weight: bold; 
+    font-size: 2em;
+    content: "\f0d8";
+    margin-left: -5.5px;
+    margin-top: 8px;
+    color: var(--color7);
+}
+#headingHud
+{
+    position: absolute;
+    left: -371.25px;
+    text-wrap: nowrap;
+}
+#headingHud div
+{
+    display: inline-block;
+    width: 22.50px;
+    text-align: center;
+}
+#mapHud
+{
+    position: relative;
+    width: 158px;
+    height: 86px;
+    box-sizing: border-box;
+}
+#mapHud>*
+{
+    position: absolute;
+    text-align: center;
+}
+#mapHud table
+{
+    width: 142px;
+    height: 70px;
+    box-sizing: border-box;
+    border-bottom: solid 1px var(--color4);
+    border-right: solid 1px var(--color4);
+}
+#mapHud table tr td
+{
+    border-top: solid 1px var(--color4);
+    border-left: solid 1px var(--color4);
+}
+#mapHud .mapItemPlayer
+{
+    font-size: 8px;
+    color: var(--color10);
+}
+#mapHud .mapItem
+{
+    font-size: 7.5px;
+    color: var(--color7);
+}
+#mapHud .enemyItem
+{
+    font-size: 7px;
+    color: var(--color6);
+}
+#mapHud .enemyItem3
+{
+    border-radius: 50%;
+}
+#mapHud .enemyItem2,
+#mapHud .enemyItem3,
+#mapHud .bossItem
+{
+    width: 6px;
+    height: 6px;
+}
+#mapHud .enemyItem2,
+#mapHud .enemyItem3
+{
+    background-color: var(--color4);
+}
+#mapHud .bossItem
+{
+    background-color: var(--color6);
+}
+.optionsIcon
+{
+    color: var(--color10);
+    font-size: 1.5em;
+}
+#sound,
+#music
+{
+    display: inline-block;
+}
+.optionsIcon,
+#sound,
+#music
+{
+    transition: opacity 0.3s linear 0s, color 0.15s linear 0s, transform 0.3s linear 0s;
+}
+.optionsIcon.change,
+#sound.change,
+#music.change
+{
+    opacity: 0;
+    color: var(--color6);
+    transform: scale(10);
+}
+#hudsMulti
+{
+    display: none;
+    max-height: 124px;
+    margin: 2.5px 0;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+.multiHuds
+{
+    display: block;
+    width: 295px;
+    height: 26px;
+    margin: 2.5px;
+    padding: 5px;
+    background-color: var(--color5);
+    border-radius: 1em;
+    box-sizing: border-box;
+}
+.keys
+{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 90px;
+    word-spacing: -0.25em;
+}
+.keys .tabs
+{
+    position: absolute;
+    bottom: 70px;
+    left: 0px;
+    width: 100%;
+}
+.keys .tab
+{
+    display: inline-block;
+    vertical-align: bottom;
+    color: var(--colorKeys1);
+    background-color: var(--colorKeys2);
+    padding: 0.75em 1.5em;
+    border-radius: 2em 2em 0 0;
+    text-decoration: none;
+    margin-left: 1px;
+    -webkit-box-shadow: 0 -1px 0 0 var(--color5);
+    -moz-box-shadow: 0 -1px 0 0 var(--color5);
+    box-shadow: 0 -1px 0 0 var(--color5);
+    transition: all 0.5s ease 0s;
+}
+.keys .tab:hover
+{
+    background-color: var(--color6);
+    color: var(--color10);
+    padding-bottom: 1.5em;
+}
+.keys .tab.active,
+.keys .tab.active:hover
+{
+    color: var(--color6);
+    background-color: var(--colorKeys3);
+    cursor: default;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding-bottom: 1.35em;
+}
+.keys .tab.fixed
+{
+    position: absolute;
+    display: inline-block;
+    right: 20px;
+    bottom: 0px;
+    height: 25px;
+    background-color: var(--colorKeys3);
+    padding: 2.5px 10px;
+    box-sizing: border-box;
+    vertical-align: middle;
+    text-align: center;
+}
+.keys .tab.fixed a
+{
+    display: inline-block;
+    color: var(--color10);
+    font-size: 16px;
+    margin: 0 3px;
+    text-shadow: 0 1px 0 var(--color5);
+    text-decoration: none;
+    transition: all 0.5s ease 0s;
+}
+.keys .tab.fixed a:hover
+{
+    color: var(--color5);
+    text-shadow: 0 1px 0 var(--color10);
+    font-size: 18px;
+}
+.keys .tab.fixed a.active,
+.keys .tab.fixed a.active:hover
+{
+    color: var(--color6);
+    font-size: 20px;
+    text-shadow: 0 1px 0 var(--color5);
+    cursor: default;
+}
+a.interaction
+{
+    font-size: 13px;
+    color: var(--color5);
+    text-shadow: 0 1px 0 var(--color6);
+    cursor: default;
+}
+form a.interaction
+{
+    color: var(--color10);
+}
+.keys .keysContent
+{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 70px;
+    box-sizing: border-box;
+    background-color: var(--colorKeys3);
+    -webkit-box-shadow: 0 -1px 0 0 var(--color5);
+    -moz-box-shadow: 0 -1px 0 0 var(--color5);
+    box-shadow: 0 -1px 0 0 var(--color5);
+}
+.keys .keysContent .tabContent
+{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+}
+.keys .keysContent .tabContent.toggle
+{
+    transition-duration: 0s;
+    transform: rotateY(-90deg);
+}
+.keys .keysContent .tabContent.active
+{
+    transform: rotateY(0deg);
+    transition: all 0.5s linear 0.5s;
+}
+.keys .keysContent .tabContent.unactive
+{
+    transform: rotateY(90deg);
+    transition: all 0.5s linear 0s;
+    animation: rotate 0s linear 0.5s 1 normal none running;
+}
+.keys .keysContent .tabContent p
+{
+    margin: 1em 0.5em 0 0.5em;
+}
+.keys .keysContent .tabContent a.changeButton,
+.keys .keysContent .tabContent a.changingButton
+{
+    display: inline-block;
+    height: 100%;
+    color: var(--color5);
+    text-decoration: none;
+    transition: all 0.5s ease 0s;
+}
+.keys .keysContent .tabContent a.changeButton:hover,
+.keys .keysContent .tabContent a.changingButton
+{
+    border-radius: 3px;
+    margin: -2px;
+    padding: 2px;
+}
+.keys .keysContent .tabContent a.changeButton:hover
+{
+    outline: solid 2px var(--color6);
+    background-color: var(--colorKeys2);
+}
+.keys .keysContent .tabContent a.changingButton
+{
+    outline: solid 2px var(--color13);
+    background-color: var(--color3);
+}
+.keys .keysContent .tabContent .gamepad,
+.keys .keysContent .tabContent .joystick
+{
+    display: none;
+}
+@keyframes rotate
+{
+    0%
+    {
+        transform: rotateY(90deg);
+    }
+    100%
+    {
+        transform: rotateY(-90deg);
+    }
+}
+.no-key
+{
+    font-size: 24px;
+    color: var(--color6);
+    vertical-align: middle;
+    width: 24px;
+    text-align: center;
+    font-weight: bold;
+}
+.key,
+.key2,
+.key3
+{
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+    border-color: var(--color12);
+    border-radius: 0.5em;
+    border-style: groove;
+    border-width: 2px 3px 6px 3px;
+    background-color: var(--color11);
+    color: var(--color5);
+    text-align: center;
+    vertical-align: middle;
+}
+.key
+{
+    padding: 0.5em 0;
+}
+.key2,
+.key3
+{
+    letter-spacing: -0.5px;
+    font-size: 0.75em;
+    padding: 0.75em 0;
+}
+.key3
+{
+    padding: 0.25em 0;
+}
+.num
+{
+    color: var(--color11);
+    background-color: var(--color5);
+}
+.button,
+.button2,
+.button3,
+.button4,
+.button5,
+.button6
+{
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+    border-color: var(--color12);
+    border-radius: 100%;
+    border-style: groove;
+    border-width: 3px;
+    color: var(--color5);
+    text-align: center;
+    padding-top: 5px;
+}
+.button2
+{
+    color: var(--color10);
+    letter-spacing: -0.5px;
+    font-size: 0.75em;
+    width: 60px;
+    border-radius: 12px;
+    padding: 5px 2px;
+    background-color: var(--color14);
+}
+.button3,
+.button4,
+.button5,
+.button6
+{
+    background-color: var(--color11);
+}
+.button3
+{
+    border-radius: 50% 0 0 0;
+}
+.button4
+{
+    border-radius: 0 50% 0 0;
+}
+.button5
+{
+    border-radius: 0 0 50% 0;
+}
+.button6
+{
+    border-radius: 0 0 0 50%;
+}
+.button.red
+{
+    color: var(--color10);
+    background-color: var(--color6);
+}
+.button.green
+{
+    background-color: var(--color7);
+}
+.button.blue
+{
+    color: var(--color10);
+    background-color: var(--color8);
+}
+.button.gray
+{
+    color: var(--color10);
+    background-color: var(--color14);
+}
+.button.silver,
+.button2.silver
+{
+    background-color: var(--color11);
+}
+.button2.silver
+{
+    padding: 2px 10px;
+    color: var(--color5);
+}
+.button.yellow
+{
+    background-color: var(--color13);
+}
+.fa-caret-up,
+.fa-caret-down,
+.fa-caret-left,
+.fa-caret-right
+{
+    vertical-align: baseline;
+    font-size: 1.5em;
+}
+.fa-caret-up
+{
+    display: block;
+    margin: -9px 0 -3px 8px;
+}
+.fa-caret-down
+{
+    display: block;
+    margin: 28px 0 -32px 8px;
+}
+.fa-square
+{
+    color: var(--color5);
+    margin: 0;
+    padding: 0;
+    font-size: 6px;
+}
+form
+{
+    display: none;
+    position: absolute;
+    top: 218px;
+    left: 747px;
+    font-size: 10px;
+    color: var(--color9);
+}
+input,
+select
+{
+    border: solid 1px var(--color10);
+    margin-top: 10px;
+    padding: 0;
+    box-sizing: border-box;
+    outline: 0;
+    font-family: "PressStart2P";
+    font-size: 10px;
+    color: var(--color10);
+    background-color: var(--color5);
+}
+input:focus,
+select:focus
+{
+    border: 0;
+    color: var(--color5);
+    background-color: var(--color10);
+}
+/*input:focus:invalid,
+select:focus:invalid
+{
+    border-color: var(--color6);
+}*/
+/*input:invalid,
+select:invalid
+{
+    border-color: var(--color6);
+}
+input:invalid:required,
+select:invalid:required
+{
+    border-color: var(--color13);
+}
+input:valid,
+select:valid
+{
+    border-color: var(--color7);
+}*/
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="color"],
+select
+{
+    width: 160px;
+    height: 20px;
+    line-height: 20px;
+}
+input[type="text"],
+input[type="password"]
+{
+    padding: 2px;
+}
+input[type="color"],
+input[type="button"],
+input[type="submit"]
+{
+    cursor: pointer;
+}
+input[type="button"],
+input[type="submit"]
+{
+    border-radius: 10px;
+    padding: 2px 5px;
+}
+input[type="button"]:hover,
+input[type="submit"]:hover
+{
+    background-color: var(--color6);
+    transition: all 0.5s ease 0s;
+}
+.rollover
+{
+    position: absolute;
+    display: none;
+    border-radius: 5px;
+    border-width: 1px;
+    padding: 5px;
+    font-size: 10px;
+}
+#fps_monitor
+{
+    text-align: left;
+    display: inline-block;
+    margin-top: 1em;
+    border: solid 1px var(--color5);
+    border-radius: 1em;
+    padding: 0.75em;
+    word-spacing: -0.75em;
+    line-height: 1.5em;
+    transition: all 1s ease 0s;
+    transform: scale(0);
+}
+#fps_monitor.active
+{
+    transform: scale(1);
+}
+#blackScreen
+{
+    position: absolute;
+    display: none;
+    top: 1px;
+    left: 1px;
+    width: 1022px;
+    height: 502px;
+    background-color: var(--color5);
+}
+
+@media screen and (max-width: 1023px)
+{
+    html
+    {
+        overflow-x: scroll;
+    }
+}
+
+@media screen and (max-height: 739px)
+{
+    html
+    {
+        overflow-y: scroll;
+    }
+}
