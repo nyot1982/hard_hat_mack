@@ -275,26 +275,6 @@ article p
     border: solid 1px var(--color12);
     box-sizing: border-box;
 }
-#ship .ship
-{
-    fill: var(--colorShip);
-} 
-#ship .light
-{
-    fill: var(--colorLight);
-}
-.lifesRotate img,
-.lifesRotate svg
-{
-    animation: rotation 5.0s linear 0s infinite normal none running;
-}
-@keyframes rotation
-{
-    100%
-    {
-        transform: rotateY(360deg);
-    }
-}
 .optionsIcon
 {
     color: var(--color10);
