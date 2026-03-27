@@ -1,4 +1,4 @@
-function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, engine1, engine2, engine1inc, engine2inc, lifes, life, fuel, ammo, shield, score_xp, gunStatus, wing1Status, wing2Status, engine1Status, engine2Status, time)
+function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes, life, fuel, ammo, shield, score_xp, gunStatus, wing1Status, wing2Status, time)
 {
     this.idShip = null;
     this.idControl = null;
@@ -56,12 +56,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
         ];
     }
     this.weapon = this.weapons.findIndex (weapon => weapon.active == true)
-    this.engine1 = engine1 || 0;
-    this.engine2 = engine2 || 0;
-    this.engine1max = 4;
-    this.engine2max = 4;
-    this.engine1inc = engine1inc || true;
-    this.engine2inc = engine2inc || true;
     this.lifes = lifes || 5;
     this.life = life || 100;
     this.fuel = fuel || 100;
@@ -71,9 +65,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
     {
         gun: gunStatus || true,
         wing1: wing1Status || true,
-        wing2: wing2Status || true,
-        engine1: engine1Status || true,
-        engine2: engine2Status || true
+        wing2: wing2Status || true
     }
     this.time = time || null;
     this.width = 28;
@@ -96,12 +88,8 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
             hook2Fill: null,
             wing1Fill: null,
             wing2Fill: null,
-            engine1Fill: null,
-            engine2Fill: null,
             lightFill: "#7B797B",
             shipStroke: null,
-            engine1Stroke: null,
-            engine2Stroke: null,
             lightStroke: null,
             negative: null,
             near: null,
@@ -171,7 +159,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
     {
         if (gameScreen == "game")
         {
-            if (!this.status.engine1 && !this.status.engine2) direction = 0;
             if (direction < 0)
             {
                 if (this.moveSpeed <= 0) this.move = -0.5;
@@ -220,7 +207,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
         }
         else if (gameScreen == "game" && gameModal == null)
         {
-            if (!this.status.engine1 && !this.status.engine2) direction = 0;
             if (direction < 0)
             {
                 if (this.strafeSpeed <= 0) this.strafe = -0.5;
@@ -324,10 +310,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     this.moveSpeed = 0;
                     this.strafeSpeed = 0;
                     this.fire = false;
-                    this.engine1 = 0;
-                    this.engine2 = 0;
-                    this.engine1inc = true;
-                    this.engine2inc = true;
                     this.life = 100;
                     this.fuel = 100;
                     this.ammo = 100;
@@ -335,8 +317,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     this.status.gun = true;
                     this.status.wing1 = true;
                     this.status.wing2 = true;
-                    this.status.engine1 = true;
-                    this.status.engine2 = true;
                     if (this.name == players [0].name)
                     {
                         var newPoint = this.x;
@@ -424,29 +404,14 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                             this.endStrafe = null;
                             this.strafe = 0;
                             this.strafeSpeed = 0;
-                            this.engine1max = 4;
-                            this.engine2max = 4;
                             if (pressed.keys [99].includes (38)) this.strafing (-1);
                             else if (pressed.keys [99].includes (40)) this.strafing (1);
-                            else
-                            {
-                                if (this.engine1 > this.engine1max)
-                                {
-                                    this.engine1 = this.engine1max;
-                                    this.engine1inc = false;
-                                }
-                                if (this.engine2 > this.engine2max)
-                                {
-                                    this.engine2 = this.engine2max;
-                                    this.engine2inc = false;
-                                }
-                            }
                         }
                     }
                 }
                 else if (gameScreen == "game" && gameModal == null)
                 {
-                    this.maxSpeed = !this.status.engine1 || !this.status.engine2 ? 3 : 6;
+                    this.maxSpeed = 6;
                     if (this.moveSpeed == 0 && this.move != 0 || this.moveSpeed != 0 && Math.abs (this.moveSpeed) <= this.maxSpeed)
                     {
                         this.moveSpeed = this.moveSpeed * 10 + this.move;
@@ -542,42 +507,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     this.paths.wing2.roundRect (23, 13, 4, 16, 2);
                     this.paths.wing2.roundRect (25, 26, 2, 5, 2);
                     ctx.stroke (this.paths.wing2);
-                }
-                if (this.status.engine1 || this.repairing != null)
-                {
-                    this.paths.engine1 = new Path2D ();
-                    this.paths.engine1.roundRect (7, 29, 4, 2, 1);
-                    if (this.colors.engine1Stroke != null) var engine1StrokeColor = this.colors.engine1Stroke;
-                    else var engine1StrokeColor = this.colors.shipFill;
-                    ctx.strokeStyle = engine1StrokeColor + "88";
-                    ctx.stroke (this.paths.engine1);
-                }
-                if (this.status.engine2 || this.repairing != null)
-                {
-                    this.paths.engine2 = new Path2D ();
-                    this.paths.engine2.roundRect (17, 29, 4, 2, 1);
-                    if (this.colors.engine2Stroke != null) var engine2StrokeColor = this.colors.engine2Stroke;
-                    else var engine2StrokeColor = this.colors.shipFill;
-                    ctx.strokeStyle = engine2StrokeColor + "88";
-                    ctx.stroke (this.paths.engine2);
-                }
-                if (this.status.engine1 || this.repairing != null && gameArea.frame % 125 >= 0 && gameArea.frame % 50 < 10)
-                {
-                    if (!this.status.engine1) ctx.fillStyle = engine1StrokeColor;
-                    else if (this.colors.engine1Fill != null) ctx.fillStyle = this.colors.engine1Fill;
-                    else if (this.colors.pattern) ctx.fillStyle = this.colors.shipFill;
-                    else ctx.fillStyle = this.colors.negative;
-                    ctx.fill (this.paths.engine1);
-                    this.shotsHit ("engine1");
-                }
-                if (this.status.engine2 || this.repairing != null && gameArea.frame % 100 >= 0 && gameArea.frame % 100 < 20)
-                {
-                    if (!this.status.engine2) ctx.fillStyle = engine2StrokeColor;
-                    else if (this.colors.engine2Fill != null) ctx.fillStyle = this.colors.engine2Fill;
-                    else if (this.colors.pattern) ctx.fillStyle = this.colors.shipFill;
-                    else ctx.fillStyle = this.colors.negative;
-                    ctx.fill (this.paths.engine2);
-                    this.shotsHit ("engine2");
                 }
                 if (this.status.gun || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 15)
                 {
