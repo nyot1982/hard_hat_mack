@@ -7,7 +7,6 @@ var fpsMonitor =
     },
     canvasWidth = 1020,
     canvasHeight = 500,
-    enemies = 0,
     idTypeAct = 0,
     blackScreen = false,
     gameScreen = null,
@@ -49,7 +48,7 @@ var fpsMonitor =
     menuHits = [],
     gameObjects = [],
     gameGround = [],
-    gameShips = [],
+    gameChars = [],
     gameEnemies = [],
     gameItems = [],
     gameText = [],
@@ -62,7 +61,7 @@ var fpsMonitor =
     userActions =
     [
         {
-            screen: ["menu", "modal_menu"],
+            screen: ["modal_menu"],
             action: "strafe_up",
             keyboard:
             {
@@ -80,7 +79,7 @@ var fpsMonitor =
             }
         },
         {
-            screen: ["menu", "modal_menu"],
+            screen: ["modal_menu"],
             action: "strafe_down",
             keyboard:
             {
@@ -98,7 +97,7 @@ var fpsMonitor =
             }
         },
         {
-            screen: ["menu", "modal_menu"],
+            screen: ["modal_menu"],
             action: "fire_menu",
             keyboard:
             {
@@ -466,7 +465,7 @@ function fetchLoad (cont, param)
     if (cont == "player")
     {
         gameText.push (new component ("text", cont == "player" ? "Loading..." : "Saving...", "yellow", 745, 395, "left", 10));
-        param = 'id=' + gameShips [0].id + '&' + param;
+        param = 'id=' + gameChars [0].id + '&' + param;
     }
   
     var cadParam = "fetch_call=fetch_origin";
@@ -546,14 +545,15 @@ function updateGameArea ()
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
         if (gameModes.findIndex (mode => mode.active == true) == 1 && gameArea.frame % 250 == 0) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), 0, 0, Math.floor (Math.random () * 720) - 360));
         else if (gameModes.findIndex (mode => mode.active == true) == 2 && gameArea.frame % 500 == 0) gameItems.push (new item (0, Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height)));
-        gameObjects = gameItems.concat (gameEnemies).concat (gameShips).concat (gameShots);
-        if (enemies == 0 && gameModes.findIndex (mode => mode.active == true) < 2)
+        gameObjects = gameItems.concat (gameEnemies).concat (gameChars).concat (gameShots);
+        /*if (gameModes.findIndex (mode => mode.active == true) < 2)
         {
             if (!gameBoss) gameBoss = new boss (0, gameMap.width / 2, gameMap.height / 2);
             gameBoss.update ();
-        }
+        }*/
         for (var object in gameObjects)
         {
+            gameObjects [object].newPos ();
             gameObjects [object].update ();
             if (gameHits.findIndex (hit => hit.name == gameObjects [object].name) > -1) for (var hit in gameHits.filter (hit => hit.name == gameObjects [object].name)) gameHits [hit].update ();
         }
@@ -574,7 +574,7 @@ function updateGameArea ()
         }
         for (var confirm in gameConfirm) gameConfirm [confirm].update ();
         for (var alert in gameAlert) gameAlert [alert].update ();
-        if (gameScreen != "game") for (var ship in gameShips) gameShips [ship].update ();
+        if (gameScreen != "game") for (var char in gameChars) gameChars [char].update ();
     }
     gameArea.frame++;
     gameArea.animation = window.requestAnimationFrame (updateGameArea);

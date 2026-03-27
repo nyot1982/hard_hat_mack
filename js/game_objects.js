@@ -57,9 +57,50 @@ function audio (src, loop)
     this.load ();
 }
 
-function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes, life, fuel, ammo, shield, score_xp, gunStatus, wing1Status, wing2Status, time)
+function mack (type, color, x, y, width, height)
 {
-    this.idShip = null;
+    this.type = type;
+    this.color = color;
+    this.x = x;
+    this.y = y;    
+    this.width = width;
+    this.height = height;
+
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.gravity = 0.1;
+    this.gravitySpeed = 0;
+    this.bounce = 0.6;
+
+    this.update = function ()
+    {
+        ctx = myGameArea.context;
+        ctx.fillStyle = this.color;
+        ctx.fillRect (this.x, this.y, this.width, this.height);
+    }
+
+    this.newPos = function ()
+    {
+        this.gravitySpeed += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY + this.gravitySpeed;
+        this.hitBottom ();
+    }
+
+    this.hitBottom = function ()
+    {
+        var rockbottom = canvasHeight - this.height;
+        if (this.y > rockbottom)
+        {
+            this.y = rockbottom;
+            this.gravitySpeed = -(this.gravitySpeed * this.bounce);
+        }
+    }
+}
+
+function mack2 (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes, life, fuel, ammo, shield, score_xp, gunStatus, wing1Status, wing2Status, time)
+{
+    this.idChar = null;
     this.idControl = null;
     this.name = name || null;
     this.x = x || canvasWidth / 2;
@@ -276,8 +317,8 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                             }
                             if (gameModes.findIndex (mode => mode.active == true) == 0 && path != "shield")
                             {
-                                var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
-                                if (gameShip > -1) gameShips [gameShip].score += 100;
+                                var gameChar = gameChars.findIndex (char => char.name == gameShots [gameShot].name);
+                                if (gameChar > -1) gameChars [gameChar].score += 100;
                             }
                             if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 300);
                         }
@@ -289,8 +330,8 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                                 gameSound.sounds ["hit0"].stop ();
                                 gameSound.sounds ["hit0"].play ();
                             }
-                            var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
-                            if (gameShip > -1) gameShips [gameShip].score += 1000;
+                            var gameChar = gameChars.findIndex (char => char.name == gameShots [gameShot].name);
+                            if (gameChar > -1) gameChars [gameChar].score += 1000;
                             this.playerDead ();
                         }
                     }
@@ -324,7 +365,7 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                     this.status.gun = true;
                     this.status.wing1 = true;
                     this.status.wing2 = true;
-                    if (this.name == gameShips [0].name)
+                    if (this.name == gameChars [0].name)
                     {
                         var newPoint = this.x;
                         if (newPoint < canvasWidth / 2) newPoint = canvasWidth / 2;
@@ -341,27 +382,19 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                     }
                     if (gameMusic.active)
                     {
-                        if (enemies == 0)
-                        {
-                            gameMusic.musics.boss.stop ();
-                            gameMusic.musics.boss.play ();
-                        }
-                        else if (enemies > 0)
-                        {
-                            gameMusic.musics.game.stop ();
-                            gameMusic.musics.game.play ();
-                        }
+                        gameMusic.musics.game.stop ();
+                        gameMusic.musics.game.play ();
                     }
                 }
                 else
                 {
-                    gameShips.splice (this.idShip, 1);
-                    if (gameModes.findIndex (mode => mode.active == true) == 2 && gameShips.length < 2)
+                    gameChars.splice (this.idChar, 1);
+                    if (gameModes.findIndex (mode => mode.active == true) == 2 && gameChars.length < 2)
                     {
-                        if (gameShips.length == 0) gameOpenModal ("exit", "Game over: Draw game");
-                        else gameOpenModal ("exit", "Game over: " + gameShips [0].name + " wins!");
+                        if (gameChars.length == 0) gameOpenModal ("exit", "Game over: Draw game");
+                        else gameOpenModal ("exit", "Game over: " + gameChars [0].name + " wins!");
                     }
-                    else if (gameModes.findIndex (mode => mode.active == true) < 2 && gameShips.length == 0)
+                    else if (gameModes.findIndex (mode => mode.active == true) < 2 && gameChars.length == 0)
                     {
                         $("#blackScreen").fadeIn (1000);
                         setTimeout
@@ -383,8 +416,8 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
     {
         if (this.name)
         {
-            this.idShip = gameShips.findIndex (ship => ship.name == this.name);
-            this.idControl = gameShips [this.idShip].control;
+            this.idChar = gameChars.findIndex (char => char.name == this.name);
+            this.idControl = gameChars [this.idChar].control;
         }
         else this.idControl = menuControl;
         if (this.life > 0)
@@ -484,10 +517,10 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                 this.paths.hook1.rect (5, 19, 2, 8);
                 this.paths.hook2 = new Path2D ();
                 this.paths.hook2.rect (21, 19, 2, 8);
-                if (this.colors.hook1Fill == null || this.colors.hook1Fill == this.colors.shipFill) this.paths.cockpit.addPath (this.paths.hook1);
-                if (this.colors.hook2Fill == null || this.colors.hook2Fill == this.colors.shipFill) this.paths.cockpit.addPath (this.paths.hook2);
+                if (this.colors.hook1Fill == null || this.colors.hook1Fill == this.colors.charFill) this.paths.cockpit.addPath (this.paths.hook1);
+                if (this.colors.hook2Fill == null || this.colors.hook2Fill == this.colors.charFill) this.paths.cockpit.addPath (this.paths.hook2);
                 ctx.lineWidth = 2;
-                if (this.colors.shipStroke != null) var strokeColor = this.colors.shipStroke;
+                if (this.colors.charStroke != null) var strokeColor = this.colors.charStroke;
                 else var strokeColor = this.colors.negative;
                 ctx.strokeStyle = strokeColor + "CC";
                 ctx.stroke (this.paths.cockpit)
@@ -541,17 +574,17 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                     ctx.fill (this.paths.wing2);
                     this.shotsHit ("wing2");
                 }
-                if (this.colors.hook1Fill != null && this.colors.hook1Fill != this.colors.shipFill)
+                if (this.colors.hook1Fill != null && this.colors.hook1Fill != this.colors.charFill)
                 {
                     ctx.fillStyle = this.colors.hook1Fill;
                     ctx.fill (this.paths.hook1);
                 }
-                if (this.colors.hook2Fill != null && this.colors.hook2Fill != this.colors.shipFill)
+                if (this.colors.hook2Fill != null && this.colors.hook2Fill != this.colors.charFill)
                 {
                     ctx.fillStyle = this.colors.hook2Fill;
                     ctx.fill (this.paths.hook2);
                 }
-                ctx.fillStyle = this.colors.pattern || this.colors.shipFill;
+                ctx.fillStyle = this.colors.pattern || this.colors.charFill;
                 ctx.fill (this.paths.cockpit);
                 this.shotsHit ("cockpit");
                 ctx.rotate (45 * Math.PI / 180);
@@ -617,7 +650,7 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                     ctx.rect (this.x - nameMeasure / 2 - 2, this.y - this.height / 2, nameMeasure + 4, 10);
                     ctx.fillStyle = this.colors.negative;
                     ctx.fill ();
-                    ctx.fillStyle = this.colors.shipFill;
+                    ctx.fillStyle = this.colors.charFill;
                     ctx.fillText (this.name, this.x + (textMeasure == 0 ? 0 : textMeasure / 2 + 1), this.y - this.height / 2);
                     if (this.xp != null)
                     {
@@ -625,12 +658,12 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                         ctx.font = "5px PressStart2P";
                         ctx.beginPath ();
                         ctx.rect (this.x - nameMeasure / 2 - 1, this.y - this.height / 2, textMeasure, 8);
-                        ctx.fillStyle = this.colors.shipFill;
+                        ctx.fillStyle = this.colors.charFill;
                         ctx.fill ();
                         ctx.fillStyle = this.colors.negative;
                         ctx.fillText (Math.floor (this.xp / 100), this.x - nameMeasure / 2 - 1, this.y - this.height / 2);
                     }
-                    if (this.name == gameShips [0].name)
+                    if (this.name == gameChars [0].name)
                     {
                         if (this.x > canvasWidth / 2 && this.x < (gameMap.width - canvasWidth) + canvasWidth / 2)
                         {
@@ -651,19 +684,19 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                         ctx.fill ();
                         ctx.beginPath ();
                         ctx.rect (this.x - 50 / 2, this.y + 10, Math.round ((gameArea.frame - this.repairing) * 50 / 500), 5);
-                        ctx.fillStyle = this.colors.shipFill;
+                        ctx.fillStyle = this.colors.charFill;
                         ctx.fill ();
                     }
                 }
                 if (gameModes.findIndex (mode => mode.active == true) > 0)
                 {
-                    for (var gameShip in gameShips)
+                    for (var gameChar in gameChars)
                     {
-                        if (this.name != gameShips [gameShip].name)
+                        if (this.name != gameChars [gameChar].name)
                         {
-                            var dx = this.x - gameShips [gameShip].x;
-                            var dy = this.y - gameShips [gameShip].y;
-                            if (this.shield == 0 && gameShips [gameShip].shield == 0 && Math.sqrt (dx * dx + dy * dy) < 30)
+                            var dx = this.x - gameChars [gameChar].x;
+                            var dy = this.y - gameChars [gameChar].y;
+                            if (this.shield == 0 && gameChars [gameChar].shield == 0 && Math.sqrt (dx * dx + dy * dy) < 30)
                             {
                                 this.life = 0;
                                 this.score += 500;
@@ -675,25 +708,25 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                                 }
                                 if (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2)
                                 {
-                                    gameShips [gameShip].life = 0;
-                                    gameShips [gameShip].score += 500;
-                                    gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
+                                    gameChars [gameChar].life = 0;
+                                    gameChars [gameChar].score += 500;
+                                    gameHits.push (new hit ("hit0", gameChars [gameChar].x, gameChars [gameChar].y, 40, 2));
                                     if (gameSound.active)
                                     {
                                         gameSound.sounds ["hit0"].stop ();
                                         gameSound.sounds ["hit0"].play ();
                                     }
-                                    gameShips [gameShip].playerDead ();
+                                    gameChars [gameChar].playerDead ();
                                 }
                                 this.playerDead ();
                                 return;
                             }
-                            else if (this.shield > 0 && gameShips [gameShip].shield > 0 && Math.sqrt (dx * dx + dy * dy) < 58)
+                            else if (this.shield > 0 && gameChars [gameChar].shield > 0 && Math.sqrt (dx * dx + dy * dy) < 58)
                             {
                                 this.shield -= 10;
                                 if (this.shield < 0) this.shield = 0;
-                                gameShips [gameShip].shield -= 10;
-                                if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;
+                                gameChars [gameChar].shield -= 10;
+                                if (gameChars [gameChar].shield < 0) gameChars [gameChar].shield = 0;
                                 gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
                                 if (gameSound.active)
                                 {
@@ -703,25 +736,25 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                             }
                             else if (Math.sqrt (dx * dx + dy * dy) < 44)
                             {
-                                if (this.shield > 0 && gameShips [gameShip].shield == 0)
+                                if (this.shield > 0 && gameChars [gameChar].shield == 0)
                                 {
                                     this.shield -= 10;
                                     if (this.shield < 0) this.shield = 0;
                                     this.score += 1000;
-                                    gameShips [gameShip].life = 0;
-                                    gameHits.push (new hit ("hit0", gameShips [gameShip].x, gameShips [gameShip].y, 40, 2));
+                                    gameChars [gameChar].life = 0;
+                                    gameHits.push (new hit ("hit0", gameChars [gameChar].x, gameChars [gameChar].y, 40, 2));
                                     if (gameSound.active)
                                     {
                                         gameSound.sounds ["hit0"].stop ();
                                         gameSound.sounds ["hit0"].play ();
                                     }
-                                    gameShips [gameShip].playerDead ();
+                                    gameChars [gameChar].playerDead ();
                                 }
-                                else if (gameShips [gameShip].shield > 0 && this.shield == 0)
+                                else if (gameChars [gameChar].shield > 0 && this.shield == 0)
                                 {
-                                    gameShips [gameShip].shield -= 10;
-                                    if (gameShips [gameShip].shield < 0) gameShips [gameShip].shield = 0;       
-                                    gameShips [gameShip].score += 1000;
+                                    gameChars [gameChar].shield -= 10;
+                                    if (gameChars [gameChar].shield < 0) gameChars [gameChar].shield = 0;       
+                                    gameChars [gameChar].score += 1000;
                                     this.life = 0;
                                     gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
                                     if (gameSound.active)
@@ -736,7 +769,7 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                         }
                     }
                 }
-                if (enemies == 0 && gameBoss)
+                if (gameBoss)
                 {
                     var dx = this.x - gameBoss.x;
                     var dy = this.y - gameBoss.y;
@@ -752,7 +785,7 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                     }
                     else if (Math.sqrt (dx * dx + dy * dy) < 31)
                     {
-                        if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == gameShips [0].name) this.life = 0;
+                        if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == gameChars [0].name) this.life = 0;
                         gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
                         if (gameSound.active)
                         {
@@ -781,7 +814,6 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                         if (gameEnemies [gameEnemy].type < 7)
                         {
                             gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
-                            if (enemies > 0) enemies--;
                             this.score += 500;
                         }
                         if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
@@ -801,7 +833,6 @@ function mack (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, lifes
                         if (gameEnemies [gameEnemy].type < 7)
                         {
                             gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
-                            if (enemies > 0) enemies--;
                             this.score += 250;
                         }
                         if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
@@ -1112,33 +1143,33 @@ function item (enemy, x, y)
             }
             this.radius -= (16 / 1000);
 
-            for (var gameShip in gameShips)
+            for (var gameChar in gameChars)
             {
-                var dx = this.x - gameShips [gameShip].x;
-                var dy = this.y - gameShips [gameShip].y;
+                var dx = this.x - gameChars [gameChar].x;
+                var dy = this.y - gameChars [gameChar].y;
                 if (Math.sqrt (dx * dx + dy * dy) < 30)
                 {
                     this.taken = true;
-                    if (gameShips [gameShip].life > 0)
+                    if (gameChars [gameChar].life > 0)
                     {
                         if (this.type == 0) var vital = "life";
                         else if (this.type == 1) var vital = "fuel";
                         else if (this.type == 2) var vital = "ammo";
                         else if (this.type == 3) var vital = "shield";
-                        else if (this.type == 4 && gameShips [gameShip].weapons [gameShips [gameShip].weapon].rate == 1) gameShips [gameShip].weapons [gameShips [gameShip].weapon].rate = 1.5;
-                        else if (this.type == 5 && gameShips [gameShip].weapons [gameShips [gameShip].weapon].power == 1) gameShips [gameShip].weapons [gameShips [gameShip].weapon].power++;
-                        else if (this.type == 6 && gameShips [gameShip].lifes < 10) gameShips [gameShip].lifes++;
-                        else if (this.type > 6 && gameShips [gameShip].weapon != this.type - 6)
+                        else if (this.type == 4 && gameChars [gameChar].weapons [gameChars [gameChar].weapon].rate == 1) gameChars [gameChar].weapons [gameChars [gameChar].weapon].rate = 1.5;
+                        else if (this.type == 5 && gameChars [gameChar].weapons [gameChars [gameChar].weapon].power == 1) gameChars [gameChar].weapons [gameChars [gameChar].weapon].power++;
+                        else if (this.type == 6 && gameChars [gameChar].lifes < 10) gameChars [gameChar].lifes++;
+                        else if (this.type > 6 && gameChars [gameChar].weapon != this.type - 6)
                         {
-                            gameShips [gameShip].weapons [gameShips [gameShip].weapon].active = false;
-                            gameShips [gameShip].weapon = this.type - 6;
-                            gameShips [gameShip].weapons [gameShips [gameShip].weapon].active = true;
-                            if (gameShips [gameShip].weapons [gameShips [gameShip].weapon].power == 0) gameShips [gameShip].weapons [gameShips [gameShip].weapon].power = 1;
+                            gameChars [gameChar].weapons [gameChars [gameChar].weapon].active = false;
+                            gameChars [gameChar].weapon = this.type - 6;
+                            gameChars [gameChar].weapons [gameChars [gameChar].weapon].active = true;
+                            if (gameChars [gameChar].weapons [gameChars [gameChar].weapon].power == 0) gameChars [gameChar].weapons [gameChars [gameChar].weapon].power = 1;
                         }
                         if (this.type < 4)
                         {
-                            gameShips [gameShip][vital] += 10;
-                            if (gameShips [gameShip][vital] > 100) gameShips [gameShip][vital] = 100;        
+                            gameChars [gameChar][vital] += 10;
+                            if (gameChars [gameChar][vital] > 100) gameChars [gameChar][vital] = 100;        
                         }
                     }
                 }
@@ -1235,12 +1266,6 @@ function component (type, src, color, x, y, width, height, max, backColor)
                     }
                     switch (this.src)
                     {
-                        case "Cooperative":
-                            if (gameControls [0] != "keyboard") changeControl ("keyboard", 99);
-                        break;
-                        case "Versus":
-                            if (gameControls [1] != "keyboard") changeControl ("keyboard", 99);
-                        break;
                         case "Sound":
                             if (gameSound.active)
                             {
@@ -1262,21 +1287,13 @@ function component (type, src, color, x, y, width, height, max, backColor)
                         case "Music":
                             if (gameMusic.active)
                             {
-                                if (gameModal == "menu")
-                                {
-                                    if (enemies == 0) gameMusic.musics.boss.stop ();
-                                    else gameMusic.musics.game.stop ();
-                                }
+                                if (gameModal == "menu") gameMusic.musics.game.stop ();
                                 else gameMusic.musics.menu.stop ();
                                 gameMusic.active = false;
                             }
                             else
                             {
-                                if (gameModal == "menu")
-                                {
-                                    if (enemies == 0) gameMusic.musics.boss.play ();
-                                    else gameMusic.musics.game.play ();
-                                }
+                                if (gameModal == "menu") gameMusic.musics.game.play ();
                                 else gameMusic.musics.menu.play ();
                                 gameMusic.active = true;
                             }

@@ -78,7 +78,7 @@ function enemy (type, x, y, heading)
 
     this.update = function ()
     {
-        if (this.life > 0 && enemies > 0)
+        if (this.life > 0)
         {
             ctx = gameArea.ctx;
             if (this.type < 3 || this.type == 7)
@@ -750,7 +750,7 @@ function enemy (type, x, y, heading)
                     var dy = this.y - gameShots [gameShot].y;
                     if ((this.type < 3 && Math.sqrt (dx * dx + dy * dy) < 18) || (this.type == 3 && Math.sqrt (dx * dx + dy * dy) < 24) || (this.type > 3 && this.type < 7 && Math.sqrt (dx * dx + dy * dy) < 30) || (this.type == 7 && Math.sqrt (dx * dx + dy * dy) < 17))
                     {
-                        var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
+                        var gameChar = gameChars.findIndex (char => char.name == gameShots [gameShot].name);
                         gameShots [gameShot].hit = true;
                         this.life -= 10;
                         if (this.life == 0)
@@ -763,15 +763,12 @@ function enemy (type, x, y, heading)
                             }
                             if (this.type < 3)
                             {
-                                enemies--;
-                                if (gameShip > -1) gameShips [gameShip].score += 500;
+                                if (gameChar > -1) gameChars [gameChar].score += 500;
                             }
                             else if (this.type < 7)
                             {
-                                enemies -= 4;
-                                if (gameShip > -1) gameShips [gameShip].score += 1000;
+                                if (gameChar > -1) gameChars [gameChar].score += 1000;
                             }
-                            if (enemies < 0) enemies = 0;
                             if (this.type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
                             if (this.type < 7) gameItems.push (new item (this.type, this.x, this.y));
                         }
@@ -783,10 +780,9 @@ function enemy (type, x, y, heading)
                                 gameSound.sounds ["hit1"].stop ();
                                 gameSound.sounds ["hit1"].play ();
                             }
-                            if (gameShips [gameShip].name == gameShots [gameShot].name && this.type < 7)
+                            if (gameChars [gameChar].name == gameShots [gameShot].name && this.type < 7)
                             {
-                                if (enemies > 0) enemies--;
-                                if (gameShip > -1) gameShips [gameShip].score += 100;
+                                if (gameChar > -1) gameChars [gameChar].score += 100;
                             }
                         }
                     }
@@ -808,7 +804,7 @@ function enemy (type, x, y, heading)
                 this.lastShotFrame = gameArea.frame;
             }
         }
-        else if (this.life > 0 && enemies == 0)
+        else if (this.life > 0)
         {
             this.life = 0;
             gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));

@@ -28,7 +28,7 @@ function gameLoadScreen (screen)
     gameBoss = null;
     menuShots = [];
     menuHits = [];
-    gameShips = [];
+    gameChars = [];
     gameEnemies = [];
     gameShots = [];
     gameHits = [];
@@ -47,11 +47,7 @@ function gameLoadScreen (screen)
             x: canvasWidth / 2,
             y: canvasHeight / 2,
         };
-        if (gameMusic.active)
-        {
-            if (enemies == 0) gameMusic.musics.boss.stop ();
-            else if (enemies > 0) gameMusic.musics.game.stop ();
-        }
+        if (gameMusic.active) gameMusic.musics.game.stop ();
     }
     if (gameScreen == "menu" && screen == "game" && gameMusic.active) gameMusic.musics.menu.stop ();
     gameScreen = screen;
@@ -109,7 +105,7 @@ function gameLoadScreen (screen)
     {
         if (gameModes.findIndex (mode => mode.active == true) == 0) generateGameMap ("level1");
         else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
-        for (var i = 0; i < gameShips.length; i++) gameShips.push (new mack ("Player 1", 0, 0));
+        gameChars.push (new mack (0, "red", 30, 30, 50, 50));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
@@ -172,7 +168,6 @@ function gameCloseModal ()
 
 function generateGameMap (map)
 {
-    enemies = 270;
     switch (map)
     {
         case "level1":

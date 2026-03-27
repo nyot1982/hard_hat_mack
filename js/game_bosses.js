@@ -375,7 +375,7 @@ function boss (type, x, y)
 
 function bossHit (gameShot, engine)
 {
-    var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
+    var gameChar = gameChars.findIndex (char => char.name == gameShots [gameShot].name);
     gameShots [gameShot].hit = true;
     gameBoss.life -= 10;
     if (gameBoss.life == 0)
@@ -386,7 +386,7 @@ function bossHit (gameShot, engine)
             gameSound.sounds ["hit0"].stop ();
             gameSound.sounds ["hit0"].play ();
         }
-        gameShips [gameShip].score += 5000;
+        gameChars [gameChar].score += 5000;
         if (gameModal != null) gameCloseModal ();
         if (gameMusic.active) gameMusic.musics.boss.stop ();
         setTimeout
@@ -435,6 +435,6 @@ function bossHit (gameShot, engine)
             gameSound.sounds ["hit1"].stop ();
             gameSound.sounds ["hit1"].play ();
         }
-        gameShips [gameShip].score += 100;
+        gameChars [gameChar].score += 100;
     }
 }
