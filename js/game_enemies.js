@@ -783,7 +783,7 @@ function enemy (type, x, y, heading)
                                 gameSound.sounds ["hit1"].stop ();
                                 gameSound.sounds ["hit1"].play ();
                             }
-                            if (players [0].name == gameShots [gameShot].name && this.type < 7)
+                            if (gameShips [gameShip].name == gameShots [gameShot].name && this.type < 7)
                             {
                                 if (enemies > 0) enemies--;
                                 if (gameShip > -1) gameShips [gameShip].score += 100;

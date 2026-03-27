@@ -406,15 +406,6 @@ input[type="submit"]:hover
     background-color: var(--color6);
     transition: all 0.5s ease 0s;
 }
-.rollover
-{
-    position: absolute;
-    display: none;
-    border-radius: 5px;
-    border-width: 1px;
-    padding: 5px;
-    font-size: 10px;
-}
 #fps_monitor
 {
     text-align: left;

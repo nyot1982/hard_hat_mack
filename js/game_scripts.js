@@ -62,10 +62,6 @@ var fpsMonitor =
     gameHits = [],
     highScores = [],
     highScoreSave = [],
-    playerId = null,
-    players = [],
-    storedPlayers = [],
-    playerColors = ["#A5FF9A", "#FF9AA5", "#9AA5FF", "#FFFF9A", "#9AFFFF", "#9A9A9A", "#FF9AFF", "#FFFFFF"],
     changingButton = null,
     userActions =
     [
@@ -532,11 +528,10 @@ $(document).ready (function ()
 
 function fetchLoad (cont, param)
 {
-    if (cont == "player" || cont == "config_save")
+    if (cont == "player")
     {
         gameText.push (new component ("text", cont == "player" ? "Loading..." : "Saving...", "yellow", 745, 395, "left", 10));
-        if (cont == "config_save") param = 'game_music=' + (gameMusic.active ? '1' : '0') + '&game_sound=' + (gameSound.active ? '1' : '0') + '&fps_monitor=' + ($("#fps_monitor").hasClass ("active") ? '1' : '0') + '&user_actions=' + JSON.stringify (userActions);
-        param = 'id=' + players [0].id + '&' + param;
+        param = 'id=' + gameShips [0].id + '&' + param;
     }
   
     var cadParam = "fetch_call=fetch_origin";
@@ -569,24 +564,9 @@ function fetchLoad (cont, param)
                 if (cont == "player")
                 {
                     gameText.pop ();
-                    var form = document.getElementById ("player");
-                    if (responseJSON ["error"] == "name_exists")
-                    {
-                        form.name.setCustomValidity ("Name already exists.");
-                        form.name.reportValidity ();
-                    }
-                    else if (responseJSON ["error"] == "password_ko")
-                    {
-                        form.password.setCustomValidity ("Wrong Password.");
-                        form.password.reportValidity ();
-                    }
-                    else gameAlert.push (new component ("text", responseJSON ["error"], "red", 745, 395, "left", 10));
+                    gameAlert.push (new component ("text", responseJSON ["error"], "red", 745, 395, "left", 10));
                 }
                 else console.error ("Error! ", responseJSON ["error"]);
-            }
-            else if (cont == "player")
-            {
-                
             }
             else document.getElementById (cont).innerHTML += responseJSON [cont];
         }
@@ -604,7 +584,6 @@ function submitForm (form)
     }
     else
     {
-        players = [];
         gameAlert = [];
         for (var i = 0; i < form.length; i++)
         {
@@ -614,17 +593,10 @@ function submitForm (form)
                 {
                     if (form.elements [j].type == "text" && form.elements [i].value == form.elements [j].value)
                     {
-                        players = [];
                         gameAlert.push (new component ("text", "All names must be diferent.", "red", 745, 255 + (form.length * 25), "left", 10));
                         return;
                     }
                 }
-                players [i] =
-                {
-                    name: form.elements [i].value || "Player" + (i > 0 ? (" " + (i * 1 + 1)) : ""),
-                    color: playerColors [i],
-                    control: (gameModes.findIndex (mode => mode.active == true) != 1 && gameModes.findIndex (mode => mode.active == true) != 2 ? menuControl : form.elements [i].id)
-                };
             }
         }
         if (!blackScreen)

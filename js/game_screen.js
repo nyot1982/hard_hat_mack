@@ -39,10 +39,6 @@ function gameLoadScreen (screen)
     gameConfirm = [];
     idTypeAct = 0;
     gameModal = null;
-    document.getElementById ("rollovers").innerHTML = "";
-    document.getElementById ("players").style.display = "none";
-    document.getElementById ("player").style.display = "none";
-    document.getElementById ("sign").style.display = "none";
 
     if (gameScreen == "game" && (screen == "menu" || screen == "game_over" || screen == "game_completed"))
     {
@@ -68,7 +64,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
     }
-    else if (gameScreen == "menu" || gameScreen == "player")
+    else if (gameScreen == "menu")
     {
         if (gameScreen == "menu" && gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
         gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
@@ -82,7 +78,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [5].y + 25, "left", 10));
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [6].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
-        menuShip = new ship (null, playerColors [0], 450, gameText [0].y + 15, 90);
+        menuShip = new ship (null, 450, gameText [0].y + 15, 90);
         gameScreen = "menu";
     }
     else if (gameScreen == "high_scores")
@@ -126,35 +122,10 @@ function gameLoadScreen (screen)
     {
         if (gameModes.findIndex (mode => mode.active == true) == 0) generateGameMap ("level1");
         else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
-        for (var i = 0; i < players.length; i++)
+        for (var i = 0; i < gameShips.length; i++)
         {
-            gameShips.push (new ship (players [i].name, players [i].color, startPoints [i].x, startPoints [i].y));
-            startPoints [i].ship = players [i].name;
-        }
-        if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
-        else
-        {
-            if (gameModes.findIndex (mode => mode.active == true) == 0)
-            {
-                storedPlayers =
-                [
-                    {
-                        name: players [0].name,
-                    }
-                ];
-            }
-            else
-            {
-                storedPlayers = [];
-                for (var player in players)
-                {
-                    storedPlayers [player] =
-                    {
-                        name: players [player].name
-                    };
-                }
-            }
-            localStorage ["players" + gameModes.findIndex (mode => mode.active == true)] = JSON.stringify (storedPlayers);
+            gameShips.push (new ship ("Player 1", startPoints [i].x, startPoints [i].y));
+            startPoints [i].ship = "Player 1";
         }
         if (gameMusic.active)
         {
@@ -203,7 +174,7 @@ function gameOpenModal (modal, text)
         gameText.push (new component ("text", "FPS Monitor", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Exit", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, startPoint.y + 445, "center", 10));
-        menuShip = new ship (null, playerColors [0], startPoint.x + 450, startPoint.y + 255, 90);
+        menuShip = new ship (null, startPoint.x + 450, startPoint.y + 255, 90);
     }
     else
     {

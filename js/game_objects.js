@@ -298,7 +298,7 @@ function item (enemy, x, y)
     }
 }
 
-function component (type, src, color, x, y, width, height, max, backColor, rollover, rolloverColor)
+function component (type, src, color, x, y, width, height, max, backColor)
 {
     this.type = type;
     this.src = src;
@@ -315,14 +315,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
     this.height = height;
     this.max = max;
     this.backColor = backColor;
-    this.rollover = rollover;
-    this.rolloverColor = rolloverColor;
-    if (this.rollover != null)
-    {
-        var rollovers = document.getElementById ("rollovers");
-        this.idRollover = rollovers.childElementCount;
-        rollovers.innerHTML += '<div class="rollover" id="rollover_' + this.idRollover + '" style="background-color: ' + (this.rolloverColor || "#FFFFFF") + 'DD; border-color: ' + (this.rolloverColor  || "white" ) + ';">' + this.rollover + '</div>';
-    }
 
     this.update = function (idComponent)
     {
@@ -377,21 +369,6 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                 else ctx.fillText (this.src, this.x, this.y + 1);
             }
         }
-        if (this.rollover != null)
-        {
-            var mouseOver = false,
-                rollover = document.getElementById ("rollover_" + this.idRollover);
-
-            if (this.type == "image" && mouse.x >= this.x - this.width / 2 && mouse.x <= this.x + this.width / 2 && mouse.y >= this.y - this.height / 2 && mouse.y <= this.y + this.height / 2) mouseOver = true;
-            else if (this.type == "text" && mouse.x >= this.x && mouse.x <= this.x + textMeasure.width && mouse.y >= this.y - this.height / 2 && mouse.y <= this.y + this.height / 2) mouseOver = true;
-            if (mouseOver)
-            {
-                rollover.style.top = (mouse.y - 18) + "px";
-                rollover.style.left = (mouse.x + 2) + "px";
-                $(rollover).fadeIn (1000);
-            }
-            else $(rollover).fadeOut (1000);
-        }
         if (gameModal == "menu" || gameScreen == "menu")
         {
             for (var menuShot in menuShots)
@@ -409,36 +386,11 @@ function component (type, src, color, x, y, width, height, max, backColor, rollo
                     }
                     switch (this.src)
                     {
-                        case "One Player":
-                            if (typeof (localStorage.players0) !== "undefined" && localStorage.players0.length > 0) storedPlayers = JSON.parse (localStorage.players0);
-                            var form = document.getElementById ("players");
-                            if (form.length > 2)
-                            {
-                                for (var i = 1; i < form.length - 1; i++)
-                                {
-                                    form.elements [i].remove ();
-                                    form.getElementsByTagName ("a")[i].remove ();
-                                }
-                            }
-                            form.style.display = "block";
-                            form.elements [0].focus ();
-                            form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
-                        break;
                         case "Cooperative":
-                            if (typeof (localStorage.players1) !== "undefined" && localStorage.players1.length > 0) storedPlayers = JSON.parse (localStorage.players1);
-                            if (controlTab != "keyboard") changeControl ("keyboard", 99);
-                            var form = document.getElementById ("players");
-                            form.style.display = "block";
-                            form.elements [0].focus ();
-                            form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
+                            if (gameControls [0] != "keyboard") changeControl ("keyboard", 99);
                         break;
                         case "Versus":
-                            if (typeof (localStorage.players2) !== "undefined" && localStorage.players2.length > 0) storedPlayers = JSON.parse (localStorage.players2);
-                            if (controlTab != "keyboard") changeControl ("keyboard", 99);
-                            var form = document.getElementById ("players");
-                            form.style.display = "block";
-                            form.elements [0].focus ();
-                            form.elements [0].value = (storedPlayers [0] && storedPlayers [0].name ? storedPlayers [0].name : "Player");
+                            if (gameControls [1] != "keyboard") changeControl ("keyboard", 99);
                         break;
                         case "Sound":
                             if (gameSound.active)

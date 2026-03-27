@@ -239,16 +239,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                         x: gameShots [gameShot].x,
                         y: gameShots [gameShot].y
                     }
-                    if (gameShips [this.idShip].name == players [0].name)
-                    {
-                        if (gameArea.centerPoint.x > canvasWidth / 2 && gameArea.centerPoint.x < (gameMap.width - canvasWidth) + canvasWidth / 2) shot.x -= gameArea.centerPoint.x - canvasWidth / 2;
-                        if (gameArea.centerPoint.y > canvasHeight / 2 && gameArea.centerPoint.y < (gameMap.height - canvasHeight) + canvasHeight / 2) shot.y -= gameArea.centerPoint.y - canvasHeight / 2;
-                    }
-                    else if (gameShots [gameShot].name == players [0].name)
-                    {
-                        if (gameArea.centerPoint.x > canvasWidth / 2 && gameArea.centerPoint.x < (gameMap.width - canvasWidth) + canvasWidth / 2) shot.x += gameArea.centerPoint.x - canvasWidth / 2;
-                        if (gameArea.centerPoint.y > canvasHeight / 2 && gameArea.centerPoint.y < (gameMap.height - canvasHeight) + canvasHeight / 2) shot.y += gameArea.centerPoint.y - canvasHeight / 2;
-                    }
                     if (ctx.isPointInStroke (this.paths [path], shot.x, shot.y) || ctx.isPointInPath (this.paths [path], shot.x, shot.y))
                     {
                         gameShots [gameShot].hit = true;
@@ -267,7 +257,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                                 gameSound.sounds ["hit1"].stop ();
                                 gameSound.sounds ["hit1"].play ();
                             }
-                            if (gameModes.findIndex (mode => mode.active == true) != 1 && gameModes.findIndex (mode => mode.active == true) != 2 && players [0].name == this.name && path != "shield")
+                            if (gameModes.findIndex (mode => mode.active == true) == 0 && path != "shield")
                             {
                                 var gameShip = gameShips.findIndex (ship => ship.name == gameShots [gameShot].name);
                                 if (gameShip > -1) gameShips [gameShip].score += 100;
@@ -317,7 +307,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     this.status.gun = true;
                     this.status.wing1 = true;
                     this.status.wing2 = true;
-                    if (this.name == players [0].name)
+                    if (this.name == gameShips [0].name)
                     {
                         var newPoint = this.x;
                         if (newPoint < canvasWidth / 2) newPoint = canvasWidth / 2;
@@ -348,7 +338,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                 }
                 else
                 {
-                    if (gameModes.findIndex (mode => mode.active == true) != 0) players.splice (players.findIndex (player => player.name == this.name), 1);
                     gameShips.splice (this.idShip, 1);
                     if (gameModes.findIndex (mode => mode.active == true) == 2 && gameShips.length < 2)
                     {
@@ -378,7 +367,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
         if (this.name)
         {
             this.idShip = gameShips.findIndex (ship => ship.name == this.name);
-            if (players.findIndex (player => player.name == this.name) > -1) this.idControl = players [players.findIndex (player => player.name == this.name)].control;
+            this.idControl = gameShips [this.idShip].control;
         }
         else this.idControl = menuControl;
         if (this.life > 0)
@@ -624,7 +613,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                         ctx.fillStyle = this.colors.negative;
                         ctx.fillText (Math.floor (this.xp / 100), this.x - nameMeasure / 2 - 1, this.y - this.height / 2);
                     }
-                    if (this.name == players [0].name)
+                    if (this.name == gameShips [0].name)
                     {
                         if (this.x > canvasWidth / 2 && this.x < (gameMap.width - canvasWidth) + canvasWidth / 2)
                         {
@@ -746,7 +735,7 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                     }
                     else if (Math.sqrt (dx * dx + dy * dy) < 31)
                     {
-                        if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == players [0].name) this.life = 0;
+                        if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == gameShips [0].name) this.life = 0;
                         gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
                         if (gameSound.active)
                         {
