@@ -392,16 +392,5 @@ function changeControl (newControl, idControl)
     if (gameScreen != "start")
     {
         if (idControl != null) menuControl = idControl;
-        if (gameModes.findIndex (mode => mode.active == true) != 1 && gameModes.findIndex (mode => mode.active == true) != 2 && controlTab != newControl)
-        {
-            $('#' + controlTab).removeClass ("active");
-            $('#' + newControl).addClass ("active");
-            $('#' + gameTab + 'Tab-' + controlTab).removeClass ("active");
-            $('#' + gameTab + 'Tab-' + controlTab).addClass ("unactive");
-            if ($('#' + gameTab + 'Tab-' + newControl).hasClass ("toggle")) $('#' + gameTab + 'Tab-' + newControl).removeClass ("toggle");
-            else if ($('#' + gameTab + 'Tab-' + newControl).hasClass ("unactive")) $('#' + gameTab + 'Tab-' + newControl).removeClass ("unactive");
-            $('#' + gameTab + 'Tab-' + newControl).addClass ("active");
-            controlTab = newControl;
-        }
     }
 }

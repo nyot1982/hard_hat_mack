@@ -23,8 +23,6 @@ var fpsMonitor =
     modalGround = null,
     menuShip = null,
     gameBoss = null,
-    gameTab = "menu",
-    controlTab = "keyboard",
     gameControls =
     {
         99: "keyboard"
