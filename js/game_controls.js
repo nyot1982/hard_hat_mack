@@ -30,7 +30,7 @@ function gamepadConnected (e)
     if (newControl && document.getElementById (newControl).style.display == 'none') $('#' + newControl).fadeIn (1000);
     pressed.buttons [e.gamepad.index * 1] = [];
     pressed.axes [e.gamepad.index * 1] = [];
-    if (gameScreen != "game" || gameModes.findIndex (mode => mode.active == true) == 0)
+    if (gameScreen != "game")
     {
         if (gameAlert.length > 0) gameAlert = [];
     }
@@ -102,10 +102,25 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
         gameMusic.musics =
         {
             menu: new audio ("music/menu.mp3", true),
-            game: new audio ("music/game.mp3", true),
-            boss: new audio ("music/boss.mp3", true)
+            game: new audio ("music/game.mp3", true)
         };
         //toggleFullScreen ();
+    }
+    else if (gameScreen == "menu")
+    {
+        if (!blackScreen)
+        {
+            blackScreen = true;
+            $("#blackScreen").fadeIn (1000);
+            setTimeout
+            (
+                () =>
+                {
+                    gameLoadScreen ("game");
+                },
+                1000
+            );
+        }
     }
     else if (gameScreen == "high_scores")
     {
@@ -251,18 +266,15 @@ function userActionStop (control, bt_type, bt_code, gameChar)
 function stopUserInteractions ()
 {
     var gameChar = gameChars.findIndex (char => char.name == "Player 1");
-    if (gameModes.findIndex (mode => mode.active == true) == 0)
+    pressed =
     {
-        pressed =
+        keys:
         {
-            keys:
-            {
-                99: []
-            },
-            buttons: [],
-            axes: []
-        };
-    }
+            99: []
+        },
+        buttons: [],
+        axes: []
+    };
     gameChars [gameChar].firing (false);
     gameChars [gameChar].moving (0);
     gameChars [gameChar].strafing (0);

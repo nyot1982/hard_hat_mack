@@ -240,8 +240,6 @@ function ground (type, color, x, y, width, height)
                     x: gameChars [gameChar].x,
                     y: gameChars [gameChar].y
                 }
-                if (gameArea.centerPoint.x > canvasWidth / 2 && gameArea.centerPoint.x < (gameMap.width - canvasWidth) + canvasWidth / 2) pos.x -= gameArea.centerPoint.x - canvasWidth / 2;
-                if (gameArea.centerPoint.y > canvasHeight / 2 && gameArea.centerPoint.y < (gameMap.height - canvasHeight) + canvasHeight / 2) pos.y -= gameArea.centerPoint.y - canvasHeight / 2;
                 if (ctx.isPointInPath (pos.x, pos.y)) gameChars [gameChar].ground = this.type;
             }
         }

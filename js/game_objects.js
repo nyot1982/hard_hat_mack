@@ -74,7 +74,7 @@ function mack (type, color, x, y, width, height)
 
     this.update = function ()
     {
-        ctx = myGameArea.context;
+        ctx = gameArea.ctx;
         ctx.fillStyle = this.color;
         ctx.fillRect (this.x, this.y, this.width, this.height);
     }
@@ -315,7 +315,7 @@ function mack2 (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, life
                                 gameSound.sounds ["hit1"].stop ();
                                 gameSound.sounds ["hit1"].play ();
                             }
-                            if (gameModes.findIndex (mode => mode.active == true) == 0 && path != "shield")
+                            if (path != "shield")
                             {
                                 var gameChar = gameChars.findIndex (char => char.name == gameShots [gameShot].name);
                                 if (gameChar > -1) gameChars [gameChar].score += 100;
@@ -344,7 +344,7 @@ function mack2 (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, life
     {
         if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
         if (this.lifes > 0) this.lifes--;
-        if (this.lifes == 0 && gameModes.findIndex (mode => mode.active == true) < 2) fetchLoad ("high_score_save", "name=" + this.name + "&score=" + this.score);
+        if (this.lifes == 0) fetchLoad ("high_score_save", "name=" + this.name + "&score=" + this.score);
         setTimeout
         (
             () =>
@@ -389,12 +389,8 @@ function mack2 (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, life
                 else
                 {
                     gameChars.splice (this.idChar, 1);
-                    if (gameModes.findIndex (mode => mode.active == true) == 2 && gameChars.length < 2)
-                    {
-                        if (gameChars.length == 0) gameOpenModal ("exit", "Game over: Draw game");
-                        else gameOpenModal ("exit", "Game over: " + gameChars [0].name + " wins!");
-                    }
-                    else if (gameModes.findIndex (mode => mode.active == true) < 2 && gameChars.length == 0)
+                    if (gameChars.length > 0) ameOpenModal ("exit", "Game over");
+                    else
                     {
                         $("#blackScreen").fadeIn (1000);
                         setTimeout
@@ -422,422 +418,253 @@ function mack2 (name, x, y, heading, moveSpeed, strafeSpeed, fire, weapons, life
         else this.idControl = menuControl;
         if (this.life > 0)
         {
-            if (this.ground != "snow")
+            if (this.turn != 0)
             {
-                if (this.turn != 0)
+                if (this.turn != 0) this.heading = (this.heading + this.turn) % 360;
+            }
+            this.radians = this.heading * Math.PI / 180;
+            if (gameScreen == "menu" || gameModal == "menu")
+            {
+                if (this.strafe != 0)
                 {
-                    if (this.turn != 0) this.heading = (this.heading + this.turn) % 360;
-                }
-                this.radians = this.heading * Math.PI / 180;
-                if (gameScreen == "menu" || gameModal == "menu")
-                {
-                    if (this.strafe != 0)
+                    this.x += this.strafe * Math.sin ((this.heading + 90) * Math.PI / 180);
+                    this.y -= this.strafe * Math.cos ((this.heading + 90) * Math.PI / 180);    
+                    if (this.y > this.endStrafe && this.strafe > 0 || this.y < this.endStrafe && this.strafe < 0)
                     {
-                        this.x += this.strafe * Math.sin ((this.heading + 90) * Math.PI / 180);
-                        this.y -= this.strafe * Math.cos ((this.heading + 90) * Math.PI / 180);    
-                        if (this.y > this.endStrafe && this.strafe > 0 || this.y < this.endStrafe && this.strafe < 0)
-                        {
-                            this.y = this.endStrafe;
-                            if (this.y > this.endStrafe && this.menuItem < 0) this.menuItem = 0;
-                            else if (this.y < this.endStrafe && this.menuItem >= this.menuItems) this.menuItem = this.menuItems - 1;
-                            this.endStrafe = null;
-                            this.strafe = 0;
-                            this.strafeSpeed = 0;
-                            if (pressed.keys [99].includes (38)) this.strafing (-1);
-                            else if (pressed.keys [99].includes (40)) this.strafing (1);
-                        }
+                        this.y = this.endStrafe;
+                        if (this.y > this.endStrafe && this.menuItem < 0) this.menuItem = 0;
+                        else if (this.y < this.endStrafe && this.menuItem >= this.menuItems) this.menuItem = this.menuItems - 1;
+                        this.endStrafe = null;
+                        this.strafe = 0;
+                        this.strafeSpeed = 0;
+                        if (pressed.keys [99].includes (38)) this.strafing (-1);
+                        else if (pressed.keys [99].includes (40)) this.strafing (1);
                     }
                 }
-                else if (gameScreen == "game" && gameModal == null)
+            }
+            else if (gameScreen == "game" && gameModal == null)
+            {
+                this.maxSpeed = 6;
+                if (this.moveSpeed == 0 && this.move != 0 || this.moveSpeed != 0 && Math.abs (this.moveSpeed) <= this.maxSpeed)
                 {
-                    this.maxSpeed = 6;
-                    if (this.moveSpeed == 0 && this.move != 0 || this.moveSpeed != 0 && Math.abs (this.moveSpeed) <= this.maxSpeed)
+                    this.moveSpeed = this.moveSpeed * 10 + this.move;
+                    this.moveSpeed /= 10;
+                    if (this.moveSpeed < 0 && this.move < 0 && this.moveSpeed <= -this.maxSpeed)
                     {
-                        this.moveSpeed = this.moveSpeed * 10 + this.move;
-                        this.moveSpeed /= 10;
-                        if (this.moveSpeed < 0 && this.move < 0 && this.moveSpeed <= -this.maxSpeed)
-                        {
-                            this.moveSpeed = -this.maxSpeed;
-                            this.move = 0;
-                        }
-                        else if (this.moveSpeed > 0 && this.move > 0 && this.moveSpeed >= this.maxSpeed)
-                        {
-                            this.moveSpeed = this.maxSpeed;
-                            this.move = 0;
-                        }
-                        else if (this.moveSpeed <= 0 && this.move == -1) this.move = -0.5;
-                        else if (this.moveSpeed >= 0 && this.move == 1) this.move = 0.5;
-                        else if (this.moveSpeed == 0) this.move = 0;
-                        var moveX = this.moveSpeed * Math.sin (this.radians);
-                        var moveY = this.moveSpeed * Math.cos (this.radians);
-                        this.x += moveX;
-                        this.y -= moveY;
+                        this.moveSpeed = -this.maxSpeed;
+                        this.move = 0;
                     }
-                    if (this.strafeSpeed == 0 && this.strafe != 0 || this.strafeSpeed != 0 && Math.abs (this.strafeSpeed) <= this.maxSpeed)
+                    else if (this.moveSpeed > 0 && this.move > 0 && this.moveSpeed >= this.maxSpeed)
                     {
-                        this.strafeSpeed = this.strafeSpeed * 10 + this.strafe;
-                        this.strafeSpeed /= 10;
-                        if (this.strafeSpeed < 0 && this.strafe < 0 && this.strafeSpeed <= -this.maxSpeed)
-                        {
-                            this.strafeSpeed = -this.maxSpeed;
-                            this.strafe = 0;
-                        }
-                        else if (this.strafeSpeed > 0 && this.strafe > 0 && this.strafeSpeed >= this.maxSpeed)
-                        {
-                            this.strafeSpeed = this.maxSpeed;
-                            this.strafe = 0;
-                        }
-                        else if (this.strafeSpeed <= 0 && this.strafe == -1) this.strafe = -0.5;
-                        else if (this.strafeSpeed >= 0 && this.strafe == 1) this.strafe = 0.5;
-                        else if (this.strafeSpeed == 0) this.strafe = 0;
-                        var moveX = this.strafeSpeed * Math.sin ((this.heading + 90) * Math.PI / 180);
-                        var moveY = this.strafeSpeed * Math.cos ((this.heading + 90) * Math.PI / 180);
-                        this.x += moveX;
-                        this.y -= moveY;    
+                        this.moveSpeed = this.maxSpeed;
+                        this.move = 0;
                     }
+                    else if (this.moveSpeed <= 0 && this.move == -1) this.move = -0.5;
+                    else if (this.moveSpeed >= 0 && this.move == 1) this.move = 0.5;
+                    else if (this.moveSpeed == 0) this.move = 0;
+                    var moveX = this.moveSpeed * Math.sin (this.radians);
+                    var moveY = this.moveSpeed * Math.cos (this.radians);
+                    this.x += moveX;
+                    this.y -= moveY;
                 }
-                if (this.x < 0) this.x = 0;
-                else if (this.x > gameMap.width) this.x = gameMap.width;
-                if (this.y < 0) this.y = 0;
-                else if (this.y > gameMap.height) this.y = gameMap.height;
-                ctx = gameArea.ctx;
-                ctx.save ();
-                ctx.translate (this.x, this.y);
-                ctx.rotate (this.radians);
-                ctx.translate (-(this.width / 2), -(this.height / 2));
-                ctx.globalAlpha = 1;
-                this.paths = [];
-                this.paths.cockpit = new Path2D ();
-                this.paths.cockpit.rect (9, 13, 10, 1);
-                this.paths.cockpit.rect (8, 14, 12, 1);
-                this.paths.cockpit.rect (7, 15, 14, 14);
-                this.paths.light = new Path2D ();
-                this.paths.light.roundRect (21, 1, 8, 8, 2);
-                this.paths.hook1 = new Path2D ();
-                this.paths.hook1.rect (5, 19, 2, 8);
-                this.paths.hook2 = new Path2D ();
-                this.paths.hook2.rect (21, 19, 2, 8);
-                if (this.colors.hook1Fill == null || this.colors.hook1Fill == this.colors.charFill) this.paths.cockpit.addPath (this.paths.hook1);
-                if (this.colors.hook2Fill == null || this.colors.hook2Fill == this.colors.charFill) this.paths.cockpit.addPath (this.paths.hook2);
-                ctx.lineWidth = 2;
-                if (this.colors.charStroke != null) var strokeColor = this.colors.charStroke;
-                else var strokeColor = this.colors.negative;
-                ctx.strokeStyle = strokeColor + "CC";
-                ctx.stroke (this.paths.cockpit)
-                if (this.status.gun || this.repairing != null)
+                if (this.strafeSpeed == 0 && this.strafe != 0 || this.strafeSpeed != 0 && Math.abs (this.strafeSpeed) <= this.maxSpeed)
                 {
-                    this.paths.gun = new Path2D ();
-                    this.paths.gun.roundRect (13, 1, 2, 7, 1);
-                    this.paths.gun.roundRect (11, 7, 6, 7, 2);
-                    ctx.stroke (this.paths.gun);
-                }
-                if (this.status.wing1 || this.repairing != null)
-                {
-                    this.paths.wing1 = new Path2D ();
-                    this.paths.wing1.roundRect (3, 9, 2, 6, 2);
-                    this.paths.wing1.roundRect (1, 13, 4, 16, 2);
-                    this.paths.wing1.roundRect (1, 26, 2, 5, 2);
-                    ctx.stroke (this.paths.wing1);
-                }
-                if (this.status.wing2 || this.repairing != null)
-                {
-                    this.paths.wing2 = new Path2D ();
-                    this.paths.wing2.roundRect (23, 9, 2, 6, 2);
-                    this.paths.wing2.roundRect (23, 13, 4, 16, 2);
-                    this.paths.wing2.roundRect (25, 26, 2, 5, 2);
-                    ctx.stroke (this.paths.wing2);
-                }
-                if (this.status.gun || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 15)
-                {
-                    if (!this.status.gun) ctx.fillStyle = strokeColor;
-                    else if (this.colors.gunFill != null) ctx.fillStyle = this.colors.gunFill;
-                    else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
-                    else ctx.fillStyle = this.colors.near;
-                    ctx.fill (this.paths.gun);
-                    this.shotsHit ("gun");
-                }
-                if (this.status.wing1 || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 25)
-                {
-                    if (!this.status.wing1) ctx.fillStyle = strokeColor;
-                    else if (this.colors.wing1Fill != null) ctx.fillStyle = this.colors.wing1Fill;
-                    else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
-                    else ctx.fillStyle = this.colors.near;
-                    ctx.fill (this.paths.wing1);
-                    this.shotsHit ("wing1");
-                }
-                if (this.status.wing2 || this.repairing != null && gameArea.frame % 50 >= 0 && gameArea.frame % 50 < 25)
-                {
-                    if (!this.status.wing2) ctx.fillStyle = strokeColor;
-                    else if (this.colors.wing2Fill != null) ctx.fillStyle = this.colors.wing2Fill;
-                    else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
-                    else ctx.fillStyle = this.colors.near;
-                    ctx.fill (this.paths.wing2);
-                    this.shotsHit ("wing2");
-                }
-                if (this.colors.hook1Fill != null && this.colors.hook1Fill != this.colors.charFill)
-                {
-                    ctx.fillStyle = this.colors.hook1Fill;
-                    ctx.fill (this.paths.hook1);
-                }
-                if (this.colors.hook2Fill != null && this.colors.hook2Fill != this.colors.charFill)
-                {
-                    ctx.fillStyle = this.colors.hook2Fill;
-                    ctx.fill (this.paths.hook2);
-                }
-                ctx.fillStyle = this.colors.pattern || this.colors.charFill;
-                ctx.fill (this.paths.cockpit);
-                this.shotsHit ("cockpit");
-                ctx.rotate (45 * Math.PI / 180);
-                ctx.fillStyle = this.colors.lightFill;
-                ctx.lineWidth = 1;
-                if (this.colors.lightStroke != null) ctx.strokeStyle = this.colors.lightStroke;
-                else if (this.colors.pattern) ctx.strokeStyle = this.colors.negative + "66";
-                else ctx.strokeStyle = this.colors.near;
-                ctx.fill (this.paths.light);
-                ctx.stroke (this.paths.light);
-                ctx.rotate (-45 * Math.PI / 180);
-                if (this.shield > 0)
-                {
-                    this.paths.shield = new Path2D ();
-                    this.paths.shield.arc (14, 19, 30, 0, 2 * Math.PI);
-                    ctx.beginPath ();
-                    ctx.lineWidth = 4;
-                    ctx.strokeStyle = this.colors.shields [this.colors.shield] + "FF";
-                    ctx.fillStyle = this.colors.shields [this.colors.shield] + "66";
-                    ctx.stroke (this.paths.shield);
-                    ctx.fill (this.paths.shield);
-                    if (gameArea.frame % 5 == 0)
+                    this.strafeSpeed = this.strafeSpeed * 10 + this.strafe;
+                    this.strafeSpeed /= 10;
+                    if (this.strafeSpeed < 0 && this.strafe < 0 && this.strafeSpeed <= -this.maxSpeed)
                     {
-                        this.colors.shield++;
-                        if (this.colors.shield == this.colors.shields.length) this.colors.shield = 0;
+                        this.strafeSpeed = -this.maxSpeed;
+                        this.strafe = 0;
                     }
-                    this.shotsHit ("shield");
-                }
-                if (this.name)
-                {
-                    ctx.translate (-this.x, -this.y);
-                    ctx.translate (this.width / 2, this.height / 2);
-                }
-                ctx.restore ();
-                if (gameArea.frame % 50 == 0)
-                {
-                    if (this.colors.lightFill == "#7B797B")
+                    else if (this.strafeSpeed > 0 && this.strafe > 0 && this.strafeSpeed >= this.maxSpeed)
                     {
-                        if (gameModal == "menu" || gameScreen == "menu") this.colors.lightFill = this.colors.weapons [4];
-                        else this.colors.lightFill = this.colors.weapons [this.weapon];
+                        this.strafeSpeed = this.maxSpeed;
+                        this.strafe = 0;
                     }
-                    else this.colors.lightFill = "#7B797B";
+                    else if (this.strafeSpeed <= 0 && this.strafe == -1) this.strafe = -0.5;
+                    else if (this.strafeSpeed >= 0 && this.strafe == 1) this.strafe = 0.5;
+                    else if (this.strafeSpeed == 0) this.strafe = 0;
+                    var moveX = this.strafeSpeed * Math.sin ((this.heading + 90) * Math.PI / 180);
+                    var moveY = this.strafeSpeed * Math.cos ((this.heading + 90) * Math.PI / 180);
+                    this.x += moveX;
+                    this.y -= moveY;    
                 }
-                else this.colors.lightFill = "#7B797B";
+            }
+            if (this.x < 0) this.x = 0;
+            else if (this.x > gameMap.width) this.x = gameMap.width;
+            if (this.y < 0) this.y = 0;
+            else if (this.y > gameMap.height) this.y = gameMap.height;
+            ctx = gameArea.ctx;
+            ctx.save ();
+            ctx.translate (this.x, this.y);
+            ctx.rotate (this.radians);
+            ctx.translate (-(this.width / 2), -(this.height / 2));
+            ctx.globalAlpha = 1;
+            this.paths = [];
+            this.paths.cockpit = new Path2D ();
+            this.paths.cockpit.rect (9, 13, 10, 1);
+            this.paths.cockpit.rect (8, 14, 12, 1);
+            this.paths.cockpit.rect (7, 15, 14, 14);
+            this.paths.light = new Path2D ();
+            this.paths.light.roundRect (21, 1, 8, 8, 2);
+            this.paths.hook1 = new Path2D ();
+            this.paths.hook1.rect (5, 19, 2, 8);
+            this.paths.hook2 = new Path2D ();
+            this.paths.hook2.rect (21, 19, 2, 8);
+            if (this.colors.hook1Fill == null || this.colors.hook1Fill == this.colors.charFill) this.paths.cockpit.addPath (this.paths.hook1);
+            if (this.colors.hook2Fill == null || this.colors.hook2Fill == this.colors.charFill) this.paths.cockpit.addPath (this.paths.hook2);
+            ctx.lineWidth = 2;
+            if (this.colors.charStroke != null) var strokeColor = this.colors.charStroke;
+            else var strokeColor = this.colors.negative;
+            ctx.strokeStyle = strokeColor + "CC";
+            ctx.stroke (this.paths.cockpit)
+            if (this.status.gun || this.repairing != null)
+            {
+                this.paths.gun = new Path2D ();
+                this.paths.gun.roundRect (13, 1, 2, 7, 1);
+                this.paths.gun.roundRect (11, 7, 6, 7, 2);
+                ctx.stroke (this.paths.gun);
+            }
+            if (this.status.wing1 || this.repairing != null)
+            {
+                this.paths.wing1 = new Path2D ();
+                this.paths.wing1.roundRect (3, 9, 2, 6, 2);
+                this.paths.wing1.roundRect (1, 13, 4, 16, 2);
+                this.paths.wing1.roundRect (1, 26, 2, 5, 2);
+                ctx.stroke (this.paths.wing1);
+            }
+            if (this.status.wing2 || this.repairing != null)
+            {
+                this.paths.wing2 = new Path2D ();
+                this.paths.wing2.roundRect (23, 9, 2, 6, 2);
+                this.paths.wing2.roundRect (23, 13, 4, 16, 2);
+                this.paths.wing2.roundRect (25, 26, 2, 5, 2);
+                ctx.stroke (this.paths.wing2);
+            }
+            if (this.status.gun || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 15)
+            {
+                if (!this.status.gun) ctx.fillStyle = strokeColor;
+                else if (this.colors.gunFill != null) ctx.fillStyle = this.colors.gunFill;
+                else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
+                else ctx.fillStyle = this.colors.near;
+                ctx.fill (this.paths.gun);
+                this.shotsHit ("gun");
+            }
+            if (this.status.wing1 || this.repairing != null && gameArea.frame % 75 >= 0 && gameArea.frame % 75 < 25)
+            {
+                if (!this.status.wing1) ctx.fillStyle = strokeColor;
+                else if (this.colors.wing1Fill != null) ctx.fillStyle = this.colors.wing1Fill;
+                else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
+                else ctx.fillStyle = this.colors.near;
+                ctx.fill (this.paths.wing1);
+                this.shotsHit ("wing1");
+            }
+            if (this.status.wing2 || this.repairing != null && gameArea.frame % 50 >= 0 && gameArea.frame % 50 < 25)
+            {
+                if (!this.status.wing2) ctx.fillStyle = strokeColor;
+                else if (this.colors.wing2Fill != null) ctx.fillStyle = this.colors.wing2Fill;
+                else if (this.colors.pattern) ctx.fillStyle = this.colors.pattern;
+                else ctx.fillStyle = this.colors.near;
+                ctx.fill (this.paths.wing2);
+                this.shotsHit ("wing2");
+            }
+            if (this.colors.hook1Fill != null && this.colors.hook1Fill != this.colors.charFill)
+            {
+                ctx.fillStyle = this.colors.hook1Fill;
+                ctx.fill (this.paths.hook1);
+            }
+            if (this.colors.hook2Fill != null && this.colors.hook2Fill != this.colors.charFill)
+            {
+                ctx.fillStyle = this.colors.hook2Fill;
+                ctx.fill (this.paths.hook2);
+            }
+            ctx.fillStyle = this.colors.pattern || this.colors.charFill;
+            ctx.fill (this.paths.cockpit);
+            this.shotsHit ("cockpit");
+            ctx.rotate (45 * Math.PI / 180);
+            ctx.fillStyle = this.colors.lightFill;
+            ctx.lineWidth = 1;
+            if (this.colors.lightStroke != null) ctx.strokeStyle = this.colors.lightStroke;
+            else if (this.colors.pattern) ctx.strokeStyle = this.colors.negative + "66";
+            else ctx.strokeStyle = this.colors.near;
+            ctx.fill (this.paths.light);
+            ctx.stroke (this.paths.light);
+            ctx.rotate (-45 * Math.PI / 180);
+            if (this.shield > 0)
+            {
+                this.paths.shield = new Path2D ();
+                this.paths.shield.arc (14, 19, 30, 0, 2 * Math.PI);
+                ctx.beginPath ();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = this.colors.shields [this.colors.shield] + "FF";
+                ctx.fillStyle = this.colors.shields [this.colors.shield] + "66";
+                ctx.stroke (this.paths.shield);
+                ctx.fill (this.paths.shield);
+                if (gameArea.frame % 5 == 0)
+                {
+                    this.colors.shield++;
+                    if (this.colors.shield == this.colors.shields.length) this.colors.shield = 0;
+                }
+                this.shotsHit ("shield");
             }
             if (this.name)
             {
-                var textMeasure = 0;
-                if (this.ground != "snow")
+                ctx.translate (-this.x, -this.y);
+                ctx.translate (this.width / 2, this.height / 2);
+            }
+            ctx.restore ();
+            if (gameArea.frame % 50 == 0)
+            {
+                if (this.colors.lightFill == "#7B797B")
                 {
-                    ctx.textBaseline = "middle";
-                    if (this.xp != null)
-                    {
-                        ctx.font = "5px PressStart2P";
-                        textMeasure = ctx.measureText (Math.floor (this.xp / 100));
-                        textMeasure = textMeasure.width;      
-                    }
-                    ctx.textAlign = "center";
-                    ctx.font = "6px PressStart2P";
-                    var nameMeasure = ctx.measureText (this.name);
-                    nameMeasure = nameMeasure.width + textMeasure;
-                    ctx.beginPath ();    
-                    ctx.rect (this.x - nameMeasure / 2 - 2, this.y - this.height / 2, nameMeasure + 4, 10);
-                    ctx.fillStyle = this.colors.negative;
-                    ctx.fill ();
-                    ctx.fillStyle = this.colors.charFill;
-                    ctx.fillText (this.name, this.x + (textMeasure == 0 ? 0 : textMeasure / 2 + 1), this.y - this.height / 2);
-                    if (this.xp != null)
-                    {
-                        ctx.textAlign = "left";
-                        ctx.font = "5px PressStart2P";
-                        ctx.beginPath ();
-                        ctx.rect (this.x - nameMeasure / 2 - 1, this.y - this.height / 2, textMeasure, 8);
-                        ctx.fillStyle = this.colors.charFill;
-                        ctx.fill ();
-                        ctx.fillStyle = this.colors.negative;
-                        ctx.fillText (Math.floor (this.xp / 100), this.x - nameMeasure / 2 - 1, this.y - this.height / 2);
-                    }
-                    if (this.name == gameChars [0].name)
-                    {
-                        if (this.x > canvasWidth / 2 && this.x < (gameMap.width - canvasWidth) + canvasWidth / 2)
-                        {
-                            ctx.translate (-(this.x - gameArea.centerPoint.x), 0);
-                            gameArea.centerPoint.x = this.x;
-                        }
-                        if (this.y > canvasHeight / 2 && this.y < (gameMap.height - canvasHeight) + canvasHeight / 2)
-                        {
-                            ctx.translate (0, -(this.y - gameArea.centerPoint.y));
-                            gameArea.centerPoint.y = this.y;
-                        }
-                    }
-                    if (this.repairing != null)
-                    {
-                        ctx.beginPath ();
-                        ctx.rect (this.x - 50 / 2, this.y + 10, 50, 5);
-                        ctx.fillStyle = this.colors.negative;
-                        ctx.fill ();
-                        ctx.beginPath ();
-                        ctx.rect (this.x - 50 / 2, this.y + 10, Math.round ((gameArea.frame - this.repairing) * 50 / 500), 5);
-                        ctx.fillStyle = this.colors.charFill;
-                        ctx.fill ();
-                    }
+                    if (gameModal == "menu" || gameScreen == "menu") this.colors.lightFill = this.colors.weapons [4];
+                    else this.colors.lightFill = this.colors.weapons [this.weapon];
                 }
-                if (gameModes.findIndex (mode => mode.active == true) > 0)
+                else this.colors.lightFill = "#7B797B";
+            }
+            else this.colors.lightFill = "#7B797B";
+            for (var gameEnemy in gameEnemies)
+            {
+                var dx = this.x - gameEnemies [gameEnemy].x;
+                var dy = this.y - gameEnemies [gameEnemy].y;
+                if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45)
                 {
-                    for (var gameChar in gameChars)
+                    gameEnemies [gameEnemy].life = 0;
+                    gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
+                    if (gameSound.active)
                     {
-                        if (this.name != gameChars [gameChar].name)
-                        {
-                            var dx = this.x - gameChars [gameChar].x;
-                            var dy = this.y - gameChars [gameChar].y;
-                            if (this.shield == 0 && gameChars [gameChar].shield == 0 && Math.sqrt (dx * dx + dy * dy) < 30)
-                            {
-                                this.life = 0;
-                                this.score += 500;
-                                gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                                if (gameSound.active)
-                                {
-                                    gameSound.sounds ["hit0"].stop ();
-                                    gameSound.sounds ["hit0"].play ();
-                                }
-                                if (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2)
-                                {
-                                    gameChars [gameChar].life = 0;
-                                    gameChars [gameChar].score += 500;
-                                    gameHits.push (new hit ("hit0", gameChars [gameChar].x, gameChars [gameChar].y, 40, 2));
-                                    if (gameSound.active)
-                                    {
-                                        gameSound.sounds ["hit0"].stop ();
-                                        gameSound.sounds ["hit0"].play ();
-                                    }
-                                    gameChars [gameChar].playerDead ();
-                                }
-                                this.playerDead ();
-                                return;
-                            }
-                            else if (this.shield > 0 && gameChars [gameChar].shield > 0 && Math.sqrt (dx * dx + dy * dy) < 58)
-                            {
-                                this.shield -= 10;
-                                if (this.shield < 0) this.shield = 0;
-                                gameChars [gameChar].shield -= 10;
-                                if (gameChars [gameChar].shield < 0) gameChars [gameChar].shield = 0;
-                                gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                                if (gameSound.active)
-                                {
-                                    gameSound.sounds ["hit0"].stop ();
-                                    gameSound.sounds ["hit0"].play ();
-                                }
-                            }
-                            else if (Math.sqrt (dx * dx + dy * dy) < 44)
-                            {
-                                if (this.shield > 0 && gameChars [gameChar].shield == 0)
-                                {
-                                    this.shield -= 10;
-                                    if (this.shield < 0) this.shield = 0;
-                                    this.score += 1000;
-                                    gameChars [gameChar].life = 0;
-                                    gameHits.push (new hit ("hit0", gameChars [gameChar].x, gameChars [gameChar].y, 40, 2));
-                                    if (gameSound.active)
-                                    {
-                                        gameSound.sounds ["hit0"].stop ();
-                                        gameSound.sounds ["hit0"].play ();
-                                    }
-                                    gameChars [gameChar].playerDead ();
-                                }
-                                else if (gameChars [gameChar].shield > 0 && this.shield == 0)
-                                {
-                                    gameChars [gameChar].shield -= 10;
-                                    if (gameChars [gameChar].shield < 0) gameChars [gameChar].shield = 0;       
-                                    gameChars [gameChar].score += 1000;
-                                    this.life = 0;
-                                    gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                                    if (gameSound.active)
-                                    {
-                                        gameSound.sounds ["hit0"].stop ();
-                                        gameSound.sounds ["hit0"].play ();
-                                    }
-                                    this.playerDead ();
-                                    return;
-                                }
-                            }
-                        }
+                        gameSound.sounds ["hit0"].stop ();
+                        gameSound.sounds ["hit0"].play ();
                     }
+                    if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 300);
+                    this.shield -= 5;
+                    if (this.shield < 0) this.shield = 0;
+                    if (gameEnemies [gameEnemy].type < 7)
+                    {
+                        gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
+                        this.score += 500;
+                    }
+                    if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
                 }
-                if (gameBoss)
+                else if (Math.sqrt (dx * dx + dy * dy) < 31)
                 {
-                    var dx = this.x - gameBoss.x;
-                    var dy = this.y - gameBoss.y;
-                    if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45)
+                    this.life = 0;
+                    gameEnemies [gameEnemy].life = 0;
+                    gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
+                    gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
+                    if (gameSound.active)
                     {
-                        if (gameSound.active)
-                        {
-                            gameSound.sounds ["hit1"].stop ();
-                            gameSound.sounds ["hit1"].play ();
-                        }
-                        this.shield -= 5;
-                        if (this.shield < 0) this.shield = 0;
+                        gameSound.sounds ["hit0"].stop ();
+                        gameSound.sounds ["hit0"].play ();
                     }
-                    else if (Math.sqrt (dx * dx + dy * dy) < 31)
+                    if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
+                    if (gameEnemies [gameEnemy].type < 7)
                     {
-                        if (gameModes.findIndex (mode => mode.active == true) < 2 || this.name == gameChars [0].name) this.life = 0;
-                        gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                        if (gameSound.active)
-                        {
-                            gameSound.sounds ["hit0"].stop ();
-                            gameSound.sounds ["hit0"].play ();
-                        }
-                        this.playerDead ();
+                        gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
+                        this.score += 250;
                     }
-                }
-                else for (var gameEnemy in gameEnemies)
-                {
-                    var dx = this.x - gameEnemies [gameEnemy].x;
-                    var dy = this.y - gameEnemies [gameEnemy].y;
-                    if (this.shield > 0 && Math.sqrt (dx * dx + dy * dy) < 45)
-                    {
-                        gameEnemies [gameEnemy].life = 0;
-                        gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
-                        if (gameSound.active)
-                        {
-                            gameSound.sounds ["hit0"].stop ();
-                            gameSound.sounds ["hit0"].play ();
-                        }
-                        if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 300);
-                        this.shield -= 5;
-                        if (this.shield < 0) this.shield = 0;
-                        if (gameEnemies [gameEnemy].type < 7)
-                        {
-                            gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
-                            this.score += 500;
-                        }
-                        if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
-                    }
-                    else if (Math.sqrt (dx * dx + dy * dy) < 31)
-                    {
-                        this.life = 0;
-                        gameEnemies [gameEnemy].life = 0;
-                        gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                        gameHits.push (new hit ("hit0", gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y, 40, 2));
-                        if (gameSound.active)
-                        {
-                            gameSound.sounds ["hit0"].stop ();
-                            gameSound.sounds ["hit0"].play ();
-                        }
-                        if (gameControls [this.idControl] == "gamepad") vibrate (this.idControl, 600);
-                        if (gameEnemies [gameEnemy].type < 7)
-                        {
-                            gameItems.push (new item (null, gameEnemies [gameEnemy].x, gameEnemies [gameEnemy].y));
-                            this.score += 250;
-                        }
-                        if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
-                        this.playerDead ();
-                    }
+                    if (gameEnemies [gameEnemy].type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
+                    this.playerDead ();
                 }
             }
             if (this.fire && (gameArea.frame - this.lastShotFrame) >= this.weapons [this.weapon].fireRate / this.weapons [this.weapon].rate)
@@ -1307,10 +1134,7 @@ function component (type, src, color, x, y, width, height, max, backColor)
                                 },
                                 300
                             );
-                        break;
-                        case "FPS Monitor":
-                            fpsHud ("toggle");
-                        break;
+                        bre
                         case "High Scores":
                             setTimeout
                             (

@@ -744,7 +744,7 @@ function enemy (type, x, y, heading)
 
             for (var gameShot in gameShots)
             {
-                if (gameShots [gameShot].name.substring (0, 6) != "enemy-" && gameShots [gameShot].name != "boss")
+                if (gameShots [gameShot].name.substring (0, 6) != "enemy-")
                 {
                     var dx = this.x - gameShots [gameShot].x;
                     var dy = this.y - gameShots [gameShot].y;

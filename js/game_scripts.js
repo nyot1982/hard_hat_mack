@@ -1,12 +1,5 @@
-var fpsMonitor =
-    {
-        time: 0,
-        frame: 0,
-        fps: 0,
-        ms: 0
-    },
-    canvasWidth = 1020,
-    canvasHeight = 500,
+var canvasWidth = 1024,
+    canvasHeight = 740,
     idTypeAct = 0,
     blackScreen = false,
     gameScreen = null,
@@ -20,7 +13,6 @@ var fpsMonitor =
         height: canvasHeight
     },
     modalGround = null,
-    gameBoss = null,
     gameControls =
     {
         99: "keyboard"
@@ -365,24 +357,6 @@ var fpsMonitor =
             }
         }
     ],
-    gameModes =
-    [
-        {
-            title: "One Player",
-            icon: "user",
-            active: false
-        },
-        {
-            title: "Local Multiplayer (Cooperative)",
-            icon: "user-group",
-            active: false
-        },
-        {
-            title: "Local Mltiplayer (Versus)",
-            icon: "regular fa-user-group",
-            active: false
-        }
-    ],
     gameSound =
     {
         active: true,
@@ -510,7 +484,6 @@ function fetchLoad (cont, param)
 
 function updateGameArea ()
 {
-    if (fpsMonitor.time > 0) fpsHud ("update");
     controls ();
     gameArea.clear ();
     for (var ground in gameGround) gameGround [ground].update ();
@@ -537,20 +510,13 @@ function updateGameArea ()
             }
         }
     }
-    if (gameScreen == "game")
+    else if (gameScreen == "game")
     {
         gameItems = gameItems.filter (item => !item.taken);
         gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        if (gameModes.findIndex (mode => mode.active == true) == 1 && gameArea.frame % 250 == 0) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), 0, 0, Math.floor (Math.random () * 720) - 360));
-        else if (gameModes.findIndex (mode => mode.active == true) == 2 && gameArea.frame % 500 == 0) gameItems.push (new item (0, Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height)));
         gameObjects = gameItems.concat (gameEnemies).concat (gameChars).concat (gameShots);
-        /*if (gameModes.findIndex (mode => mode.active == true) < 2)
-        {
-            if (!gameBoss) gameBoss = new boss (0, gameMap.width / 2, gameMap.height / 2);
-            gameBoss.update ();
-        }*/
         for (var object in gameObjects)
         {
             gameObjects [object].newPos ();

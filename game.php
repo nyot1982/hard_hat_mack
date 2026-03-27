@@ -24,9 +24,7 @@
         <script type="text/javascript" src="js/game_controls.js"></script>
         <script type="text/javascript" src="js/game_ground.js"></script>
         <script type="text/javascript" src="js/game_enemies.js"></script>
-        <script type="text/javascript" src="js/game_bosses.js"></script>
         <script type="text/javascript" src="js/game_objects.js"></script>
-        <script type="text/javascript" src="js/game_hud.js"></script>
     </head>
     <body>
         <?php
@@ -37,10 +35,6 @@
         <preloader><div class="spinner"></div></preloader>
         <main>
             <article>
-                <div id="fps_monitor">
-                    frame rate: <span id="frame_rate">0</span> <span title="Frames per second" style="cursor: default;">fps</span><br>
-                    frame time: <span id="frame_time">0</span> <span title="Milliseconds" style="cursor: default;">ms</span>
-                </div>
                 <div id="blackScreen"></div>
             </article>
         </main>

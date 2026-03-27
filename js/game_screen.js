@@ -25,9 +25,6 @@ function gameLoadScreen (screen)
     gameXP = [];
     gameGround = [];
     modalGround = null;
-    gameBoss = null;
-    menuShots = [];
-    menuHits = [];
     gameChars = [];
     gameEnemies = [];
     gameShots = [];
@@ -70,8 +67,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Versus", "white", 575, gameText [2].y + 25, "left", 10));
         gameText.push (new component ("text", "Sound", "white", 575, gameText [3].y + 25, "left", 10));
         gameText.push (new component ("text", "Music", "white", 575, gameText [4].y + 25, "left", 10));
-        gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [5].y + 25, "left", 10));
-        gameText.push (new component ("text", "High Scores", "white", 575, gameText [6].y + 25, "left", 10));
+        gameText.push (new component ("text", "High Scores", "white", 575, gameText [5].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
     }
     else if (gameScreen == "high_scores")
@@ -103,8 +99,7 @@ function gameLoadScreen (screen)
     }
     else if (gameScreen == "game")
     {
-        if (gameModes.findIndex (mode => mode.active == true) == 0) generateGameMap ("level1");
-        else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
+        generateGameMap ("level1");
         gameChars.push (new mack (0, "red", 30, 30, 50, 50));
         if (gameMusic.active)
         {
@@ -145,7 +140,6 @@ function gameOpenModal (modal, text)
         startMenu += 25;
         gameText.push (new component ("text", "Sound", "white", 575, startMenu, "left", 10));
         gameText.push (new component ("text", "Music", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Exit", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, 445, "center", 10));
     }
@@ -174,41 +168,17 @@ function generateGameMap (map)
             gameMap =
             {
                 name: map,
-                width: 4080,
-                height: 2000
+                width: canvasWidth,
+                height: canvasHeight
             };
             gameGround.push (new ground ("water", "#292C9C", 0, 0, gameMap.width, gameMap.height));
-            gameEnemies.push (new enemy (3, 150, 100, 0));
-            gameEnemies.push (new enemy (3, 900, 200, 0));
-            gameEnemies.push (new enemy (3, 200, 400, 0));
-            gameEnemies.push (new enemy (4, 800, 400, 0));
-            gameEnemies.push (new enemy (5, 1300, 350, 0));
-            gameEnemies.push (new enemy (4, 1700, 250, 0));
-            gameEnemies.push (new enemy (6, 2500, 250, 0));
-            gameEnemies.push (new enemy (5, 3500, 150, 0));
-            gameEnemies.push (new enemy (3, 3850, 350, 0));
-            gameEnemies.push (new enemy (6, 2500, 650, 0));
-            gameEnemies.push (new enemy (6, 2700, 750, 0));
-            gameEnemies.push (new enemy (6, 2500, 1200, 0));
-            gameEnemies.push (new enemy (6, 3400, 1200, 0));
-            gameEnemies.push (new enemy (5, 400, 1800, 0));
-            gameEnemies.push (new enemy (5, 1500, 1600, 0));
-            gameEnemies.push (new enemy (5, 2300, 1700, 0));
-            gameEnemies.push (new enemy (5, 3900, 1900, 0));
-            for (var y = 195; y < 2000; y += 410)
-            {
-                for (var x = 195; x < 4080; x += 410)
-                {
-                    gameEnemies.push (new enemy (Math.floor (Math.random () * 3), x, y, Math.floor (Math.random () * 720) - 360));
-                }
-            }
         break;
-        case "mode1":
+        case "level2":
             gameMap =
             {
                 name: map,
-                width: 1020,
-                height: 500
+                width: canvasWidth,
+                height: canvasHeight
             };
             gameGround.push (new ground ("water", "#292C9C", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (3, 200, 100, 0));
@@ -221,12 +191,12 @@ function generateGameMap (map)
             gameEnemies.push (new enemy (6, 400, 400, 0));
             gameEnemies.push (new enemy (3, 600, 400, 0));
         break;
-        case "mode2":
+        case "level3":
             gameMap =
             {
                 name: map,
-                width: 1020,
-                height: 500
+                width: canvasWidth,
+                height: canvasHeight
             };
             gameGround.push (new ground ("water", "#292C9C", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (7, 110, 100, 0));
