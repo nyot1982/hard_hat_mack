@@ -25,7 +25,6 @@ function gameLoadScreen (screen)
     gameXP = [];
     gameGround = [];
     modalGround = null;
-    menuShip = null;
     gameBoss = null;
     menuShots = [];
     menuHits = [];
@@ -78,7 +77,6 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [5].y + 25, "left", 10));
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [6].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
-        menuShip = new ship (null, 450, gameText [0].y + 15, 90);
     }
     else if (gameScreen == "high_scores")
     {
@@ -111,7 +109,7 @@ function gameLoadScreen (screen)
     {
         if (gameModes.findIndex (mode => mode.active == true) == 0) generateGameMap ("level1");
         else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
-        for (var i = 0; i < gameShips.length; i++) gameShips.push (new ship ("Player 1", 0, 0));
+        for (var i = 0; i < gameShips.length; i++) gameShips.push (new mack ("Player 1", 0, 0));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
@@ -134,7 +132,6 @@ function gameLoadScreen (screen)
 
 function gameOpenModal (modal, text)
 {
-    menuShip = null;
     gameTitle = null;
     gameText = [];
     gameAlert = [];
@@ -155,7 +152,6 @@ function gameOpenModal (modal, text)
         gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Exit", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, 445, "center", 10));
-        menuShip = new ship (null, 450, 255, 90);
     }
     else
     {
@@ -169,7 +165,6 @@ function gameCloseModal ()
     modalGround = null;
     gameTitle = null;
     gameText = [];
-    menuShip = null;
     menuShots = [];
     menuHits = [];
     gameModal = null;

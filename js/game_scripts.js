@@ -21,7 +21,6 @@ var fpsMonitor =
         height: canvasHeight
     },
     modalGround = null,
-    menuShip = null,
     gameBoss = null,
     gameControls =
     {
@@ -575,8 +574,7 @@ function updateGameArea ()
         }
         for (var confirm in gameConfirm) gameConfirm [confirm].update ();
         for (var alert in gameAlert) gameAlert [alert].update ();
-        if (menuShip) menuShip.update ();
-        else if (gameScreen != "game") for (var ship in gameShips) gameShips [ship].update ();
+        if (gameScreen != "game") for (var ship in gameShips) gameShips [ship].update ();
     }
     gameArea.frame++;
     gameArea.animation = window.requestAnimationFrame (updateGameArea);

@@ -179,7 +179,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
     else
     {
         if (gameConfirm.length > 0) var screen = "confirm";
-        else if (gameScreen == "menu" && gameModal == null && menuShip != null) var screen = "menu";
+        else if (gameScreen == "menu" && gameModal == null) var screen = "menu";
         else if (gameScreen == "game" && gameShips.length > 0 && gameModal == null) var screen = "game";
         else if (gameModal != null) var screen = "modal_" + gameModal;
 
@@ -190,15 +190,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
         {
             switch (userActions [userAction].action)
             {
-                case 'strafe_down':
-                    menuShip.strafing (-bt_value);
-                break;
-                case 'strafe_up':
-                    menuShip.strafing (bt_value);
-                break;
-                case 'fire_menu':
-                    menuShip.firing (true);
-                break;
                 case 'confirm_no':
                     gameConfirm = [];
                 break;
@@ -267,7 +258,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
 
 function userActionStop (control, bt_type, bt_code, gameShip)
 {
-    if ((gameScreen == "menu" || gameModal == "menu") && menuShip != null && gameConfirm.length == 0) var screen = "modal";
+    if ((gameScreen == "menu" || gameModal == "menu") && gameConfirm.length == 0) var screen = "modal";
     else if (gameScreen == "game" && gameModal == null && gameShips.length > 0 && gameConfirm.length == 0) var screen = "game";
     
     var userAction = userActions.findIndex (action => action.screen.includes (screen) && action [control][bt_type].includes (bt_code));
@@ -276,9 +267,6 @@ function userActionStop (control, bt_type, bt_code, gameShip)
     {
         switch (userActions [userAction].action)
         {
-            case 'fire_menu':
-                menuShip.firing (false);
-            break;
             case 'fire':
                 if (gameShip > -1) gameShips [gameShip].firing (false);
             break;
