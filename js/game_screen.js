@@ -54,7 +54,7 @@ function gameLoadScreen (screen)
             else if (enemies > 0) gameMusic.musics.game.stop ();
         }
     }
-    if (gameScreen == "menu" && screen == "intro" && gameMusic.active) gameMusic.musics.menu.stop ();
+    if (gameScreen == "menu" && screen == "game" && gameMusic.active) gameMusic.musics.menu.stop ();
     gameScreen = screen;
     if (gameScreen == "start")
     {
@@ -66,7 +66,7 @@ function gameLoadScreen (screen)
     }
     else if (gameScreen == "menu")
     {
-        if (gameScreen == "menu" && gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
+        if (gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
         gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
@@ -79,7 +79,6 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [6].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
         menuShip = new ship (null, 450, gameText [0].y + 15, 90);
-        gameScreen = "menu";
     }
     else if (gameScreen == "high_scores")
     {
@@ -88,22 +87,12 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
         fetchLoad ("high_scores");
     }
-    else if (gameScreen == "intro" || gameScreen == "game_over" || gameScreen == "game_completed")
+    else if (gameScreen == "game_over" || gameScreen == "game_completed")
     {
         gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         var textMeasure = ctx.measureText (" ");
 
-        if (gameScreen == "intro")
-        {
-            gameText.push (new component ("type", "YOU ARE AN OUTCAST ......", "white", 385, 150, "left", 10));
-            gameText.push (new component ("type", "RESTORE YOUR HONOR ......", "white", 385, 210, "left", 10));
-            gameText.push (new component ("type", "INVADE THE HOSTILE FORCES", "white", 385, 240, "left", 10));
-            gameText.push (new component ("type", "WHO TORMENT YOUR PEOPLE .", "white", 385, 270, "left", 10));
-            gameText.push (new component ("type", "YOUR QUEST FOR", "white", 385 + textMeasure.width, 330, "left", 10));
-            gameText.push (new component ("type", "HONOR IS YOUR .....", "white", 385 + textMeasure.width * 6, 360, "left", 10));
-            gameText.push (new component ("type", "LAST MISSION .", "white", 385 + textMeasure.width * 11, 390, "left", 10));
-        }
-        else if (gameScreen == "game_over")
+        if (gameScreen == "game_over")
         {
             gameText.push (new component ("type", "LAST MISSION", "white", canvasWidth / 2, 150, "center", 10));
             gameText.push (new component ("type", "HARD LUCK!", "white", canvasWidth / 2, 210, "center", 10));
@@ -122,11 +111,7 @@ function gameLoadScreen (screen)
     {
         if (gameModes.findIndex (mode => mode.active == true) == 0) generateGameMap ("level1");
         else generateGameMap ("mode" + gameModes.findIndex (mode => mode.active == true));
-        for (var i = 0; i < gameShips.length; i++)
-        {
-            gameShips.push (new ship ("Player 1", startPoints [i].x, startPoints [i].y));
-            startPoints [i].ship = "Player 1";
-        }
+        for (var i = 0; i < gameShips.length; i++) gameShips.push (new ship ("Player 1", 0, 0));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
@@ -154,27 +139,23 @@ function gameOpenModal (modal, text)
     gameText = [];
     gameAlert = [];
     gameConfirm = [];
-    startPoint =
-    {
-        x: gameArea.centerPoint.x - canvasWidth / 2,
-        y: gameArea.centerPoint.y - canvasHeight / 2
-    }
-    if (gameModal == null) modalGround = new ground ("menu", "#000000DD", startPoint.x, startPoint.y, canvasWidth, canvasHeight);
+    
+    if (gameModal == null) modalGround = new ground ("menu", "#000000DD", 0, 0, canvasWidth, canvasHeight);
     gameModal = modal;
 
     if (gameModal == "menu")
     {
-        gameTitle = new component ("image", "svgs/title.svg", "", gameArea.centerPoint.x, startPoint.y + 100, 203, 92);
-        gameText.push (new component ("text", "Options:", "white", startPoint.x + 310, gameTitle.y + 105, "left", 10));
-        var startMenu = startPoint.y + 255;
-        gameText.push (new component ("text", "Pause", "white", startPoint.x + 575, startMenu, "left", 10));
+        gameTitle = new component ("image", "svgs/title.svg", "", gameArea.centerPoint.x, 100, 203, 92);
+        gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
+        var startMenu = 255;
+        gameText.push (new component ("text", "Pause", "white", 575, startMenu, "left", 10));
         startMenu += 25;
-        gameText.push (new component ("text", "Sound", "white", startPoint.x + 575, startMenu, "left", 10));
-        gameText.push (new component ("text", "Music", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "FPS Monitor", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Exit", "white", startPoint.x + 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, startPoint.y + 445, "center", 10));
-        menuShip = new ship (null, startPoint.x + 450, startPoint.y + 255, 90);
+        gameText.push (new component ("text", "Sound", "white", 575, startMenu, "left", 10));
+        gameText.push (new component ("text", "Music", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
+        gameText.push (new component ("text", "FPS Monitor", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
+        gameText.push (new component ("text", "Exit", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
+        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, 445, "center", 10));
+        menuShip = new ship (null, 450, 255, 90);
     }
     else
     {
@@ -197,98 +178,6 @@ function gameCloseModal ()
 function generateGameMap (map)
 {
     enemies = 270;
-    if (map == "mode1" || map == "mode2")
-    {
-        startPoints =
-        [
-            {
-                ship: null,
-                x: 510,
-                y: 250
-            },
-            {
-                ship: null,
-                x: 510,
-                y: 210
-            },
-            {
-                ship: null,
-                x: 546,
-                y: 210
-            },
-            {
-                ship: null,
-                x: 546,
-                y: 250
-            },
-            {
-                ship: null,
-                x: 510,
-                y: 345
-            },
-            {
-                ship: null,
-                x: 510,
-                y: 305
-            },
-            {
-                ship: null,
-                x: 546,
-                y: 305
-            },
-            {
-                ship: null,
-                x: 546,
-                y: 345
-            }
-        ];
-    }
-    else
-    {
-        startPoints =
-        [
-            {
-                ship: null,
-                x: 510,
-                y: 250
-            },
-            {
-                ship: null,
-                x: 510,
-                y: 210
-            },
-            {
-                ship: null,
-                x: 546,
-                y: 210
-            },
-            {
-                ship: null,
-                x: 546,
-                y: 250
-            },
-            {
-                ship: null,
-                x: 3570,
-                y: 1750
-            },
-            {
-                ship: null,
-                x: 3570,
-                y: 1710
-            },
-            {
-                ship: null,
-                x: 3606,
-                y: 1710
-            },
-            {
-                ship: null,
-                x: 3606,
-                y: 1750
-            }
-        ];
-    }
     switch (map)
     {
         case "level1":

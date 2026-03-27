@@ -142,23 +142,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameShip)
         };
         //toggleFullScreen ();
     }
-    else if (gameScreen == "intro")
-    {
-        if (!blackScreen)
-        {
-            blackScreen = true;
-            $("#blackScreen").fadeIn (1000);
-            setTimeout
-            (
-                () =>
-                {
-                    gameSound.sounds ["type"].stop ();
-                    gameLoadScreen ("game");
-                },
-                1000
-            );
-        }
-    }
     else if (gameScreen == "high_scores")
     {
         if (!blackScreen)

@@ -482,7 +482,7 @@ function component (type, src, color, x, y, width, height, max, backColor)
                             );
                         break;
                         case "Exit":
-                            gameConfirm.push (new component ("text", ">>> Are you sure?", "yellow", startPoint.x + 705, gameText [gameText.length - 2].y, "left", 10));
+                            gameConfirm.push (new component ("text", ">>> Are you sure?", "yellow", 705, gameText [gameText.length - 2].y, "left", 10));
                         break;
                     }
                 }

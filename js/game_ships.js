@@ -252,8 +252,8 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
                 if (this.lifes > 0)
                 {
                     if (gameModal != null) gameCloseModal ();
-                    this.x = startPoints [startPoints.findIndex (startPoint => startPoint.ship == this.name)].x;
-                    this.y = startPoints [startPoints.findIndex (startPoint => startPoint.ship == this.name)].y;
+                    this.x = 0;
+                    this.y = 0;
                     this.heading = 0;
                     this.moveSpeed = 0;
                     this.strafeSpeed = 0;
