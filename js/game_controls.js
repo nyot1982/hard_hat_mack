@@ -8,20 +8,6 @@ function controls ()
     for (const gamepad of navigator.getGamepads ())
     {
         if (!gamepad || gamepad.mapping == "" && !gamepad.id.toLowerCase ().includes ("joystick")) continue;
-        if (gameScreen == "menu" && (gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2) && form.style.display == "block" && !document.getElementById (gamepad.index))
-        {
-            var element = document.createElement ("input");
-            element.id = gamepad.index * 1;
-            element.name = "name";
-            element.type = "text";
-            element.autocomplete = "name";
-            element.maxLength = "Player " + element.id;
-            element.required = true;
-            element.setAttribute ("oninput", "javascript: this.setCustomValidity ('');");
-            element = document.createElement ("a");
-            element.title = "Mouse interaction";
-            element.className = "fa fa-mouse fa-beat interaction";
-        }
         for (const [index, axis] of gamepad.axes.entries ())
         {
             if (axis.toFixed (2) * 1 != 0) startControl (gamepad.index * 1, (gamepad.mapping == "standard" ? "gamepad" : gamepad.id.toLowerCase ().includes ("joystick") ? "joystick" : ""), "axes", index, axis.toFixed (2) * 1);
@@ -57,19 +43,6 @@ function gamepadDisconnected (e)
     delete gameControls [e.gamepad.index * 1];
     pressed.buttons.splice (pressed.buttons.indexOf (e.gamepad.index * 1), 1);
     pressed.axes.splice (pressed.axes.indexOf (e.gamepad.index * 1), 1);
-
-    if (gameScreen == "menu" && gameModes.findIndex (mode => mode.active == true) != 0 && form.length > 2)
-    {
-        for (var i = 0; i < form.length; i++)
-        {
-            if (form.elements [i].id == e.gamepad.index * 1)
-            {
-                form.elements [i].remove ();
-                form.getElementsByTagName ("a")[i].remove ();
-                break;
-            }
-        }
-    }
     for (const gamepad of navigator.getGamepads ())
     {
         if (!gamepad) continue;
@@ -199,9 +172,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
                             1000
                         );
                     }
-                break;
-                case 'input_exit':
-                    gameLoadScreen ("menu");
                 break;
                 case 'open_modal':
                     gameOpenModal ("menu");
