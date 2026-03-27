@@ -208,42 +208,6 @@ var fpsMonitor =
                 axes: []
             }
         },
-                {
-            screen: ["input"],
-            action: "input_change",
-            keyboard:
-            {
-                keys: [9] // Tabulator
-            },
-            gamepad:
-            {
-                buttons: [],
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: []
-            }
-        },
-        {
-            screen: ["input"],
-            action: "input_exit",
-            keyboard:
-            {
-                keys: [27] // Escape
-            },
-            gamepad:
-            {
-                buttons: [2, 8], // X, Select
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [2],
-                axes: []
-            }
-        },
         {
             screen: ["game"],
             action: "move_front",
@@ -422,11 +386,6 @@ var fpsMonitor =
             title: "Local Mltiplayer (Versus)",
             icon: "regular fa-user-group",
             active: false
-        },
-        {
-            title: "Online Multiplayer",
-            icon: "users",
-            active: false
         }
     ],
     gameSound =
@@ -552,57 +511,6 @@ function fetchLoad (cont, param)
         }
     )
     .catch (error => console.error ("Error! ", error.message));
-}
-
-function submitForm (form)
-{
-
-    if ((gameModes.findIndex (mode => mode.active == true) == 1 || gameModes.findIndex (mode => mode.active == true) == 2) && form.length < 3)
-    {
-        gameAlert.push (new component ("text", "Connect other controllers", "red", 745, 300, "left", 10));
-        gameAlert.push (new component ("text", "to add more players.", "red", 745, 325, "left", 10));
-    }
-    else
-    {
-        gameAlert = [];
-        for (var i = 0; i < form.length; i++)
-        {
-            if (form.elements [i].type == "text")
-            {
-                for (var j = i + 1; j < form.length; j++)
-                {
-                    if (form.elements [j].type == "text" && form.elements [i].value == form.elements [j].value)
-                    {
-                        gameAlert.push (new component ("text", "All names must be diferent.", "red", 745, 255 + (form.length * 25), "left", 10));
-                        return;
-                    }
-                }
-            }
-        }
-        if (!blackScreen)
-        {
-            blackScreen = true;
-            $("#blackScreen").fadeIn (1000);
-            setTimeout
-            (
-                () =>
-                {
-                    if (gameModes.findIndex (mode => mode.active == true) == 2) gameLoadScreen ("game");
-                    else gameLoadScreen ("intro");
-                },
-                1000
-            );
-        }
-    }
-}
-
-function changeColor (color)
-{
-    menuShip.changeColor (color);
-    gameXP [0].backColor = menuShip.colors.negative;
-    gameXP [0].color = menuShip.colors.shipFill;
-    gameXP [1].backColor = menuShip.colors.shipFill;
-    gameXP [1].color = menuShip.colors.negative;
 }
 
 function updateGameArea ()

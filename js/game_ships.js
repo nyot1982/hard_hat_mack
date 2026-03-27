@@ -78,48 +78,6 @@ function ship (name, color, x, y, heading, moveSpeed, strafeSpeed, fire, weapons
     this.xp = null;
     this.score = score_xp || 0;
 
-    this.changeColor = function (color)
-    {
-        this.colors =
-        {
-            shipFill: color || null,
-            gunFill: null,
-            hook1Fill: null,
-            hook2Fill: null,
-            wing1Fill: null,
-            wing2Fill: null,
-            lightFill: "#7B797B",
-            shipStroke: null,
-            lightStroke: null,
-            negative: null,
-            near: null,
-            shield: 0,
-            shields:
-            [
-                "#813338",
-                "#8E3C97",
-                "#56AC4D"
-            ],
-            weapons:
-            [
-                "#C66D73",
-                "#52AE4A",
-                "#EFF373",
-                "#73CFCE",
-                "#A53C9A"
-            ],
-            pattern: null
-        }
-        if (tinycolor (this.colors.shipFill).isDark ()) this.colors.near = tinycolor (this.colors.shipFill).lighten (15).toHexString ();
-        else this.colors.near = tinycolor (this.colors.shipFill).darken (15).toHexString ();
-        this.colors.negative = tinycolor (this.colors.shipFill).toRgb ();
-        this.colors.negative.r = 255 - this.colors.negative.r;
-        this.colors.negative.g = 255 - this.colors.negative.g;
-        this.colors.negative.b = 255 - this.colors.negative.b;
-        this.colors.negative = tinycolor (this.colors.negative).toHexString ();
-    }
-    this.changeColor (color);
-
     this.firing = function (active)
     {
         if (gameModal == "menu" || gameScreen == "menu") this.fire = true;
