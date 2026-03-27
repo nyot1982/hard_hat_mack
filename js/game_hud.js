@@ -20,8 +20,6 @@ function fpsHud (action)
             fpsMonitor.time = Date.now ();
             fpsMonitor.frame = gameArea.frame || 0;
         }
-        if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
-        else localStorage.fpsMonitor = action;
     }
     else if (action == "update" && Date.now () - fpsMonitor.time >= 1000)
     {

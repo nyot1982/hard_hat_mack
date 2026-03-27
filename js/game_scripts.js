@@ -62,7 +62,6 @@ var fpsMonitor =
     gameHits = [],
     highScores = [],
     highScoreSave = [],
-    changingButton = null,
     userActions =
     [
         {
@@ -503,25 +502,6 @@ var fpsMonitor =
 $(document).ready (function ()
 {
     $("preloader").fadeOut (1000);
-    if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
-    else
-    {
-        if (typeof (localStorage.gameSound) !== "undefined" && localStorage.gameSound != "")
-        {
-            gameSound.active = localStorage.gameSound == 1 ? true : false;
-            document.getElementById ("sound").innerHTML = gameSound.active ? "On" : "Off";
-        }
-        if (typeof (localStorage.gameMusic) !== "undefined" && localStorage.gameMusic != "")
-        {
-            gameMusic.active = localStorage.gameMusic == 1 ? true : false;
-            document.getElementById ("music").innerHTML = gameMusic.active ? "On" : "Off";
-        }
-        if (typeof (localStorage.fpsMonitor) !== "undefined" && localStorage.fpsMonitor == 1) fpsHud ("toggle");
-        if (typeof (localStorage.userActions) !== "undefined" && localStorage.userActions != "") userActions = JSON.parse (localStorage.userActions);
-    }
-    showControls ("keyboard", "keys");
-    showControls ("gamepad", "buttons");
-    showControls ("joystick", "buttons");
     gameLoadScreen ("start");
     gameArea.start ();
 });

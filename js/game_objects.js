@@ -399,8 +399,6 @@ function component (type, src, color, x, y, width, height, max, backColor)
                                 gameSound.active = false;
                             }
                             else gameSound.active = true;
-                            if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
-                            else localStorage.gameSound = gameSound.active ? 1 : 0;
                             $("#sound").addClass ("change");
                             setTimeout
                             (
@@ -433,8 +431,6 @@ function component (type, src, color, x, y, width, height, max, backColor)
                                 else gameMusic.musics.menu.play ();
                                 gameMusic.active = true;
                             }
-                            if (typeof (Storage) === "undefined") alert ("This browser does not support local web storage.");
-                            else localStorage.gameMusic = gameMusic.active ? 1 : 0;
                             $("#music").addClass ("change");
                             setTimeout
                             (
