@@ -349,26 +349,6 @@ select:focus
     color: var(--color5);
     background-color: var(--color10);
 }
-/*input:focus:invalid,
-select:focus:invalid
-{
-    border-color: var(--color6);
-}*/
-/*input:invalid,
-select:invalid
-{
-    border-color: var(--color6);
-}
-input:invalid:required,
-select:invalid:required
-{
-    border-color: var(--color13);
-}
-input:valid,
-select:valid
-{
-    border-color: var(--color7);
-}*/
 input[type="text"],
 input[type="email"],
 input[type="password"],

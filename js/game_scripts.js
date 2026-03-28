@@ -1,6 +1,7 @@
 var canvasWidth = 1024,
     canvasHeight = 740,
-    idTypeAct = 0,
+    gravity = 0.1,
+    gravitySpeed = 0,
     blackScreen = false,
     gameScreen = null,
     gameModal = null,
@@ -42,7 +43,6 @@ var canvasWidth = 1024,
     gameGround = [],
     gameChars = [],
     gameEnemies = [],
-    gameItems = [],
     gameText = [],
     gameAlert = [],
     gameConfirm = [],
@@ -52,60 +52,6 @@ var canvasWidth = 1024,
     highScoreSave = [],
     userActions =
     [
-        {
-            screen: ["modal_menu"],
-            action: "strafe_up",
-            keyboard:
-            {
-                keys: [40] // Up
-            },
-            gamepad:
-            {
-                buttons: [13], // Up
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [1]
-            }
-        },
-        {
-            screen: ["modal_menu"],
-            action: "strafe_down",
-            keyboard:
-            {
-                keys: [38] // Down
-            },
-            gamepad:
-            {
-                buttons: [12], // Down
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [1]
-            }
-        },
-        {
-            screen: ["modal_menu"],
-            action: "fire_menu",
-            keyboard:
-            {
-                keys: [13, 32] // Enter, Space
-            },
-            gamepad:
-            {
-                buttons: [0], // A
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [0],
-                axes: []
-            }
-        },
         {
             screen: ["modal_continue"],
             action: "close_continue",
@@ -234,86 +180,6 @@ var canvasWidth = 1024,
             {
                 buttons: [],
                 axes: [1]
-            }
-        },
-        {
-            screen: ["game"],
-            action: "turn_left",
-            title: "Turn left",
-            editable: true,
-            keyboard:
-            {
-                keys: [37] // Left
-            },
-            gamepad:
-            {
-                buttons: [],
-                axes: [0, 2] // LS, RS
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [0]
-            }
-        },
-        {
-            screen: ["game"],
-            action: "turn_right",
-            title: "Turn right",
-            editable: true,
-            keyboard:
-            {
-                keys: [39] // Right
-            },
-            gamepad:
-            {
-                buttons: [],
-                axes: [0, 2] // LS, RS
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: [0]
-            }
-        },
-        {
-            screen: ["game"],
-            action: "strafe_left",
-            title: "Strafe left",
-            editable: true,
-            keyboard:
-            {
-                keys: [90] // Z
-            },
-            gamepad:
-            {
-                buttons: [4], // LB
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [2],
-                axes: []
-            }
-        },
-        {
-            screen: ["game"],
-            action: "strafe_right",
-            title: "Strafe right",
-            editable: true,
-            keyboard:
-            {
-                keys: [88] // X
-            },
-            gamepad:
-            {
-                buttons: [5], // RB
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [3],
-                axes: []
             }
         },
         {
@@ -512,11 +378,10 @@ function updateGameArea ()
     }
     else if (gameScreen == "game")
     {
-        gameItems = gameItems.filter (item => !item.taken);
         gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        gameObjects = gameItems.concat (gameEnemies).concat (gameChars).concat (gameShots);
+        gameObjects = ggameEnemies.concat (gameChars).concat (gameShots);
         for (var object in gameObjects)
         {
             gameObjects [object].newPos ();

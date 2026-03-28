@@ -23,23 +23,12 @@ function controls ()
 
 function gamepadConnected (e)
 {
-    console.log ("Gamepad connected");
-    if (e.gamepad.mapping == "standard") var newControl = "gamepad";
-    else if (e.gamepad.id.toLowerCase ().includes ("joystick")) var newControl = "joystick";
-    else return;
-    gameControls [e.gamepad.index * 1] = newControl;
     pressed.buttons [e.gamepad.index * 1] = [];
     pressed.axes [e.gamepad.index * 1] = [];
-    if (gameScreen != "game")
-    {
-        if (gameAlert.length > 0) gameAlert = [];
-    }
 }
 
 function gamepadDisconnected (e)
 {
-    if (e.gamepad.mapping == "" && !e.gamepad.id.toLowerCase ().includes ("joystick")) return;
-    delete gameControls [e.gamepad.index * 1];
     pressed.buttons.splice (pressed.buttons.indexOf (e.gamepad.index * 1), 1);
     pressed.axes.splice (pressed.axes.indexOf (e.gamepad.index * 1), 1);
 }
@@ -84,7 +73,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
     {
         gameSound.sounds =
         {
-            type: new audio ("sound/type.wav", true),
             shot0: new audio ("sound/shot0.wav", false),
             shot1: new audio ("sound/shot1.wav", false),
             shot2: new audio ("sound/shot2.wav", false),
@@ -206,21 +194,11 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
                 case 'fire':
                     if (gameChar > -1) gameChars [gameChar].firing (true);
                 break;
-                case 'turn_left':
-                case 'turn_right':
-                    if (gameChar > -1) gameChars [gameChar].turning (bt_value);
-                break;
                 case 'move_front':
                     if (gameChar > -1) gameChars [gameChar].moving (bt_value);
                 break;
                 case 'move_back':
                     if (gameChar > -1) gameChars [gameChar].moving (-bt_value);
-                break;
-                case 'strafe_right':
-                    if (gameChar > -1) gameChars [gameChar].strafing (bt_value);
-                break;
-                case 'strafe_left':
-                    if (gameChar > -1) gameChars [gameChar].strafing (-bt_value);
                 break;
             }
         }
@@ -241,17 +219,9 @@ function userActionStop (control, bt_type, bt_code, gameChar)
             case 'fire':
                 if (gameChar > -1) gameChars [gameChar].firing (false);
             break;
-            case 'turn_left':
-            case 'turn_right':
-                if (gameChar > -1) gameChars [gameChar].turning (0);
-            break;
             case 'move_back':
             case 'move_front':
                 if (gameChar > -1) gameChars [gameChar].moving (0);
-            break;
-            case 'strafe_right':
-            case 'strafe_left':
-                if (gameChar > -1) gameChars [gameChar].strafing (0);  
             break;
         }
     }
@@ -271,8 +241,6 @@ function stopUserInteractions ()
     };
     gameChars [gameChar].firing (false);
     gameChars [gameChar].moving (0);
-    gameChars [gameChar].strafing (0);
-    gameChars [gameChar].turning (0);
 }
 
 function mouseMove (e)

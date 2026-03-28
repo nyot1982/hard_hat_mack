@@ -22,18 +22,15 @@ function gameHighScores (max_high_scores, high_scores)
 function gameLoadScreen (screen)
 {
     gameTitle = null;
-    gameXP = [];
     gameGround = [];
     modalGround = null;
     gameChars = [];
     gameEnemies = [];
     gameShots = [];
     gameHits = [];
-    gameItems = [];
     gameText = [];
     gameAlert = [];
     gameConfirm = [];
-    idTypeAct = 0;
     gameModal = null;
 
     if (gameScreen == "game" && (screen == "menu" || screen == "game_over" || screen == "game_completed"))

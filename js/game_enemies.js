@@ -54,7 +54,6 @@ function enemy (type, x, y, heading)
     if (this.type < 3)
     {
         this.move = this.speed;
-        this.turn = 0;
         this.life = 10;
     }
     else if (this.type == 7) this.life = 10;
@@ -63,17 +62,6 @@ function enemy (type, x, y, heading)
     this.firing = function (active)
     {
         this.fire = active;
-    }
-
-    this.turning = function (turn)
-    {
-        if (turn == 0) this.turn = 0;
-        else if (this.turn < 8 && this.turn > -8)
-        {
-            if (turn < 0 && this.turn == 0) this.turn = -4;
-            else if (turn > 0 && this.turn == 0) this.turn = 4;
-            this.turn += turn;
-        }
     }
 
     this.update = function ()
@@ -90,15 +78,6 @@ function enemy (type, x, y, heading)
                         this.action = Math.floor (Math.random () * 5);
                         switch (this.action)
                         {
-                            case 0:
-                                this.turning (-1);
-                                break;
-                            case 1:
-                                this.turning (0);
-                                break;
-                            case 2:
-                                this.turning (1);
-                                break;
                             case 3:
                                 this.firing (true);
                                 break;
@@ -108,7 +87,6 @@ function enemy (type, x, y, heading)
                         }
                     }
                     this.enginemax = 4;
-                    if (this.turn != 0) this.heading = (this.heading + this.turn) % 360;
                     this.radians = this.heading * Math.PI / 180;
                     if (this.move != 0)
                     {
@@ -770,7 +748,6 @@ function enemy (type, x, y, heading)
                                 if (gameChar > -1) gameChars [gameChar].score += 1000;
                             }
                             if (this.type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
-                            if (this.type < 7) gameItems.push (new item (this.type, this.x, this.y));
                         }
                         else
                         {
