@@ -364,7 +364,7 @@ var canvasWidth = 1024,
     },
     gameMusic =
     {
-        active: true,
+        active: false,
         musics: []
     },
     gameArea =

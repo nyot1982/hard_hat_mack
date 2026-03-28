@@ -23,11 +23,11 @@ function controls ()
 
 function gamepadConnected (e)
 {
+    console.log ("Gamepad connected");
     if (e.gamepad.mapping == "standard") var newControl = "gamepad";
     else if (e.gamepad.id.toLowerCase ().includes ("joystick")) var newControl = "joystick";
     else return;
     gameControls [e.gamepad.index * 1] = newControl;
-    if (newControl && document.getElementById (newControl).style.display == 'none') $('#' + newControl).fadeIn (1000);
     pressed.buttons [e.gamepad.index * 1] = [];
     pressed.axes [e.gamepad.index * 1] = [];
     if (gameScreen != "game")
@@ -39,15 +39,9 @@ function gamepadConnected (e)
 function gamepadDisconnected (e)
 {
     if (e.gamepad.mapping == "" && !e.gamepad.id.toLowerCase ().includes ("joystick")) return;
-    var oldControl = gameControls [e.gamepad.index * 1];
     delete gameControls [e.gamepad.index * 1];
     pressed.buttons.splice (pressed.buttons.indexOf (e.gamepad.index * 1), 1);
     pressed.axes.splice (pressed.axes.indexOf (e.gamepad.index * 1), 1);
-    for (const gamepad of navigator.getGamepads ())
-    {
-        if (!gamepad) continue;
-        if (gamepad.mapping == "standard" && oldControl == "gamepad" || gamepad.id.toLowerCase ().includes ("joystick") && oldControl == "joystick") controlFinded = gamepad.index * 1;
-    }
 }
 
 function startControl (id_control, control, bt_type, bt_code, bt_value)
