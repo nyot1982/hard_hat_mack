@@ -57,7 +57,7 @@ function audio (src, loop)
     this.load ();
 }
 
-function mack (type, color, x, y, width, height, sppedX, speedY, bounce)
+function mack (type, color, x, y, width, height, speedX, speedY, brake, bounce)
 {
     this.type = type || 0;
     this.color = color || null;
@@ -65,13 +65,12 @@ function mack (type, color, x, y, width, height, sppedX, speedY, bounce)
     this.y = y || 0;    
     this.width = width || 0;
     this.height = height || 0;
-
-    this.speedX = 0;
-    this.speedY = 0;    
-    this.bounce = 0.6;
-    this.gravity = 0.1;
-    this.gravitySpeed = 0;
-
+    this.speedX = speedX || 0;
+    this.speedY = speedY || 0;
+    this.brake = brake || 0.1;
+    this.bounce = bounce || 0.75;
+    this.gravity = gravity;
+    this.gravitySpeed = gravitySpeed;
 
     this.update = function ()
     {
@@ -82,6 +81,9 @@ function mack (type, color, x, y, width, height, sppedX, speedY, bounce)
 
     this.newPos = function ()
     {
+        if (this.speedX > 0) this.speedX -= this.brake;
+        else if (this.speedX < 0) this.speedX += this.brake;
+        else if (this.speedX == 0) this.brake = 0;
         this.gravitySpeed += this.gravity;
         this.x += this.speedX;
         this.y += this.speedY + this.gravitySpeed;
@@ -90,10 +92,19 @@ function mack (type, color, x, y, width, height, sppedX, speedY, bounce)
 
     this.hitBottom = function ()
     {
-        var rockbottom = canvasHeight - this.height;
-        if (this.y > rockbottom)
+        var rockY = canvasHeight - this.height,
+            rockX = canvasWidth - this.width;
+        
+        if (this.x < 0 || this.x > rockX)
         {
-            this.y = rockbottom;
+            if (this.x < 0) this.x = 0;
+            else this.x = rockX;
+            this.speedX = -(this.speedX);
+        }
+        if (this.y < 0 || this.y > rockY)
+        {
+            if (this.y < 0) this.y = 0;
+            else this.y = rockY;
             this.gravitySpeed = -(this.gravitySpeed * this.bounce);
         }
     }

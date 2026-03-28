@@ -6,7 +6,6 @@ var canvasWidth = 1024,
     gameScreen = null,
     gameModal = null,
     gameTitle = null,
-    gameXP = [],
     gameMap =
     {
         name: null,
@@ -381,7 +380,7 @@ function updateGameArea ()
         gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
         gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        gameObjects = ggameEnemies.concat (gameChars).concat (gameShots);
+        gameObjects = gameEnemies.concat (gameChars).concat (gameShots);
         for (var object in gameObjects)
         {
             gameObjects [object].newPos ();
@@ -397,7 +396,6 @@ function updateGameArea ()
         for (var shot in menuShots) menuShots [shot].update ();
         menuHits = menuHits.filter (hit => !hit.reverse || hit.r > 0);
         if (gameTitle) gameTitle.update ();
-        for (var xp in gameXP) gameXP [xp].update ();
         for (var text in gameText)
         {
             if (gameText [text]) gameText [text].update (text);
