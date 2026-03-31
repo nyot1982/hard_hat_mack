@@ -57,6 +57,37 @@ function audio (src, loop)
     this.load ();
 }
 
+function back (type, color, x, y, width, height)
+{
+    this.type = type;
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+
+    this.update = function ()
+    {
+        ctx = gameArea.ctx;
+        ctx.beginPath ();
+        if (this.type == "pattern")
+        {
+            this.image = new Image ();
+            this.image.src = this.color;
+            this.pattern = ctx.createPattern (this.image, "repeat");
+            ctx.rect (this.x, this.y, this.width, this.height);
+            ctx.fillStyle = this.pattern;
+            ctx.fill ();
+        }
+        else
+        {
+            ctx.rect (this.x, this.y, this.width, this.height);
+            ctx.fillStyle = this.color;
+            ctx.fill ();
+        }
+    }
+}
+
 function mack (type, color, x, y, width, height, speedX, speedY, brake, bounce)
 {
     this.type = type || 0;
@@ -67,7 +98,7 @@ function mack (type, color, x, y, width, height, speedX, speedY, brake, bounce)
     this.height = height || 0;
     this.speedX = speedX || 0;
     this.speedY = speedY || 0;
-    this.brake = brake || 0.1;
+    this.brake = brake || 0.02;
     this.bounce = bounce || 0.75;
     this.gravity = gravity;
     this.gravitySpeed = gravitySpeed;
@@ -106,164 +137,6 @@ function mack (type, color, x, y, width, height, speedX, speedY, brake, bounce)
             if (this.y < 0) this.y = 0;
             else this.y = rockY;
             this.gravitySpeed = -(this.gravitySpeed * this.bounce);
-        }
-    }
-}
-
-function shot (name, weapon, color, x, y, width, height, speed, heading)
-{
-    this.name = name;
-    this.weapon = weapon;
-    this.color = color;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.speed = speed;
-    this.heading = heading;
-    this.radians = this.heading * Math.PI / 180;
-    this.move = 0;
-    this.hit = false;
-    
-    this.update = function ()
-    {
-        if (!this.hit)
-        {
-            this.move = this.speed;
-
-            ctx = gameArea.ctx;
-            ctx.save ();
-            ctx.translate (this.x, this.y);
-            ctx.rotate (this.radians);
-            if (this.weapon == 0 || this.weapon == 4)
-            {
-                ctx.lineWidth = 0;
-                ctx.fillStyle = this.color;
-                ctx.fillRect (-(this.height / 2), 0, this.height, this.width);
-                if (this.weapon == 4) ctx.fillRect (-4.5, this.width - 7, 9, 3);
-            }
-            else if (this.weapon == 1)
-            {
-                ctx.lineWidth = this.height;
-                ctx.beginPath ();
-                ctx.moveTo (0, 0);
-                ctx.lineTo (-this.width, this.width);
-                ctx.moveTo (0, 0);
-                ctx.lineTo (this.width, this.width);
-                ctx.strokeStyle = "#4A4A4A";
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.moveTo (0, 3);
-                ctx.lineTo (-(this.width - 3), this.width);
-                ctx.moveTo (0, 3);
-                ctx.lineTo (this.width - 3, this.width);
-                ctx.strokeStyle = this.color;
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.moveTo (0, 6);
-                ctx.lineTo (-(this.width - 6), this.width);
-                ctx.moveTo (0, 6);
-                ctx.lineTo (this.width - 6, this.width);
-                ctx.strokeStyle = "black";
-                ctx.stroke ();
-            }
-            else if (this.weapon == 2)
-            {
-                ctx.beginPath ();
-                ctx.lineWidth = 0;
-                ctx.arc (0, 0, this.width, 0, 2 * Math.PI);
-                ctx.fillStyle = "#4A4A4A";
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.width / 2;
-                ctx.arc (0, 0, this.width / 2, 0, 2 * Math.PI);
-                ctx.strokeStyle = "black";
-                ctx.stroke ();
-                ctx.fillStyle = this.color;
-                ctx.fill ();
-            }
-            else if (this.weapon == 3)
-            {
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 3, this.width, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = '#4A4A4A';
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 0, this.width, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = this.color;
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 7, this.width - 4, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = '#4A4A4A';
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 4, this.width - 4, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = this.color;
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 12, this.width - 8, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = '#4A4A4A';
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 9, this.width - 8, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = this.color;
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 14, this.width - 12, -Math.PI / 1.1, -0.3);
-                ctx.strokeStyle = this.color;
-                ctx.stroke ();
-            }
-            else if (this.weapon == 5)
-            {
-                ctx.beginPath ();
-                ctx.lineWidth = this.height;
-                ctx.arc (0, 0, this.width, 0, 2 * Math.PI);
-                ctx.strokeStyle = "#4A4A4A";
-                ctx.stroke ();
-                ctx.fillStyle = this.color;
-                ctx.fill ();
-            }
-            ctx.restore ();
-        }
-    }
-}
-
-function hit (name, x, y, radius, add)
-{
-    this.name = name;
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.add = add;
-    this.r = 0;
-    this.reverse = false;
-    this.colors = ['#813338', '#8E3C97', '#56AC4D'];
-    this.color = 0;
-    
-    this.update = function ()
-    {
-        if (!this.reverse || this.r > 0)
-        {
-            if (this.reverse && this.r > 0) this.r -= this.add;
-            else if (this.r < this.radius) this.r += this.add;
-            else this.reverse = true;
-            ctx = gameArea.ctx;
-            ctx.beginPath ();
-            ctx.arc (this.x, this.y, this.r, 0, 2 * Math.PI);
-            ctx.fillStyle = this.colors [this.color];
-            if (this.r % 5 == 0)
-            {
-                this.color++
-                if (this.color == this.colors.length) this.color = 0;
-            }
-            ctx.fill ();
         }
     }
 }

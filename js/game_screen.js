@@ -22,8 +22,8 @@ function gameHighScores (max_high_scores, high_scores)
 function gameLoadScreen (screen)
 {
     gameTitle = null;
-    gameGround = [];
-    modalGround = null;
+    gameBack = [];
+    modalBack = null;
     gameChars = [];
     gameEnemies = [];
     gameShots = [];
@@ -47,7 +47,7 @@ function gameLoadScreen (screen)
     gameScreen = screen;
     if (gameScreen == "start")
     {
-        gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
+        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "Welcome to Last Mission.", "white", canvasWidth / 2, 275, "center", 10));
         gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
@@ -56,7 +56,7 @@ function gameLoadScreen (screen)
     else if (gameScreen == "menu")
     {
         if (gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
-        gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
+        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
         gameText.push (new component ("text", "One Player", "white", 575, gameText [0].y + 15, "left", 10));
@@ -69,29 +69,14 @@ function gameLoadScreen (screen)
     }
     else if (gameScreen == "high_scores")
     {
-        gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
+        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
         fetchLoad ("high_scores");
     }
     else if (gameScreen == "game_over" || gameScreen == "game_completed")
     {
-        gameGround.push (new ground ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        var textMeasure = ctx.measureText (" ");
-
-        if (gameScreen == "game_over")
-        {
-            gameText.push (new component ("type", "LAST MISSION", "white", canvasWidth / 2, 150, "center", 10));
-            gameText.push (new component ("type", "HARD LUCK!", "white", canvasWidth / 2, 210, "center", 10));
-            gameText.push (new component ("type", "YOUR MISSION HAS FAILED.", "white", canvasWidth / 2, 240, "center", 10));
-        }
-        else if (gameScreen == "game_completed")
-        {
-            gameText.push (new component ("type", "LAST MISSION", "white", canvasWidth / 2, 150, "center", 10));
-            gameText.push (new component ("type", "WELL DONE!", "white", canvasWidth / 2, 210, "center", 10));
-            gameText.push (new component ("type", "YOUR MISSION HAS", "white", canvasWidth / 2, 240, "center", 10));
-            gameText.push (new component ("type", "SUCCEEDED.", "white", canvasWidth / 2, 270, "center", 10));
-        }
+        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         if (gameSound.active) gameSound.sounds ["type"].play ();
     }
     else if (gameScreen == "game")
@@ -125,7 +110,7 @@ function gameOpenModal (modal, text)
     gameAlert = [];
     gameConfirm = [];
     
-    if (gameModal == null) modalGround = new ground ("menu", "#000000DD", 0, 0, canvasWidth, canvasHeight);
+    if (gameModal == null) modalBack = new back("menu", "#000000DD", 0, 0, canvasWidth, canvasHeight);
     gameModal = modal;
 
     if (gameModal == "menu")
@@ -149,11 +134,9 @@ function gameOpenModal (modal, text)
 
 function gameCloseModal ()
 {
-    modalGround = null;
+    modalBack = null;
     gameTitle = null;
     gameText = [];
-    menuShots = [];
-    menuHits = [];
     gameModal = null;
 }
 
@@ -168,7 +151,7 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameGround.push (new ground ("water", "#292C9C", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("game", "#292C9C", 0, 0, gameMap.width, gameMap.height));
         break;
         case "level2":
             gameMap =
@@ -177,7 +160,7 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameGround.push (new ground ("water", "#292C9C", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("game", "#292C9C", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (3, 200, 100, 0));
             gameEnemies.push (new enemy (4, 400, 100, 0));
             gameEnemies.push (new enemy (5, 600, 100, 0));
@@ -195,7 +178,7 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameGround.push (new ground ("water", "#292C9C", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("game", "#292C9C", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (7, 110, 100, 0));
             gameEnemies.push (new enemy (7, 310, 100, 0));
             gameEnemies.push (new enemy (7, 510, 100, 0));

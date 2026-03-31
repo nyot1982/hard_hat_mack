@@ -12,12 +12,11 @@ var canvasWidth = 1024,
         width: canvasWidth,
         height: canvasHeight
     },
-    modalGround = null,
+    modalBack = null,
     gameControls =
     {
         99: "keyboard"
     },
-    menuControl = 99,
     pressed =
     {
         keys:
@@ -39,7 +38,7 @@ var canvasWidth = 1024,
     menuShots = [],
     menuHits = [],
     gameObjects = [],
-    gameGround = [],
+    gameBack = [],
     gameChars = [],
     gameEnemies = [],
     gameText = [],
@@ -351,7 +350,7 @@ function updateGameArea ()
 {
     controls ();
     gameArea.clear ();
-    for (var ground in gameGround) gameGround [ground].update ();
+    for (var back in gameBack) gameBack [back].update ();
     if (gameScreen == "start")
     {
         if (Object.keys (gameSound.sounds).length > 0 && Object.keys (gameMusic.musics).length > 0)
@@ -377,33 +376,22 @@ function updateGameArea ()
     }
     else if (gameScreen == "game")
     {
-        gameShots = gameShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
-        gameHits = gameHits.filter (hit => !hit.reverse || hit.r > 0);
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        gameObjects = gameEnemies.concat (gameChars).concat (gameShots);
+        gameObjects = gameEnemies.concat (gameChars);
         for (var object in gameObjects)
         {
             gameObjects [object].newPos ();
-            gameObjects [object].update ();
-            if (gameHits.findIndex (hit => hit.name == gameObjects [object].name) > -1) for (var hit in gameHits.filter (hit => hit.name == gameObjects [object].name)) gameHits [hit].update ();
+            gameObjects [object].update (object);
         }
-        for (var hit in gameHits.filter (hit => hit.name == "hit0")) gameHits [hit].update ();
     }
     if (gameModal != null || gameScreen != "game")
     {
-        if (modalGround) modalGround.update ();
-        menuShots = menuShots.filter (shot => !shot.hit && shot.x > 0 && shot.x < gameMap.width && shot.y > 0 && shot.y < gameMap.height);
-        for (var shot in menuShots) menuShots [shot].update ();
-        menuHits = menuHits.filter (hit => !hit.reverse || hit.r > 0);
+        if (modalBack) modalBack.update ();
         if (gameTitle) gameTitle.update ();
-        for (var text in gameText)
-        {
-            if (gameText [text]) gameText [text].update (text);
-            if (menuHits.findIndex (hit => hit.name == gameText [text].src) > -1) for (var hit in menuHits.filter (hit => hit.name == gameText [text].src)) menuHits [hit].update ();
-        }
+        for (var text in gameText) if (gameText [text]) gameText [text].update (text);
         for (var confirm in gameConfirm) gameConfirm [confirm].update ();
         for (var alert in gameAlert) gameAlert [alert].update ();
-        if (gameScreen != "game") for (var char in gameChars) gameChars [char].update ();
+        if (gameScreen != "game") for (var char in gameChars) gameChars [char].update (char);
     }
     gameArea.frame++;
     gameArea.animation = window.requestAnimationFrame (updateGameArea);

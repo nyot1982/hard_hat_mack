@@ -22,7 +22,6 @@
         <script type="text/javascript" src="js/game_scripts.js"></script>
         <script type="text/javascript" src="js/game_screen.js"></script>
         <script type="text/javascript" src="js/game_controls.js"></script>
-        <script type="text/javascript" src="js/game_ground.js"></script>
         <script type="text/javascript" src="js/game_enemies.js"></script>
         <script type="text/javascript" src="js/game_objects.js"></script>
     </head>
