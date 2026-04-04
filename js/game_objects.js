@@ -2,31 +2,12 @@ function audio (src, loop)
 {
     this.src = src;
     this.loop = loop;
+    this.audio = new Audio (this.src);
     this.audioCtx = new AudioContext ();
     this.buffer;
-    this.source;
+    this.source = this.audioCtx.createBufferSource (this.audio);
+    this.source.connect (this.audioCtx.destination);
     this.duration = 0;
-    
-    this.load = async function ()
-    {
-        try
-        {
-            const response = await fetch (this.src);
-            this.audioCtx.decodeAudioData
-            (
-                await response.arrayBuffer (), (buf) =>
-                {
-                    // executes when buffer has been decoded
-                    this.buffer = buf;
-                    this.duration = buf.duration.toFixed (2);
-                }
-            );
-        }
-        catch (err)
-        {
-            console.error (`Unable to fetch the audio file. Error: ${err.message}`);
-        }
-    }
 
     this.play = function ()
     {
@@ -53,8 +34,6 @@ function audio (src, loop)
             this.source = null;
         }
     }
-
-    this.load ();
 }
 
 function back (type, color, x, y, width, height)

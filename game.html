@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <title>Hard Hat Mack</title>
-        <base href="/hard_hat_mack/">
+        <base href="./">
         <meta charset="utf-8">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="language" content="English">
@@ -27,6 +27,23 @@
     </head>
     <body>
         <preloader><div class="spinner"></div></preloader>
+        <script type="text/javascript">
+            gameSound.sounds =
+            {
+                shot0: new audio ("sound/shot0.wav", false),
+                shot1: new audio ("sound/shot1.wav", false),
+                shot2: new audio ("sound/shot2.wav", false),
+                shot3: new audio ("sound/shot3.wav", false),
+                hit0: new audio ("sound/hit0.wav", false),
+                hit1: new audio ("sound/hit1.wav", false),
+                hit2: new audio ("sound/hit2.wav", false)
+            };
+            gameMusic.musics =
+            {
+                menu: new audio ("music/menu.mp3", true),
+                game: new audio ("music/game.mp3", true)
+            };
+        </script>
         <main>
             <article>
                 <div id="blackScreen"></div>
