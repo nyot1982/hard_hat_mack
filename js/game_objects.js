@@ -12,7 +12,7 @@ function audio (src, loop)
         "loadeddata",
         () =>
         {
-            this.duration = audioElement.duration;
+            this.duration = this.audio.duration;
         }
     )
 
