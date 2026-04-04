@@ -7,7 +7,14 @@ function audio (src, loop)
     this.buffer;
     this.source = this.audioCtx.createBufferSource (this.audio);
     this.source.connect (this.audioCtx.destination);
-    this.duration = 0;
+    this.audio.addEventListener
+    (
+        "loadeddata",
+        () =>
+        {
+            this.duration = audioElement.duration;
+        }
+    )
 
     this.play = function ()
     {
