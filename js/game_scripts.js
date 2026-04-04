@@ -298,54 +298,6 @@ $(document).ready (function ()
     gameArea.start ();
 });
 
-function fetchLoad (cont, param)
-{
-    if (cont == "player")
-    {
-        gameText.push (new component ("text", cont == "player" ? "Loading..." : "Saving...", "yellow", 745, 395, "left", 10));
-        param = 'id=' + gameChars [0].id + '&' + param;
-    }
-  
-    var cadParam = "fetch_call=fetch_origin";
-    if (param) cadParam += "&" + param;
-
-    const options =
-    {
-        method: "POST",
-        headers:
-        {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: cadParam
-    };
-
-    const isResponseOk = response =>
-    {
-        if (!response.ok) throw new Error (response.status);
-        return response.json ();
-    }
-      
-    fetch ("fetch/" + cont + ".php", options)
-    .then (response => isResponseOk (response))
-    .then
-    (
-        responseJSON =>
-        {
-            if (responseJSON ["error"])
-            {
-                if (cont == "player")
-                {
-                    gameText.pop ();
-                    gameAlert.push (new component ("text", responseJSON ["error"], "red", 745, 395, "left", 10));
-                }
-                else console.error ("Error! ", responseJSON ["error"]);
-            }
-            else document.getElementById (cont).innerHTML += responseJSON [cont];
-        }
-    )
-    .catch (error => console.error ("Error! ", error.message));
-}
-
 function updateGameArea ()
 {
     controls ();

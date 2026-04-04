@@ -64,7 +64,6 @@ function gameLoadScreen (screen)
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
-        fetchLoad ("high_scores");
     }
     else if (gameScreen == "game_over" || gameScreen == "game_completed")
     {
