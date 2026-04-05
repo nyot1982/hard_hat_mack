@@ -76,16 +76,16 @@ function back (type, color, x, y, width, height)
 
 function mack (type, color, x, y, width, height, speedX, speedY, brake, bounce)
 {
-    this.type = type || 0;
+    this.type = (type != null ? type : 0);
     this.color = color || null;
-    this.x = x || 0;
-    this.y = y || 0;    
-    this.width = width || 0;
-    this.height = height || 0;
-    this.speedX = speedX || 0;
-    this.speedY = speedY || 0;
-    this.brake = brake || 0.02;
-    this.bounce = bounce || 0.75;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = (width != null ? width : 0);
+    this.height = (height != null ? height : 0);
+    this.speedX = (speedX != null ? speedX : 0);
+    this.speedY = (speedY != null ? speedY : 0);
+    this.brake = (brake != null ? brake : 0.01);
+    this.bounce = (bounce != null ? bounce : 0.75);
     this.gravity = gravity;
     this.gravitySpeed = gravitySpeed;
 
