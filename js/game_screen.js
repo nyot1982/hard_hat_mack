@@ -49,9 +49,9 @@ function gameLoadScreen (screen)
     {
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
-        gameText.push (new component ("text", "Welcome to Last Mission.", "white", canvasWidth / 2, 275, "center", 10));
+        gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", canvasWidth / 2, 275, "center", 10));
         gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
+        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", canvasWidth / 2, 445, "center", 10));
     }
     else if (gameScreen == "menu")
     {
@@ -65,7 +65,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Sound", "white", 575, gameText [3].y + 25, "left", 10));
         gameText.push (new component ("text", "Music", "white", 575, gameText [4].y + 25, "left", 10));
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [5].y + 25, "left", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
+        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", canvasWidth / 2, 445, "center", 10));
     }
     else if (gameScreen == "high_scores")
     {
@@ -122,7 +122,7 @@ function gameOpenModal (modal, text)
         gameText.push (new component ("text", "Sound", "white", 575, startMenu, "left", 10));
         gameText.push (new component ("text", "Music", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Exit", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", gameArea.centerPoint.x, 445, "center", 10));
+        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", gameArea.centerPoint.x, 445, "center", 10));
     }
     else
     {
