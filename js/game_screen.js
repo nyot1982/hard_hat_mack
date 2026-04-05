@@ -41,13 +41,13 @@ function gameLoadScreen (screen)
             x: canvasWidth / 2,
             y: canvasHeight / 2,
         };
-        if (gameMusic.active) gameMusic.musics.game.stop ();
+        /*if (gameMusic.active)*/ gameMusic.musics.game.stop ();
     }
-    if (gameScreen == "menu" && screen == "game" && gameMusic.active) gameMusic.musics.menu.stop ();
+    if (gameScreen == "menu" && screen == "game" /*&& gameMusic.active*/) gameMusic.musics.menu.stop ();
     gameScreen = screen;
     if (gameScreen == "menu")
     {
-        if (gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
+        /*if (gameMusic.active && !gameMusic.musics.menu.source)*/ gameMusic.musics.menu.play ();
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
@@ -74,11 +74,11 @@ function gameLoadScreen (screen)
     {
         generateGameMap ("level1");
         gameChars.push (new mack (0, "red", 0, 0, 50, 50, 4, 0, 0));
-        if (gameMusic.active)
-        {
+        /*if (gameMusic.active)
+        {*/
             gameMusic.musics.menu.stop ();
             gameMusic.musics.game.play ();
-        }
+        //}
     }
     if (document.getElementById ("blackScreen").style.display == 'block')
     {

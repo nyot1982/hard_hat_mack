@@ -269,12 +269,12 @@ var canvasWidth = 1024,
         },
         play: function ()
         {
-            if (gameScreen == "game" && gameMusic.active) gameMusic.musics.game.play ();
+            if (gameScreen == "game" /*&& gameMusic.active*/) gameMusic.musics.game.play ();
             this.animation = window.requestAnimationFrame (updateGameArea);
         },
         pause: function ()
         {
-            if (gameScreen == "game" && gameMusic.active) gameMusic.musics.game.pause ();
+            if (gameScreen == "game" /*&& gameMusic.active*/) gameMusic.musics.game.pause ();
             window.cancelAnimationFrame (this.animation);
         },
         stop: function ()
