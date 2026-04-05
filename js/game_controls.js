@@ -69,7 +69,26 @@ function stopControl (id_control, control, bt_type, bt_code)
 
 function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
 {
-    if (gameScreen == "menu")
+    if (gameScreen == "start" && control == "keyboard")
+    {
+        gameSound.sounds =
+        {
+            shot0: new audio ("sound/shot0.wav", false),
+            shot1: new audio ("sound/shot1.wav", false),
+            shot2: new audio ("sound/shot2.wav", false),
+            shot3: new audio ("sound/shot3.wav", false),
+            hit0: new audio ("sound/hit0.wav", false),
+            hit1: new audio ("sound/hit1.wav", false),
+            hit2: new audio ("sound/hit2.wav", false)
+        };
+        gameMusic.musics =
+        {
+            menu: new audio ("music/menu.mp3", true),
+            game: new audio ("music/game.mp3", true)
+        };
+        //toggleFullScreen ();
+    }
+    else if (gameScreen == "menu")
     {
         if (!blackScreen)
         {

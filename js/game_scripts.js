@@ -294,7 +294,7 @@ var canvasWidth = 1024,
 $(document).ready (function ()
 {
     $("preloader").fadeOut (1000);
-    gameLoadScreen ("menu");
+    gameLoadScreen ("start");
     gameArea.start ();
 });
 
@@ -303,7 +303,30 @@ function updateGameArea ()
     controls ();
     gameArea.clear ();
     for (var back in gameBack) gameBack [back].update ();
-    if (gameScreen == "game")
+    if (gameScreen == "start")
+    {
+        if (Object.keys (gameSound.sounds).length > 0 && Object.keys (gameMusic.musics).length > 0)
+        {
+            var loadedAudio = 0;
+            for (var sound in gameSound.sounds) if (gameSound.sounds [sound].duration > 0) loadedAudio++;
+            for (var music in gameMusic.musics) if (gameMusic.musics [music].duration > 0) loadedAudio++;
+            gameText [1].src = "Loading audio: " + loadedAudio + "/" + (Object.keys (gameSound.sounds).length + Object.keys (gameMusic.musics).length) + " Files.";
+            gameText [1].color = "#0C0";
+            if (loadedAudio == Object.keys (gameSound.sounds).length + Object.keys (gameMusic.musics).length)
+            {
+                $("#blackScreen").fadeIn (1000);
+                setTimeout
+                (
+                    () =>
+                    {
+                        gameLoadScreen ("menu");
+                    },
+                    1000
+                );
+            }
+        }
+    }
+    else if (gameScreen == "game")
     {
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
         gameObjects = gameEnemies.concat (gameChars);

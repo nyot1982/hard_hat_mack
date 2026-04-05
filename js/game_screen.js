@@ -45,7 +45,15 @@ function gameLoadScreen (screen)
     }
     if (gameScreen == "menu" && screen == "game" /*&& gameMusic.active*/) gameMusic.musics.menu.stop ();
     gameScreen = screen;
-    if (gameScreen == "menu")
+    if (gameScreen == "start")
+    {
+        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
+        gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
+        gameText.push (new component ("text", "Welcome to Last Mission.", "white", canvasWidth / 2, 275, "center", 10));
+        gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
+        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1986-2024", "white", canvasWidth / 2, 445, "center", 10));
+    }
+    else if (gameScreen == "menu")
     {
         /*if (gameMusic.active && !gameMusic.musics.menu.source)*/ gameMusic.musics.menu.play ();
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
