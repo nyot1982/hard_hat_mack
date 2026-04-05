@@ -116,10 +116,6 @@ function gameOpenModal (modal, text)
     {
         gameTitle = new component ("image", "svgs/title.svg", "", gameArea.centerPoint.x, 100, 203, 92);
         gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
-        var startMenu = 255;
-        gameText.push (new component ("text", "Pause", "white", 575, startMenu, "left", 10));
-        startMenu += 25;
-        gameText.push (new component ("text", "Sound", "white", 575, startMenu, "left", 10));
         gameText.push (new component ("text", "Music", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Exit", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", gameArea.centerPoint.x, 445, "center", 10));
