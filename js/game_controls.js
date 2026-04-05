@@ -194,10 +194,10 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
                 case 'fire':
                     if (gameChar > -1) gameChars [gameChar].firing (true);
                 break;
-                case 'move_front':
+                case 'move_up':
                     if (gameChar > -1) gameChars [gameChar].moving (bt_value);
                 break;
-                case 'move_back':
+                case 'move_down':
                     if (gameChar > -1) gameChars [gameChar].moving (-bt_value);
                 break;
             }
@@ -219,8 +219,8 @@ function userActionStop (control, bt_type, bt_code, gameChar)
             case 'fire':
                 if (gameChar > -1) gameChars [gameChar].firing (false);
             break;
-            case 'move_back':
-            case 'move_front':
+            case 'move_down':
+            case 'move_up':
                 if (gameChar > -1) gameChars [gameChar].moving (0);
             break;
         }

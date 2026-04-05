@@ -35,8 +35,6 @@ var canvasWidth = 1024,
         wheelZ: 0,
         pressed: []
     },
-    menuShots = [],
-    menuHits = [],
     gameObjects = [],
     gameBack = [],
     gameChars = [],
@@ -44,8 +42,6 @@ var canvasWidth = 1024,
     gameText = [],
     gameAlert = [],
     gameConfirm = [],
-    gameShots = [],
-    gameHits = [],
     highScores = [],
     highScoreSave = [],
     userActions =
@@ -142,8 +138,8 @@ var canvasWidth = 1024,
         },
         {
             screen: ["game"],
-            action: "move_front",
-            title: "Move forward",
+            action: "move_up",
+            title: "Move up",
             editable: true,
             keyboard:
             {
@@ -162,8 +158,8 @@ var canvasWidth = 1024,
         },
         {
             screen: ["game"],
-            action: "move_back",
-            title: "Move backward",
+            action: "move_down",
+            title: "Move down",
             editable: true,
             keyboard:
             {
@@ -182,8 +178,8 @@ var canvasWidth = 1024,
         },
         {
             screen: ["game"],
-            action: "fire",
-            title: "Fire",
+            action: "jump",
+            title: "Jump",
             editable: true,
             keyboard:
             {
@@ -197,6 +193,26 @@ var canvasWidth = 1024,
             joystick:
             {
                 buttons: [0],
+                axes: []
+            }
+        },
+        {
+            screen: ["game"],
+            action: "drop_drill",
+            title: "Drop drill",
+            editable: true,
+            keyboard:
+            {
+                keys: [13] // Enter
+            },
+            gamepad:
+            {
+                buttons: [3], // Y
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [1],
                 axes: []
             }
         },
@@ -228,7 +244,7 @@ var canvasWidth = 1024,
     },
     gameMusic =
     {
-        active: false,
+        active: true,
         musics: []
     },
     gameArea =
@@ -269,12 +285,12 @@ var canvasWidth = 1024,
         },
         play: function ()
         {
-            if (gameScreen == "game" /*&& gameMusic.active*/) gameMusic.musics.game.play ();
+            if (gameScreen == "game" && gameMusic.active) gameMusic.musics.game.play ();
             this.animation = window.requestAnimationFrame (updateGameArea);
         },
         pause: function ()
         {
-            if (gameScreen == "game" /*&& gameMusic.active*/) gameMusic.musics.game.pause ();
+            if (gameScreen == "game" && gameMusic.active) gameMusic.musics.game.pause ();
             window.cancelAnimationFrame (this.animation);
         },
         stop: function ()
