@@ -87,6 +87,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
             game: new audio ("music/game.mp3", true)
         };
         //toggleFullScreen ();
+        //gameConfirm.push (new component ("text", ">>> Are you sure?", "yellow", 705, gameText [gameText.length - 2].y, "left", 10));
     }
     else if (gameScreen == "menu")
     {
@@ -191,14 +192,23 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
                 case 'close_modal':
                     gameCloseModal ();
                 break;
-                case 'fire':
-                    if (gameChar > -1) gameChars [gameChar].firing (true);
-                break;
                 case 'move_up':
-                    if (gameChar > -1) gameChars [gameChar].moving (bt_value);
+                    if (gameChar > -1) gameChars [gameChar].moving (0, bt_value);
                 break;
                 case 'move_down':
-                    if (gameChar > -1) gameChars [gameChar].moving (-bt_value);
+                    if (gameChar > -1) gameChars [gameChar].moving (0, -bt_value);
+                break;
+                 case 'move_left':
+                    if (gameChar > -1) gameChars [gameChar].moving (bt_value, 0);
+                break;
+                case 'move_right':
+                    if (gameChar > -1) gameChars [gameChar].moving (-bt_value, 0);
+                break;
+                case 'jump':
+                    if (gameChar > -1) gameChars [gameChar].jumping (true);
+                break;
+                case 'drop_drill':
+                    if (gameChar > -1) gameChars [gameChar].droping (true);
                 break;
             }
         }
