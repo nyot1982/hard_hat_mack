@@ -54,7 +54,7 @@ function stopControl (id_control, control, bt_type, bt_code)
         if (gameScreen == "game" && gamePlayers.length > 0)
         {
             player = gamePlayers.findIndex (player => player.name == "Player 1");
-            userActionStop (control, bt_type, bt_code, player);
+            userActionStop (id_control, control, bt_type, bt_code, player);
         }
     }
 }
@@ -111,23 +111,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
             );
         }
     }
-    else if (gameScreen == "game_over" || gameScreen == "game_completed")
-    {
-        if (!blackScreen)
-        {
-            blackScreen = true;
-            $("#blackScreen").fadeIn (1000);
-            setTimeout
-            (
-                () =>
-                {
-                    gameLoadScreen ("high_scores");
-                },
-                1000
-            );
-        }
-    }
-    else
+    else if (gameScreen == "game")
     {
         if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
         else var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
@@ -159,7 +143,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
     }
 }
 
-function userActionStop (control, bt_type, bt_code, player)
+function userActionStop (id_control, control, bt_type, bt_code, player)
 {
     var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
@@ -168,12 +152,40 @@ function userActionStop (control, bt_type, bt_code, player)
         switch (userActions [userAction].action)
         {
             case 'move_down':
+                if (player > -1)
+                {
+                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedY = -1;
+                    else gamePlayers [player].speedY = 0;
+                }
+            break;
             case 'move_up':
-                if (player > -1) gamePlayers [player].speedY = 0;
+                if (player > -1)
+                {
+                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedY = 1;
+                    else gamePlayers [player].speedY = 0;
+                }
             break;
             case 'move_left':
+                if (player > -1)
+                {
+                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedX = 1;
+                    else gamePlayers [player].speedX = 0;
+                }
+            break;
             case 'move_right':
-                if (player > -1) gamePlayers [player].speedX = 0;
+                if (player > -1)
+                {
+                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedX = -1;
+                    else gamePlayers [player].speedX = 0;
+                }
             break;
         }
     }
