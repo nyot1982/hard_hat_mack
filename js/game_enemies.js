@@ -719,72 +719,10 @@ function enemy (type, x, y, heading)
                 }
             }
             ctx.restore ();
-
-            for (var gameShot in gameShots)
-            {
-                if (gameShots [gameShot].name.substring (0, 6) != "enemy-")
-                {
-                    var dx = this.x - gameShots [gameShot].x;
-                    var dy = this.y - gameShots [gameShot].y;
-                    if ((this.type < 3 && Math.sqrt (dx * dx + dy * dy) < 18) || (this.type == 3 && Math.sqrt (dx * dx + dy * dy) < 24) || (this.type > 3 && this.type < 7 && Math.sqrt (dx * dx + dy * dy) < 30) || (this.type == 7 && Math.sqrt (dx * dx + dy * dy) < 17))
-                    {
-                        var player = players.findIndex (player => player.name == gameShots [gameShot].name);
-                        gameShots [gameShot].hit = true;
-                        this.life -= 10;
-                        if (this.life == 0)
-                        {
-                            gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
-                            if (gameSound.active)
-                            {
-                                gameSound.sounds ["hit0"].stop ();
-                                gameSound.sounds ["hit0"].play ();
-                            }
-                            if (this.type < 3)
-                            {
-                                if (player > -1) players [player].score += 500;
-                            }
-                            else if (this.type < 7)
-                            {
-                                if (player > -1) players [player].score += 1000;
-                            }
-                            if (this.type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
-                        }
-                        else
-                        {
-                            gameHits.push (new hit (gameShots [gameShot].name, gameShots [gameShot].x, gameShots [gameShot].y, 20, 1));
-                            if (gameSound.active)
-                            {
-                                gameSound.sounds ["hit1"].stop ();
-                                gameSound.sounds ["hit1"].play ();
-                            }
-                            if (players [player].name == gameShots [gameShot].name && this.type < 7)
-                            {
-                                if (player > -1) players [player].score += 100;
-                            }
-                        }
-                    }
-                }
-            }
-            if (this.fire && (gameArea.frame - this.lastShotFrame) >= 50)
-            {
-                if (this.weapon == 0) gameShots.push (new shot ("enemy-" + this.id, this.weapon, "black", this.x + (this.height / 2 + 24) * Math.sin (this.heading * Math.PI / 180), this.y - (this.height / 2 + 24) * Math.cos (this.heading * Math.PI / 180), 24, 3, 12, this.heading));
-                else if (this.weapon == 4)
-                {
-                    if (this.type == 4) var startHeading = -45;
-                    else if (this.type == 5) var startHeading = 0;
-                    gameShots.push (new shot ("enemy-" + this.id, this.weapon, "black", this.x + (this.height / 2 + 28) * Math.sin ((this.heading + startHeading) * Math.PI / 180), this.y - (this.height / 2 + 28) * Math.cos ((this.heading + startHeading) * Math.PI / 180), 28, 3, 8, this.heading + startHeading));
-                    gameShots.push (new shot ("enemy-" + this.id, this.weapon, "black", this.x + (this.width / 2 + 28) * Math.sin ((this.heading + startHeading + 90) * Math.PI / 180), this.y - (this.width / 2 + 28) * Math.cos ((this.heading + startHeading + 90) * Math.PI / 180), 28, 3, 8, this.heading + startHeading + 90));
-                    gameShots.push (new shot ("enemy-" + this.id, this.weapon, "black", this.x + (this.height / 2 + 28) * Math.sin ((this.heading + startHeading + 180) * Math.PI / 180), this.y - (this.height / 2 + 28) * Math.cos ((this.heading + startHeading + 180) * Math.PI / 180), 28, 3, 8, this.heading + startHeading + 180));
-                    gameShots.push (new shot ("enemy-" + this.id, this.weapon, "black", this.x + (this.width / 2 + 28) * Math.sin ((this.heading + startHeading + 270) * Math.PI / 180), this.y - (this.width / 2 + 28) * Math.cos ((this.heading + startHeading + 270) * Math.PI / 180), 28, 3, 8, this.heading + startHeading + 270));
-                }
-                else if (this.weapon == 5) gameShots.push (new shot ("enemy-" + this.id, this.weapon, "#B2B2B2", this.x + 16 * Math.sin (this.heading * Math.PI / 180), this.y - 16 * Math.cos (this.heading * Math.PI / 180), 4, 4, 6, this.heading));
-                this.lastShotFrame = gameArea.frame;
-            }
         }
         else if (this.life > 0)
         {
             this.life = 0;
-            gameHits.push (new hit ("hit0", this.x, this.y, 40, 2));
             if (gameSound.active)
             {
                 gameSound.sounds ["hit0"].stop ();

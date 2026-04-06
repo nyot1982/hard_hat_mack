@@ -39,7 +39,7 @@ function startControl (id_control, control, bt_type, bt_code, bt_value)
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
         var player = -1;
-        if (gameScreen == "game" && players.length > 0) player = players.findIndex (player => player.name == "Player 1");
+        if (gameScreen == "game" && gamePlayers.length > 0) player = gamePlayers.findIndex (player => player.name == "Player 1");
         if (control == "keyboard") bt_value = 1;
         userActionStart (control, bt_type, bt_code, bt_value, player);
     }
@@ -51,9 +51,9 @@ function stopControl (id_control, control, bt_type, bt_code)
     {
         pressed [bt_type][id_control].splice (pressed [bt_type][id_control].indexOf (bt_code), 1);
         var player = -1;
-        if (gameScreen == "game" && players.length > 0)
+        if (gameScreen == "game" && gamePlayers.length > 0)
         {
-            player = players.findIndex (player => player.name == "Player 1");
+            player = gamePlayers.findIndex (player => player.name == "Player 1");
             userActionStop (control, bt_type, bt_code, player);
         }
     }
@@ -137,22 +137,22 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
             switch (userActions [userAction].action)
             {
                 case 'move_up':
-                    if (player > -1) players [player].speedY = -bt_value;
+                    if (player > -1) gamePlayers [player].speedY = -bt_value;
                 break;
                 case 'move_down':
-                    if (player > -1) players [player].speedY = bt_value;
+                    if (player > -1) gamePlayers [player].speedY = bt_value;
                 break;
                  case 'move_left':
-                    if (player > -1) players [player].speedX = -bt_value;
+                    if (player > -1) gamePlayers [player].speedX = -bt_value;
                 break;
                 case 'move_right':
-                    if (player > -1) players [player].speedX = bt_value;
+                    if (player > -1) gamePlayers [player].speedX = bt_value;
                 break;
                 case 'jump':
-                    if (player > -1) players [player].jumping (true);
+                    if (player > -1) gamePlayers [player].speedY = -5;
                 break;
                 case 'drop_drill':
-                    if (player > -1) players [player].droping (true);
+                    if (player > -1) gamePlayers [player].drill (false);
                 break;
             }
         }
@@ -169,17 +169,11 @@ function userActionStop (control, bt_type, bt_code, player)
         {
             case 'move_down':
             case 'move_up':
-                if (player > -1) players [player].speedY = 0;
+                if (player > -1) gamePlayers [player].speedY = 0;
             break;
             case 'move_left':
             case 'move_right':
-                if (player > -1) players [player].speedX = 0;
-            break;
-            case 'jump':
-                if (player > -1) players [player].jumping (false);
-            break;
-            case 'drop_drill':
-                if (player > -1) players [player].droping (false);
+                if (player > -1) gamePlayers [player].speedX = 0;
             break;
         }
     }
@@ -187,7 +181,7 @@ function userActionStop (control, bt_type, bt_code, player)
 
 function stopUserInteractions ()
 {
-    var player = players.findIndex (player => player.name == "Player 1");
+    var player = gamePlayers.findIndex (player => player.name == "Player 1");
     pressed =
     {
         keys:
@@ -197,8 +191,8 @@ function stopUserInteractions ()
         buttons: [],
         axes: []
     };
-    players [player].firing (false);
-    players [player].moving (0);
+    gamePlayers [player].firing (false);
+    gamePlayers [player].moving (0);
 }
 
 function mouseMove (e)

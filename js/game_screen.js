@@ -23,10 +23,8 @@ function gameLoadScreen (screen)
 {
     gameTitle = null;
     gameBack = [];
-    players = [];
+    gamePlayers = [];
     gameEnemies = [];
-    gameShots = [];
-    gameHits = [];
     gameText = [];
 
     if (gameScreen == "game" && screen == "menu")
@@ -68,7 +66,7 @@ function gameLoadScreen (screen)
     else if (gameScreen == "game")
     {
         generateGameMap ("level1");
-        players.push (new player (0, "Player 1", "red", 0, 0, 50, 50));
+        gamePlayers.push (new player (0, "Player 1", "red", 0, 0, 50, 50));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();

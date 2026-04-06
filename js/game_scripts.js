@@ -35,7 +35,7 @@ var canvasWidth = 1024,
     },
     gameObjects = [],
     gameBack = [],
-    players = [],
+    gamePlayers = [],
     gameEnemies = [],
     gameText = [],
     highScores = [],
@@ -271,7 +271,7 @@ function updateGameArea ()
     else if (gameScreen == "game")
     {
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        gameObjects = gameEnemies.concat (players);
+        gameObjects = gameEnemies.concat (gamePlayers);
         for (var object in gameObjects)
         {
             gameObjects [object].newPos ();
@@ -282,7 +282,7 @@ function updateGameArea ()
     {
         if (gameTitle) gameTitle.update ();
         for (var text in gameText) if (gameText [text]) gameText [text].update (text);
-        if (gameScreen != "game") for (var player in players) players [player].update (player);
+        if (gameScreen != "game") for (var player in gamePlayers) gamePlayers [player].update (player);
     }
     gameArea.frame++;
     gameArea.animation = window.requestAnimationFrame (updateGameArea);

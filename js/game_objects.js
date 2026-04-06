@@ -126,6 +126,10 @@ function player (type, name, color, x, y, width, height, speedX, speedY, brake, 
             this.gravitySpeed = -(this.gravitySpeed * this.bounce);
         }
     }
+
+    this.drill = function (drilling)
+    {
+    }
 }
 
 function component (type, src, color, x, y, width, height, max, backColor)
