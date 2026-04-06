@@ -90,7 +90,7 @@ function player (type, name, color, x, y, width, height, speedX, speedY, brake, 
     this.gravity = gravity;
     this.gravitySpeed = gravitySpeed;
 
-    this.update = function ()
+    this.update = function (idPlayer)
     {
         ctx = gameArea.ctx;
         ctx.fillStyle = this.color;

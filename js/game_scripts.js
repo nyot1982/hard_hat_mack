@@ -282,7 +282,6 @@ function updateGameArea ()
     {
         if (gameTitle) gameTitle.update ();
         for (var text in gameText) if (gameText [text]) gameText [text].update (text);
-        if (gameScreen != "game") for (var player in gamePlayers) gamePlayers [player].update (player);
     }
     gameArea.frame++;
     gameArea.animation = window.requestAnimationFrame (updateGameArea);
