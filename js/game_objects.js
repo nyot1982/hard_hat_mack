@@ -74,9 +74,10 @@ function back (type, color, x, y, width, height)
     }
 }
 
-function mack (type, color, x, y, width, height, speedX, speedY, brake, bounce)
+function player (type, name, color, x, y, width, height, speedX, speedY, brake, bounce)
 {
     this.type = (type != null ? type : 0);
+    this.name = name || null;
     this.color = color || null;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
@@ -137,7 +138,6 @@ function component (type, src, color, x, y, width, height, max, backColor)
         this.image = new Image ();
         this.image.src = this.src;
     }
-    else if (this.type == "type") this.typeFrame = 1;
     this.x = x;
     this.y = y;
     this.width = width;

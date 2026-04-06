@@ -23,15 +23,11 @@ function gameLoadScreen (screen)
 {
     gameTitle = null;
     gameBack = [];
-    modalBack = null;
-    gameChars = [];
+    players = [];
     gameEnemies = [];
     gameShots = [];
     gameHits = [];
     gameText = [];
-    gameAlert = [];
-    gameConfirm = [];
-    gameModal = null;
 
     if (gameScreen == "game" && (screen == "menu" || screen == "game_over" || screen == "game_completed"))
     {
@@ -60,11 +56,7 @@ function gameLoadScreen (screen)
         gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
         gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
         gameText.push (new component ("text", "One Player", "white", 575, gameText [0].y + 15, "left", 10));
-        gameText.push (new component ("text", "Cooperative", "white", 575, gameText [1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Versus", "white", 575, gameText [2].y + 25, "left", 10));
-        gameText.push (new component ("text", "Sound", "white", 575, gameText [3].y + 25, "left", 10));
-        gameText.push (new component ("text", "Music", "white", 575, gameText [4].y + 25, "left", 10));
-        gameText.push (new component ("text", "High Scores", "white", 575, gameText [5].y + 25, "left", 10));
+        gameText.push (new component ("text", "High Scores", "white", 575, gameText [1].y + 25, "left", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", canvasWidth / 2, 445, "center", 10));
     }
     else if (gameScreen == "high_scores")
@@ -76,12 +68,11 @@ function gameLoadScreen (screen)
     else if (gameScreen == "game_over" || gameScreen == "game_completed")
     {
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        if (gameSound.active) gameSound.sounds ["type"].play ();
     }
     else if (gameScreen == "game")
     {
         generateGameMap ("level1");
-        gameChars.push (new mack (0, "red", 0, 0, 50, 50));
+        players.push (new player (0, "Player 1", "red", 0, 0, 50, 50));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
@@ -100,39 +91,6 @@ function gameLoadScreen (screen)
             1000
         );
     }
-}
-
-function gameOpenModal (modal, text)
-{
-    gameTitle = null;
-    gameText = [];
-    gameAlert = [];
-    gameConfirm = [];
-    
-    if (gameModal == null) modalBack = new back("menu", "#000000DD", 0, 0, canvasWidth, canvasHeight);
-    gameModal = modal;
-
-    if (gameModal == "menu")
-    {
-        gameTitle = new component ("image", "svgs/title.svg", "", gameArea.centerPoint.x, 100, 203, 92);
-        gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
-        gameText.push (new component ("text", "Music", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Exit", "white", 575, gameText [gameText.length - 1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", gameArea.centerPoint.x, 445, "center", 10));
-    }
-    else
-    {
-        gameText.push (new component ("text", text, "white", gameArea.centerPoint.x, gameArea.centerPoint.y, "center", 32));
-        gameText.push (new component ("text", "Press 'Esc' to " + gameModal + "...", "white", gameArea.centerPoint.x, gameText [0].y + 30, "center", 10));
-    }
-}
-
-function gameCloseModal ()
-{
-    modalBack = null;
-    gameTitle = null;
-    gameText = [];
-    gameModal = null;
 }
 
 function generateGameMap (map)

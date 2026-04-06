@@ -4,7 +4,6 @@ var canvasWidth = 1024,
     gravitySpeed = 0,
     blackScreen = false,
     gameScreen = null,
-    gameModal = null,
     gameTitle = null,
     gameMap =
     {
@@ -12,7 +11,6 @@ var canvasWidth = 1024,
         width: canvasWidth,
         height: canvasHeight
     },
-    modalBack = null,
     gameControls =
     {
         99: "keyboard"
@@ -37,105 +35,13 @@ var canvasWidth = 1024,
     },
     gameObjects = [],
     gameBack = [],
-    gameChars = [],
+    players = [],
     gameEnemies = [],
     gameText = [],
-    gameAlert = [],
-    gameConfirm = [],
     highScores = [],
     highScoreSave = [],
     userActions =
     [
-        {
-            screen: ["modal_continue"],
-            action: "close_continue",
-            keyboard:
-            {
-                keys: [27] // Escape
-            },
-            gamepad:
-            {
-                buttons: [9, 16], // Start, Home
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [7],
-                axes: []
-            }
-        },
-        {
-            screen: ["modal_exit"],
-            action: "close_exit",
-            keyboard:
-            {
-                keys: [27] // Escape
-            },
-            gamepad:
-            {
-                buttons: [9, 16], // Start, Home
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [7],
-                axes: []
-            }
-        },
-        {
-            screen: ["modal_menu"],
-            action: "close_modal",
-            keyboard:
-            {
-                keys: [27] // Escape
-            },
-            gamepad:
-            {
-                buttons: [9, 16], // Start, Home
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [7],
-                axes: []
-            }
-        },
-        {
-            screen: ["confirm"],
-            action: "confirm_yes",
-            keyboard:
-            {
-                keys: [89] // Y
-            },
-            gamepad:
-            {
-                buttons: [9], // Start
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [1],
-                axes: []
-            }
-        },
-        {
-            screen: ["confirm"],
-            action: "confirm_no",
-            keyboard:
-            {
-                keys: [78] // N
-            },
-            gamepad:
-            {
-                buttons: [8], // Select
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [0],
-                axes: []
-            }
-        },
         {
             screen: ["game"],
             action: "move_up",
@@ -164,6 +70,46 @@ var canvasWidth = 1024,
             keyboard:
             {
                 keys: [40] // Down
+            },
+            gamepad:
+            {
+                buttons: [6], // LT
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: [1]
+            }
+        },
+        {
+            screen: ["game"],
+            action: "move_left",
+            title: "Move left",
+            editable: true,
+            keyboard:
+            {
+                keys: [37] // Left
+            },
+            gamepad:
+            {
+                buttons: [7], // RT
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: [1]
+            }
+        },
+        {
+            screen: ["game"],
+            action: "move_right",
+            title: "Move right",
+            editable: true,
+            keyboard:
+            {
+                keys: [39] // Right
             },
             gamepad:
             {
@@ -213,26 +159,6 @@ var canvasWidth = 1024,
             joystick:
             {
                 buttons: [1],
-                axes: []
-            }
-        },
-        {
-            screen: ["game"],
-            action: "open_modal",
-            title: "Menu",
-            editable: false,
-            keyboard:
-            {
-                keys: [27] // Escape
-            },
-            gamepad:
-            {
-                buttons: [9, 16], // Start, Home
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [7],
                 axes: []
             }
         }
@@ -345,21 +271,12 @@ function updateGameArea ()
     else if (gameScreen == "game")
     {
         gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
-        gameObjects = gameEnemies.concat (gameChars);
+        gameObjects = gameEnemies.concat (players);
         for (var object in gameObjects)
         {
             gameObjects [object].newPos ();
             gameObjects [object].update (object);
         }
-    }
-    if (gameModal != null || gameScreen != "game")
-    {
-        if (modalBack) modalBack.update ();
-        if (gameTitle) gameTitle.update ();
-        for (var text in gameText) if (gameText [text]) gameText [text].update (text);
-        for (var confirm in gameConfirm) gameConfirm [confirm].update ();
-        for (var alert in gameAlert) gameAlert [alert].update ();
-        if (gameScreen != "game") for (var char in gameChars) gameChars [char].update (char);
     }
     gameArea.frame++;
     gameArea.animation = window.requestAnimationFrame (updateGameArea);

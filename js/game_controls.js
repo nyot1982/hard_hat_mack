@@ -1,5 +1,5 @@
-window.addEventListener ("keydown", (e) => { if ((document.activeElement.tagName != "INPUT" && document.activeElement.tagName != "SELECT") || e.keyCode == 9 || e.keyCode == 27 || gameAlert.length > 0) { e.preventDefault (); startControl (99, "keyboard", "keys", e.keyCode, e.key); }});
-window.addEventListener ("keyup", (e) => { if ((document.activeElement.tagName != "INPUT" && document.activeElement.tagName != "SELECT") || e.keyCode == 9 || e.keyCode == 27 || gameAlert.length > 0) { stopControl (99, "keyboard", "keys", e.keyCode); }});
+window.addEventListener ("keydown", (e) => { if ((document.activeElement.tagName != "INPUT" && document.activeElement.tagName != "SELECT") || e.keyCode == 9 || e.keyCode == 27) { e.preventDefault (); startControl (99, "keyboard", "keys", e.keyCode, e.key); }});
+window.addEventListener ("keyup", (e) => { if ((document.activeElement.tagName != "INPUT" && document.activeElement.tagName != "SELECT") || e.keyCode == 9 || e.keyCode == 27) { stopControl (99, "keyboard", "keys", e.keyCode); }});
 window.addEventListener ('gamepaddisconnected', gamepadDisconnected);
 window.addEventListener ('gamepadconnected', gamepadConnected);
 
@@ -38,18 +38,10 @@ function startControl (id_control, control, bt_type, bt_code, bt_value)
     if (!pressed [bt_type][id_control].includes (bt_code) || bt_type == "axes")
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
-        var gameChar = -1;
-        if (gameScreen == "game" && gameChars.length > 0 && gameConfirm.length == 0)
-        {
-            gameChar = gameChars.findIndex (char => char.name == "Player 1");
-            if (control == "keyboard")
-            {
-                if (bt_code == 37) bt_value = -1;
-                else bt_value = 1;
-            }
-        }
-        else if (control == "keyboard") bt_value = 1;
-        userActionStart (control, bt_type, bt_code, bt_value, gameChar);
+        var player = -1;
+        if (gameScreen == "game" && players.length > 0) player = players.findIndex (player => player.name == "Player 1");
+        if (control == "keyboard") bt_value = 1;
+        userActionStart (control, bt_type, bt_code, bt_value, player);
     }
 }
 
@@ -58,16 +50,16 @@ function stopControl (id_control, control, bt_type, bt_code)
     if (pressed [bt_type][id_control].includes (bt_code))
     {
         pressed [bt_type][id_control].splice (pressed [bt_type][id_control].indexOf (bt_code), 1);
-        var gameChar = -1;
-        if (gameScreen == "game" && gameChars.length > 0 && gameConfirm.length == 0)
+        var player = -1;
+        if (gameScreen == "game" && players.length > 0)
         {
-            gameChar = gameChars.findIndex (char => char.name == "Player 1");
-            userActionStop (control, bt_type, bt_code, gameChar);
+            player = players.findIndex (player => player.name == "Player 1");
+            userActionStop (control, bt_type, bt_code, player);
         }
     }
 }
 
-function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
+function userActionStart (control, bt_type, bt_code, bt_value, player)
 {
     if (gameScreen == "start" && control == "keyboard")
     {
@@ -86,8 +78,6 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
             menu: new audio ("music/menu.mp3", true),
             game: new audio ("music/game.mp3", true)
         };
-        //toggleFullScreen ();
-        //gameConfirm.push (new component ("text", ">>> Are you sure?", "yellow", 705, gameText [gameText.length - 2].y, "left", 10));
     }
     else if (gameScreen == "menu")
     {
@@ -131,107 +121,65 @@ function userActionStart (control, bt_type, bt_code, bt_value, gameChar)
             (
                 () =>
                 {
-                    gameSound.sounds ["type"].stop ();
                     gameLoadScreen ("high_scores");
                 },
                 1000
             );
         }
     }
-    else if (gameAlert.length > 0) gameAlert = [];
     else
     {
-        if (gameConfirm.length > 0) var screen = "confirm";
-        else if (gameScreen == "menu" && gameModal == null) var screen = "menu";
-        else if (gameScreen == "game" && gameChars.length > 0 && gameModal == null) var screen = "game";
-        else if (gameModal != null) var screen = "modal_" + gameModal;
-
-        if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (screen) && action [control].includes (bt_code));
-        else var userAction = userActions.findIndex (action => action.screen.includes (screen) && action [control][bt_type].includes (bt_code));
+        if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
+        else var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
         if (userAction > -1)
         {
             switch (userActions [userAction].action)
             {
-                case 'confirm_no':
-                    gameConfirm = [];
-                break;
-                case 'confirm_yes':
-                    if (!blackScreen)
-                    {
-                        blackScreen = true;
-                        $("#blackScreen").fadeIn (1000);
-                        setTimeout
-                        (
-                            () =>
-                            {
-                                gameLoadScreen ("menu");
-                            },
-                            1000
-                        );
-                    }
-                break;
-                case 'open_modal':
-                    gameOpenModal ("menu");
-                break;
-                case 'close_exit':
-                    $("#blackScreen").fadeIn (1000);
-                    setTimeout
-                    (
-                        () =>
-                        {
-                            gameLoadScreen ("menu");
-                        },
-                        1000
-                    );
-                break;
-                case 'close_continue':
-                    gameOpenModal ("menu");
-                    gameArea.play ();
-                break;
-                case 'close_modal':
-                    gameCloseModal ();
-                break;
                 case 'move_up':
-                    if (gameChar > -1) gameChars [gameChar].moving (0, bt_value);
+                    if (player > -1) players [player].speedY = -bt_value;
                 break;
                 case 'move_down':
-                    if (gameChar > -1) gameChars [gameChar].moving (0, -bt_value);
+                    if (player > -1) players [player].speedY = bt_value;
                 break;
                  case 'move_left':
-                    if (gameChar > -1) gameChars [gameChar].moving (bt_value, 0);
+                    if (player > -1) players [player].speedX = -bt_value;
                 break;
                 case 'move_right':
-                    if (gameChar > -1) gameChars [gameChar].moving (-bt_value, 0);
+                    if (player > -1) players [player].speedX = bt_value;
                 break;
                 case 'jump':
-                    if (gameChar > -1) gameChars [gameChar].jumping (true);
+                    if (player > -1) players [player].jumping (true);
                 break;
                 case 'drop_drill':
-                    if (gameChar > -1) gameChars [gameChar].droping (true);
+                    if (player > -1) players [player].droping (true);
                 break;
             }
         }
     }
 }
 
-function userActionStop (control, bt_type, bt_code, gameChar)
+function userActionStop (control, bt_type, bt_code, player)
 {
-    if ((gameScreen == "menu" || gameModal == "menu") && gameConfirm.length == 0) var screen = "modal";
-    else if (gameScreen == "game" && gameModal == null && gameChars.length > 0 && gameConfirm.length == 0) var screen = "game";
-    
-    var userAction = userActions.findIndex (action => action.screen.includes (screen) && action [control][bt_type].includes (bt_code));
+    var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
     if (userAction > -1)
     {
         switch (userActions [userAction].action)
         {
-            case 'fire':
-                if (gameChar > -1) gameChars [gameChar].firing (false);
-            break;
             case 'move_down':
             case 'move_up':
-                if (gameChar > -1) gameChars [gameChar].moving (0);
+                if (player > -1) players [player].speedY = 0;
+            break;
+            case 'move_left':
+            case 'move_right':
+                if (player > -1) players [player].speedX = 0;
+            break;
+            case 'jump':
+                if (player > -1) players [player].jumping (false);
+            break;
+            case 'drop_drill':
+                if (player > -1) players [player].droping (false);
             break;
         }
     }
@@ -239,7 +187,7 @@ function userActionStop (control, bt_type, bt_code, gameChar)
 
 function stopUserInteractions ()
 {
-    var gameChar = gameChars.findIndex (char => char.name == "Player 1");
+    var player = players.findIndex (player => player.name == "Player 1");
     pressed =
     {
         keys:
@@ -249,8 +197,8 @@ function stopUserInteractions ()
         buttons: [],
         axes: []
     };
-    gameChars [gameChar].firing (false);
-    gameChars [gameChar].moving (0);
+    players [player].firing (false);
+    players [player].moving (0);
 }
 
 function mouseMove (e)

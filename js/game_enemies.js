@@ -728,7 +728,7 @@ function enemy (type, x, y, heading)
                     var dy = this.y - gameShots [gameShot].y;
                     if ((this.type < 3 && Math.sqrt (dx * dx + dy * dy) < 18) || (this.type == 3 && Math.sqrt (dx * dx + dy * dy) < 24) || (this.type > 3 && this.type < 7 && Math.sqrt (dx * dx + dy * dy) < 30) || (this.type == 7 && Math.sqrt (dx * dx + dy * dy) < 17))
                     {
-                        var gameChar = gameChars.findIndex (char => char.name == gameShots [gameShot].name);
+                        var player = players.findIndex (player => player.name == gameShots [gameShot].name);
                         gameShots [gameShot].hit = true;
                         this.life -= 10;
                         if (this.life == 0)
@@ -741,11 +741,11 @@ function enemy (type, x, y, heading)
                             }
                             if (this.type < 3)
                             {
-                                if (gameChar > -1) gameChars [gameChar].score += 500;
+                                if (player > -1) players [player].score += 500;
                             }
                             else if (this.type < 7)
                             {
-                                if (gameChar > -1) gameChars [gameChar].score += 1000;
+                                if (player > -1) players [player].score += 1000;
                             }
                             if (this.type < 3) gameEnemies.push (new enemy (Math.floor (Math.random () * 3), Math.floor (Math.random () * gameMap.width), Math.floor (Math.random () * gameMap.height), Math.floor (Math.random () * 720) - 360));
                         }
@@ -757,9 +757,9 @@ function enemy (type, x, y, heading)
                                 gameSound.sounds ["hit1"].stop ();
                                 gameSound.sounds ["hit1"].play ();
                             }
-                            if (gameChars [gameChar].name == gameShots [gameShot].name && this.type < 7)
+                            if (players [player].name == gameShots [gameShot].name && this.type < 7)
                             {
-                                if (gameChar > -1) gameChars [gameChar].score += 100;
+                                if (player > -1) players [player].score += 100;
                             }
                         }
                     }
