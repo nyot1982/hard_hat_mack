@@ -42,7 +42,7 @@ function gameLoadScreen (screen)
     if (gameScreen == "start")
     {
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
+        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
         gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", canvasWidth / 2, 275, "center", 10));
         gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
         gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", canvasWidth / 2, 445, "center", 10));
@@ -51,7 +51,7 @@ function gameLoadScreen (screen)
     {
         if (gameMusic.active /*&& !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
+        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
         gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
         gameText.push (new component ("text", "One Player", "white", 575, gameText [0].y + 15, "left", 10));
         gameText.push (new component ("text", "High Scores", "white", 575, gameText [1].y + 25, "left", 10));
@@ -60,7 +60,7 @@ function gameLoadScreen (screen)
     else if (gameScreen == "high_scores")
     {
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "svgs/title.svg", "", canvasWidth / 2, 100, 203, 92);
+        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
     }
     else if (gameScreen == "game")
