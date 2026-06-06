@@ -74,11 +74,10 @@ function back (type, color, x, y, width, height)
     }
 }
 
-function player (type, name, color, x, y, width, height, speedX, speedY, brake, bounce)
+function player (type, name, x, y, width, height, speedX, speedY, brake, bounce)
 {
     this.type = (type != null ? type : 0);
     this.name = name || null;
-    this.color = color || null;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.width = (width != null ? width : 0);
@@ -88,13 +87,92 @@ function player (type, name, color, x, y, width, height, speedX, speedY, brake, 
     this.brake = (brake != null ? brake : 0.01);
     this.bounce = (bounce != null ? bounce : 0.75);
     this.gravity = gravity;
-    this.gravitySpeed = gravitySpeed;
 
     this.update = function (idPlayer)
     {
         ctx = gameArea.ctx;
-        ctx.fillStyle = this.color;
-        ctx.fillRect (this.x, this.y, this.width, this.height);
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (this.x, this.y);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath ();
+        ctx.moveTo (10, 0);
+        ctx.lineTo (18, 0);
+        ctx.lineTo (18, 2);
+        ctx.lineTo (20, 2);
+        ctx.lineTo (20, 4);
+        ctx.lineTo (22, 4);
+        ctx.lineTo (22, 8);
+        ctx.lineTo (14, 8);
+        ctx.lineTo (14, 10);
+        ctx.lineTo (8, 10);
+        ctx.lineTo (8, 8);
+        ctx.lineTo (2, 8);
+        ctx.lineTo (2, 6);
+        ctx.lineTo (6, 6);
+        ctx.lineTo (6, 4);
+        ctx.lineTo (8, 4);
+        ctx.lineTo (8, 2);
+        ctx.lineTo (10, 2);
+        ctx.closePath ();
+        ctx.fill ();
+        ctx.fillRect (0, 16, 4, 4);
+        ctx.beginPath ();
+        ctx.moveTo (20, 22);
+        ctx.lineTo (24, 22);
+        ctx.lineTo (24, 24);
+        ctx.lineTo (26, 24);
+        ctx.lineTo (26, 30);
+        ctx.lineTo (20, 30);
+        ctx.lineTo (20, 26);
+        ctx.lineTo (16, 26);
+        ctx.lineTo (16, 24);
+        ctx.lineTo (20, 24);
+        ctx.closePath ();
+        ctx.fill ();
+        ctx.beginPath ();
+        ctx.moveTo (20, 22);
+        ctx.lineTo (24, 22);
+        ctx.lineTo (24, 24);
+        ctx.lineTo (26, 24);
+        ctx.lineTo (26, 30);
+        ctx.lineTo (20, 30);
+        ctx.lineTo (20, 26);
+        ctx.lineTo (16, 26);
+        ctx.lineTo (16, 24);
+        ctx.lineTo (20, 24);
+        ctx.closePath ();
+        ctx.fill ();
+        ctx.beginPath ();
+        ctx.moveTo (4, 24);
+        ctx.lineTo (10, 24);
+        ctx.lineTo (10, 26);
+        ctx.lineTo (8, 26);
+        ctx.lineTo (8, 30);
+        ctx.lineTo (2, 30);
+        ctx.lineTo (2, 28);
+        ctx.lineTo (4, 28);
+        ctx.closePath ();
+        ctx.fill ();
+        ctx.fillStyle = "#FF55FF";
+        ctx.beginPath ();
+        ctx.moveTo (14, 8);
+        ctx.lineTo (18, 8);
+        ctx.lineTo (18, 14);
+        ctx.lineTo (12, 14);
+        ctx.lineTo (12, 12);
+        ctx.lineTo (8, 12);
+        ctx.lineTo (8, 10);
+        ctx.lineTo (14, 10);
+        ctx.closePath ();
+        ctx.fill ();
+        ctx.fillRect (8, 20, 14, 2);
+        ctx.fillRect (4, 22, 16, 2);
+        ctx.fillStyle = "#55FFFF";
+        ctx.fillRect (2, 14, 2, 2);
+        ctx.fillRect (10, 14, 10, 6);
+        ctx.fillRect (4, 16, 6, 4);
+        ctx.restore ();
     }
 
     this.newPos = function ()
@@ -102,9 +180,9 @@ function player (type, name, color, x, y, width, height, speedX, speedY, brake, 
         if (this.speedX > 0) this.speedX -= this.brake;
         else if (this.speedX < 0) this.speedX += this.brake;
         else if (this.speedX == 0) this.brake = 0;
-        this.gravitySpeed += this.gravity;
+        this.speedY += this.gravity;
         this.x += this.speedX;
-        this.y += this.speedY + this.gravitySpeed;
+        this.y += this.speedY;
         this.hitBottom ();
     }
 
@@ -123,7 +201,7 @@ function player (type, name, color, x, y, width, height, speedX, speedY, brake, 
         {
             if (this.y < 0) this.y = 0;
             else this.y = rockY;
-            this.gravitySpeed = -(this.gravitySpeed * this.bounce);
+            this.speedY = -(this.speedY * this.bounce);
         }
     }
 

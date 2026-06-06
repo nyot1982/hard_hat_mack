@@ -133,7 +133,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                     if (player > -1) gamePlayers [player].speedX = bt_value;
                 break;
                 case 'jump':
-                    if (player > -1) gamePlayers [player].speedY = -5;
+                    if (player > -1 && gamePlayers [player].y + gamePlayers [player].height == canvasHeight) gamePlayers [player].speedY = -5;
                 break;
                 case 'drop_drill':
                     if (player > -1) gamePlayers [player].drill (false);

@@ -1,7 +1,6 @@
 var canvasWidth = 1024,
     canvasHeight = 740,
     gravity = 0.1,
-    gravitySpeed = 0,
     blackScreen = false,
     gameScreen = null,
     gameTitle = null,
