@@ -66,7 +66,7 @@ function gameLoadScreen (screen)
     else if (gameScreen == "game")
     {
         generateGameMap ("level1");
-        gamePlayers.push (new player (0, "Player 1", "red", 0, 0, 50, 50));
+        gamePlayers.push (new player (0, "Player 1", "red", 0, 0, 26, 30));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
