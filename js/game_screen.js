@@ -49,12 +49,12 @@ function gameLoadScreen (screen)
     {
         if (gameMusic.active /*&& !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 310, gameTitle.y + 105, "left", 10));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 575, gameText [0].y + 15, "left", 10));
-        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using HTML5 + JavaScript + Canvas", "white", 575, gameText [1].y + 25, "left", 10));
-        gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 200, 445, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 445, "center", 10));
+        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
+        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 105, "center", 10));
+        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", canvasWidth / 2, gameText [0].y + 25, "center", 10));
+        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using HTML5 + JavaScript + Canvas.", "white", canvasWidth / 2, gameText [1].y + 25, "center", 10));
+        gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 525, 192, 66));
+        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 550, "left", 10));
     }
     else if (gameScreen == "high_scores")
     {
@@ -65,7 +65,7 @@ function gameLoadScreen (screen)
     else if (gameScreen == "game")
     {
         generateGameMap ("level1");
-        gamePlayers.push (new player (0, "Player 1", 0, 0, 26, 30));
+        gamePlayers.push (new player (0, "Player 1", 0, 0, 26, 30, -1));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();

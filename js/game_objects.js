@@ -93,8 +93,8 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
-        ctx.scale (this.heading, 1);
-        ctx.translate (this.x - (this.heading == -1 ? this.width : 0), this.y);
+        ctx.scale (-this.heading, 1);
+        ctx.translate (this.x - (this.heading == 1 ? this.width : 0), this.y);
         ctx.fillStyle = "#FFFFFF";
         ctx.beginPath ();
         ctx.moveTo (10, 0);
@@ -178,9 +178,17 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
 
     this.newPos = function ()
     {
-        if (this.speedX > 0) this.speedX -= this.brake;
-        else if (this.speedX < 0) this.speedX += this.brake;
-        else if (this.speedX == 0) this.brake = 0;
+        if (this.speedX == 0) this.brake = 0;
+        else if (this.speedX > 0)
+        {
+            this.heading = 1;
+            this.speedX -= this.brake;
+        }
+        else if (this.speedX < 0)
+        {
+            this.heading = -1;
+            this.speedX += this.brake;
+        }
         this.speedY += gravity;
         this.x += this.speedX;
         this.y += this.speedY;
@@ -196,7 +204,7 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
         {
             if (this.x < 0) this.x = 0;
             else this.x = rockX;
-            this.speedX = -(this.speedX);
+            this.speedX = 0;
         }
         if (this.y < 0 || this.y > rockY)
         {
