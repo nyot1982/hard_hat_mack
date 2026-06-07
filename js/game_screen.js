@@ -98,7 +98,7 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("game", "#292C9C", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("game", "black", 0, 0, gameMap.width, gameMap.height));
         break;
         case "level2":
             gameMap =
@@ -107,7 +107,7 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("game", "#292C9C", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("game", "black", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (3, 200, 100, 0));
             gameEnemies.push (new enemy (4, 400, 100, 0));
             gameEnemies.push (new enemy (5, 600, 100, 0));
@@ -125,7 +125,7 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("game", "#292C9C", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("game", "black", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (7, 110, 100, 0));
             gameEnemies.push (new enemy (7, 310, 100, 0));
             gameEnemies.push (new enemy (7, 510, 100, 0));
