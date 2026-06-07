@@ -447,7 +447,7 @@ function component (type, src, color, x, y, width, height, max, backColor)
             ctx.fillStyle = this.color;
             ctx.fill ();
         }
-        else
+        else if (this.type == "text")
         {
             ctx.textAlign = this.width;
             ctx.textBaseline = "middle";

@@ -42,20 +42,19 @@ function gameLoadScreen (screen)
     if (gameScreen == "start")
     {
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
         gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", canvasWidth / 2, 275, "center", 10));
         gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", canvasWidth / 2, 445, "center", 10));
     }
     else if (gameScreen == "menu")
     {
         if (gameMusic.active /*&& !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
         gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
-        gameText.push (new component ("text", "Options:", "white", 310, gameTitle.y + 105, "left", 10));
-        gameText.push (new component ("text", "One Player", "white", 575, gameText [0].y + 15, "left", 10));
-        gameText.push (new component ("text", "High Scores", "white", 575, gameText [1].y + 25, "left", 10));
-        gameText.push (new component ("text", "Remake by Marc Pinyot Gascón  1983-2026", "white", canvasWidth / 2, 445, "center", 10));
+        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 310, gameTitle.y + 105, "left", 10));
+        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 575, gameText [0].y + 15, "left", 10));
+        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using HTML5 + JavaScript + Canvas", "white", 575, gameText [1].y + 25, "left", 10));
+        gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 200, 445, 192, 66));
+        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 445, "center", 10));
     }
     else if (gameScreen == "high_scores")
     {
