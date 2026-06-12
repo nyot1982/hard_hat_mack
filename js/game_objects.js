@@ -43,9 +43,8 @@ function audio (src, loop)
     }
 }
 
-function back (type, color, x, y, width, height)
+function back (color, x, y, width, height)
 {
-    this.type = type;
     this.color = color;
     this.x = x;
     this.y = y;
@@ -55,22 +54,32 @@ function back (type, color, x, y, width, height)
     this.update = function ()
     {
         ctx = gameArea.ctx;
-        ctx.beginPath ();
-        if (this.type == "pattern")
-        {
-            this.image = new Image ();
-            this.image.src = this.color;
-            this.pattern = ctx.createPattern (this.image, "repeat");
-            ctx.rect (this.x, this.y, this.width, this.height);
-            ctx.fillStyle = this.pattern;
-            ctx.fill ();
-        }
-        else
-        {
-            ctx.rect (this.x, this.y, this.width, this.height);
-            ctx.fillStyle = this.color;
-            ctx.fill ();
-        }
+        ctx.fillStyle = this.color;
+        ctx.fillRect (this.x, this.y, this.width, this.height);
+    }
+}
+
+function floor (color, x, y, width, height)
+{
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+
+    this.update = function ()
+    {
+        const patternCanvas = document.createElement ("canvas");
+        const patternContext = patternCanvas.getContext ("2d");
+        patternCanvas.width = 4;
+        patternCanvas.height = 6;
+        patternContext.fillStyle = this.color;
+        patternContext.fillRect (0, 0, 2, 2);
+        patternContext.fillRect (2, 2, 2, 4);
+        ctx = gameArea.ctx;
+        this.pattern = ctx.createPattern (patternCanvas, "repeat");
+        ctx.fillStyle = this.pattern;
+        ctx.fillRect (this.x, this.y, this.width, this.height);
     }
 }
 
@@ -86,93 +95,39 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
     this.speedX = (speedX != null ? speedX : 0);
     this.speedY = (speedY != null ? speedY : 0);
     this.brake = (brake != null ? brake : 0.01);
-    this.bounce = (bounce != null ? bounce : 0.75);
+    this.bounce = (bounce != null ? bounce : 0);
 
     this.update = function (idPlayer)
     {
+        if (gameScreen == "game") this.newPos ();
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
-        ctx.scale (-this.heading, 1);
-        ctx.translate (this.x - (this.heading == 1 ? this.width : 0), this.y);
+        ctx.scale (this.heading, 1);
+        ctx.translate (this.x * this.heading - (this.heading == -1 ? this.width : 0), this.y);
         ctx.fillStyle = "#FFFFFF";
-        ctx.beginPath ();
-        ctx.moveTo (10, 0);
-        ctx.lineTo (18, 0);
-        ctx.lineTo (18, 2);
-        ctx.lineTo (20, 2);
-        ctx.lineTo (20, 4);
-        ctx.lineTo (22, 4);
-        ctx.lineTo (22, 8);
-        ctx.lineTo (14, 8);
-        ctx.lineTo (14, 10);
-        ctx.lineTo (8, 10);
-        ctx.lineTo (8, 8);
-        ctx.lineTo (2, 8);
-        ctx.lineTo (2, 6);
-        ctx.lineTo (6, 6);
-        ctx.lineTo (6, 4);
-        ctx.lineTo (8, 4);
-        ctx.lineTo (8, 2);
-        ctx.lineTo (10, 2);
-        ctx.closePath ();
-        ctx.fill ();
-        ctx.fillRect (0, 16, 4, 4);
-        ctx.beginPath ();
-        ctx.moveTo (20, 22);
-        ctx.lineTo (24, 22);
-        ctx.lineTo (24, 24);
-        ctx.lineTo (26, 24);
-        ctx.lineTo (26, 30);
-        ctx.lineTo (20, 30);
-        ctx.lineTo (20, 26);
-        ctx.lineTo (16, 26);
-        ctx.lineTo (16, 24);
-        ctx.lineTo (20, 24);
-        ctx.closePath ();
-        ctx.fill ();
-        ctx.beginPath ();
-        ctx.moveTo (20, 22);
-        ctx.lineTo (24, 22);
-        ctx.lineTo (24, 24);
-        ctx.lineTo (26, 24);
-        ctx.lineTo (26, 30);
-        ctx.lineTo (20, 30);
-        ctx.lineTo (20, 26);
-        ctx.lineTo (16, 26);
-        ctx.lineTo (16, 24);
-        ctx.lineTo (20, 24);
-        ctx.closePath ();
-        ctx.fill ();
-        ctx.beginPath ();
-        ctx.moveTo (4, 24);
-        ctx.lineTo (10, 24);
-        ctx.lineTo (10, 26);
-        ctx.lineTo (8, 26);
-        ctx.lineTo (8, 30);
-        ctx.lineTo (2, 30);
-        ctx.lineTo (2, 28);
-        ctx.lineTo (4, 28);
-        ctx.closePath ();
-        ctx.fill ();
+        ctx.fillRect (8, 0, 8, 2);
+        ctx.fillRect (6, 2, 12, 2);
+        ctx.fillRect (4, 4, 16, 2);
+        ctx.fillRect (4, 6, 20, 2);
+        ctx.fillRect (12, 8, 6, 2);
+        ctx.fillRect (22, 16, 4, 4);
+        ctx.fillRect (2, 22, 4, 2);
+        ctx.fillRect (0, 24, 10, 2);
+        ctx.fillRect (0, 26, 6, 4);
+        ctx.fillRect (16, 24, 6, 2);
+        ctx.fillRect (18, 26, 4, 2);
+        ctx.fillRect (18, 28, 6, 2);
         ctx.fillStyle = "#FF55FF";
-        ctx.beginPath ();
-        ctx.moveTo (14, 8);
-        ctx.lineTo (18, 8);
-        ctx.lineTo (18, 14);
-        ctx.lineTo (12, 14);
-        ctx.lineTo (12, 12);
-        ctx.lineTo (8, 12);
-        ctx.lineTo (8, 10);
-        ctx.lineTo (14, 10);
-        ctx.closePath ();
-        ctx.fill ();
-        ctx.fillRect (8, 20, 14, 2);
-        ctx.fillRect (4, 22, 16, 2);
+        ctx.fillRect (8, 8, 4, 2);
+        ctx.fillRect (8, 10, 10, 2);
+        ctx.fillRect (8, 12, 6, 2);
+        ctx.fillRect (4, 20, 14, 2);
+        ctx.fillRect (6, 22, 16, 2);
         ctx.fillStyle = "#55FFFF";
-        ctx.fillRect (2, 14, 2, 2);
-        ctx.fillRect (10, 14, 10, 6);
-        ctx.fillRect (4, 16, 6, 4);
+        ctx.fillRect (6, 14, 10, 6);
+        ctx.fillRect (16, 16, 6, 4);
+        ctx.fillRect (22, 14, 2, 2);
         ctx.restore ();
     }
 
@@ -192,10 +147,10 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
         this.speedY += gravity;
         this.x += this.speedX;
         this.y += this.speedY;
-        this.hitBottom ();
+        this.collision ();
     }
 
-    this.hitBottom = function ()
+    this.collision = function ()
     {
         var rockY = canvasHeight - this.height,
             rockX = canvasWidth - this.width;

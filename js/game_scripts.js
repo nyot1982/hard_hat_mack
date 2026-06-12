@@ -269,13 +269,8 @@ function updateGameArea ()
     }
     else if (gameScreen == "game")
     {
-        gameEnemies = gameEnemies.filter (enemy => enemy.life > 0);
         gameObjects = gameEnemies.concat (gamePlayers);
-        for (var object in gameObjects)
-        {
-            gameObjects [object].newPos ();
-            gameObjects [object].update (object);
-        }
+        for (var object in gameObjects) gameObjects [object].update (object);
     }
     if (gameScreen != "game")
     {

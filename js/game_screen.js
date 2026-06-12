@@ -41,31 +41,35 @@ function gameLoadScreen (screen)
     gameScreen = screen;
     if (gameScreen == "start")
     {
-        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
-        gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", canvasWidth / 2, 275, "center", 10));
+        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+        gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", canvasWidth / 2, canvasHeight / 2 - 15, "center", 10));
         gameText.push (new component ("text", "Press any key to start...", "white", canvasWidth / 2, gameText [0].y + 30, "center", 10));
     }
     else if (gameScreen == "menu")
     {
         if (gameMusic.active /*&& !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
-        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
+        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
         gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 105, "center", 10));
         gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", canvasWidth / 2, gameText [0].y + 25, "center", 10));
         gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using HTML5 + JavaScript + Canvas.", "white", canvasWidth / 2, gameText [1].y + 25, "center", 10));
+        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 200, gameText [2].y + 50, "center", 10));
+        gameText.push (new component ("text", "Mack", "white", canvasWidth / 2, gameText [3].y, "center", 10));
+        gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 200, gameText [4].y, "center", 10));
+        gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25, 26, 30, 1));
         gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 525, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 550, "left", 10));
     }
     else if (gameScreen == "high_scores")
     {
-        gameBack.push (new back ("menu", "black", 0, 0, canvasWidth, canvasHeight));
+        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
         gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105, "left", 10));
     }
     else if (gameScreen == "game")
     {
         generateGameMap ("level1");
-        gamePlayers.push (new player (0, "Player 1", 0, 0, 26, 30, -1));
+        gamePlayers.push (new player (0, "Mack", 0, gameMap.height - 30, 26, 30, 1));
         if (gameMusic.active)
         {
             gameMusic.musics.menu.stop ();
@@ -97,7 +101,8 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("game", "black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
         break;
         case "level2":
             gameMap =
@@ -106,16 +111,12 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("game", "black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (3, 200, 100, 0));
             gameEnemies.push (new enemy (4, 400, 100, 0));
             gameEnemies.push (new enemy (5, 600, 100, 0));
             gameEnemies.push (new enemy (6, 200, 250, 0));
             gameEnemies.push (new enemy (3, 400, 250, 0));
-            gameEnemies.push (new enemy (4, 600, 250, 0));
-            gameEnemies.push (new enemy (5, 200, 400, 0));
-            gameEnemies.push (new enemy (6, 400, 400, 0));
-            gameEnemies.push (new enemy (3, 600, 400, 0));
         break;
         case "level3":
             gameMap =
@@ -124,20 +125,13 @@ function generateGameMap (map)
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("game", "black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameEnemies.push (new enemy (7, 110, 100, 0));
             gameEnemies.push (new enemy (7, 310, 100, 0));
             gameEnemies.push (new enemy (7, 510, 100, 0));
             gameEnemies.push (new enemy (7, 710, 100, 0));
             gameEnemies.push (new enemy (7, 910, 100, 0));
             gameEnemies.push (new enemy (7, 110, 250, 0));
-            gameEnemies.push (new enemy (7, 310, 250, 0));
-            gameEnemies.push (new enemy (7, 710, 250, 0));
-            gameEnemies.push (new enemy (7, 910, 250, 0));
-            gameEnemies.push (new enemy (7, 110, 400, 0));
-            gameEnemies.push (new enemy (7, 310, 400, 0));
-            gameEnemies.push (new enemy (7, 510, 400, 0));
-            gameEnemies.push (new enemy (7, 710, 400, 0));
             gameEnemies.push (new enemy (7, 910, 400, 0));
         break;
     }

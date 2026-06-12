@@ -39,7 +39,7 @@ function startControl (id_control, control, bt_type, bt_code, bt_value)
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
         var player = -1;
-        if (gameScreen == "game" && gamePlayers.length > 0) player = gamePlayers.findIndex (player => player.name == "Player 1");
+        if (gameScreen == "game" && gamePlayers.length > 0) player = gamePlayers.findIndex (player => player.name == "Mack");
         if (control == "keyboard") bt_value = 1;
         userActionStart (control, bt_type, bt_code, bt_value, player);
     }
@@ -53,7 +53,7 @@ function stopControl (id_control, control, bt_type, bt_code)
         var player = -1;
         if (gameScreen == "game" && gamePlayers.length > 0)
         {
-            player = gamePlayers.findIndex (player => player.name == "Player 1");
+            player = gamePlayers.findIndex (player => player.name == "Mack");
             userActionStop (id_control, control, bt_type, bt_code, player);
         }
     }
@@ -133,7 +133,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                     if (player > -1) gamePlayers [player].speedX = bt_value;
                 break;
                 case 'jump':
-                    if (player > -1 && gamePlayers [player].y + gamePlayers [player].height == canvasHeight) gamePlayers [player].speedY = -5;
+                    if (player > -1 && gamePlayers [player].y + gamePlayers [player].height == canvasHeight) gamePlayers [player].speedY = -2;
                 break;
                 case 'drop_drill':
                     if (player > -1) gamePlayers [player].drill (false);
@@ -155,7 +155,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 if (player > -1)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedY = -1;
                     else gamePlayers [player].speedY = 0;
                 }
@@ -164,7 +164,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 if (player > -1)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedY = 1;
                     else gamePlayers [player].speedY = 0;
                 }
@@ -173,7 +173,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 if (player > -1)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedX = 1;
                     else gamePlayers [player].speedX = 0;
                 }
@@ -182,7 +182,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 if (player > -1)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][bt_code];
+                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedX = -1;
                     else gamePlayers [player].speedX = 0;
                 }
@@ -193,7 +193,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
 
 function stopUserInteractions ()
 {
-    var player = gamePlayers.findIndex (player => player.name == "Player 1");
+    var player = gamePlayers.findIndex (player => player.name == "Mack");
     pressed =
     {
         keys:
