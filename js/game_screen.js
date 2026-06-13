@@ -39,7 +39,7 @@ function gameLoadScreen (screen)
     }
     else if (gameScreen == "menu")
     {
-        if (gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
+        if (gameMusic.active/* && !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
         gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 105, "center", 10));
@@ -49,8 +49,8 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Mack", "white", canvasWidth / 2, gameText [3].y, "center", 10));
         gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 200, gameText [4].y, "center", 10));
         gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25, 26, 30));
-        gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 525, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 550, "left", 10));
+        gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 577, 192, 66));
+        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 605, "left", 10));
     }
     else if (gameScreen == "high_scores")
     {
