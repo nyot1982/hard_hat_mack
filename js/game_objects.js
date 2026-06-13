@@ -172,8 +172,11 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
     {
         if (this.speedX != 0)
         {
-            if (this.type < 3) this.type++;
-            else this.type = 0;
+            if (gameArea.frame % 2 == 0)
+            {
+                if (this.type < 3) this.type++;
+                else this.type = 0;
+            }
             if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
         }
