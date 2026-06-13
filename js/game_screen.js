@@ -27,16 +27,7 @@ function gameLoadScreen (screen)
     gameEnemies = [];
     gameText = [];
 
-    if (gameScreen == "game" && screen == "menu")
-    {
-        ctx.translate (gameArea.centerPoint.x - canvasWidth / 2, gameArea.centerPoint.y - canvasHeight / 2);
-        gameArea.centerPoint =
-        {
-            x: canvasWidth / 2,
-            y: canvasHeight / 2,
-        };
-        if (gameMusic.active) gameMusic.musics.game.stop ();
-    }
+    if (gameScreen == "game" && screen == "menu" && gameMusic.active) gameMusic.musics.game.stop ();
     else if (gameScreen == "menu" && screen == "game" && gameMusic.active) gameMusic.musics.menu.stop ();
     gameScreen = screen;
     if (gameScreen == "start")
@@ -68,13 +59,9 @@ function gameLoadScreen (screen)
     }
     else if (gameScreen == "game")
     {
+        if (gameMusic.active) gameMusic.musics.game.play ();
         generateGameMap ("level1");
         gamePlayers.push (new player (0, "Mack", 0, gameMap.height - 30, 26, 30, 1));
-        if (gameMusic.active)
-        {
-            gameMusic.musics.menu.stop ();
-            gameMusic.musics.game.play ();
-        }
     }
     if (document.getElementById ("blackScreen").style.display == 'block')
     {
@@ -115,8 +102,6 @@ function generateGameMap (map)
             gameEnemies.push (new enemy (3, 200, 100, 0));
             gameEnemies.push (new enemy (4, 400, 100, 0));
             gameEnemies.push (new enemy (5, 600, 100, 0));
-            gameEnemies.push (new enemy (6, 200, 250, 0));
-            gameEnemies.push (new enemy (3, 400, 250, 0));
         break;
         case "level3":
             gameMap =
@@ -129,10 +114,6 @@ function generateGameMap (map)
             gameEnemies.push (new enemy (7, 110, 100, 0));
             gameEnemies.push (new enemy (7, 310, 100, 0));
             gameEnemies.push (new enemy (7, 510, 100, 0));
-            gameEnemies.push (new enemy (7, 710, 100, 0));
-            gameEnemies.push (new enemy (7, 910, 100, 0));
-            gameEnemies.push (new enemy (7, 110, 250, 0));
-            gameEnemies.push (new enemy (7, 910, 400, 0));
         break;
     }
 }

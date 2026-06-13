@@ -152,8 +152,8 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
 
     this.collision = function ()
     {
-        var rockY = canvasHeight - this.height,
-            rockX = canvasWidth - this.width;
+        var rockY = gameMap.height - this.height,
+            rockX = gameMap.width - this.width;
         
         if (this.x < 0 || this.x > rockX)
         {

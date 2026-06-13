@@ -201,11 +201,6 @@ var canvasWidth = 1024,
             );
             this.frame = 0;
             this.time = 0;
-            this.centerPoint = 
-            {
-                x: canvasWidth / 2,
-                y: canvasHeight / 2,
-            };
             this.play ();
         },
         play: function ()
