@@ -23,6 +23,7 @@ function gameLoadScreen (screen)
 {
     gameTitle = null;
     gameBack = [];
+    gameFront = [];
     gamePlayers = [];
     gameEnemies = [];
     gameText = [];
@@ -89,7 +90,7 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
+            gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
         break;
         case "level2":
             gameMap =

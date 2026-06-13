@@ -34,6 +34,7 @@ var canvasWidth = 1024,
     },
     gameObjects = [],
     gameBack = [],
+    gameFront = [],
     gamePlayers = [],
     gameEnemies = [],
     gameText = [],
@@ -239,6 +240,7 @@ function updateGameArea ()
     controls ();
     gameArea.clear ();
     for (var back in gameBack) gameBack [back].update ();
+    for (var front in gameFront) gameFront [front].update ();
     if (gameScreen == "start")
     {
         if (Object.keys (gameSound.sounds).length > 0 && Object.keys (gameMusic.musics).length > 0)
