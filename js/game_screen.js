@@ -47,7 +47,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 200, gameText [2].y + 50, "center", 10));
         gameText.push (new component ("text", "Mack", "white", canvasWidth / 2, gameText [3].y, "center", 10));
         gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 200, gameText [4].y, "center", 10));
-        gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25, 26, 30, 1));
+        gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25, 26, 30));
         gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 525, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 550, "left", 10));
     }
@@ -61,7 +61,7 @@ function gameLoadScreen (screen)
     {
         if (gameMusic.active) gameMusic.musics.game.play ();
         generateGameMap ("level1");
-        gamePlayers.push (new player (0, "Mack", 0, gameMap.height - 30, 26, 30, 1));
+        gamePlayers.push (new player (0, "Mack", 0, gameMap.height - 30, 26, 30));
     }
     if (document.getElementById ("blackScreen").style.display == 'block')
     {

@@ -83,7 +83,7 @@ function floor (color, x, y, width, height)
     }
 }
 
-function player (type, name, x, y, width, height, heading, speedX, speedY, brake, bounce)
+function player (type, name, x, y, width, height, heading, speedX, speedY, bounce)
 {
     this.type = (type != null ? type : 0);
     this.name = name || null;
@@ -94,7 +94,6 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
     this.heading = (heading != null ? heading : 1);
     this.speedX = (speedX != null ? speedX : 0);
     this.speedY = (speedY != null ? speedY : 0);
-    this.brake = (brake != null ? brake : 0.01);
     this.bounce = (bounce != null ? bounce : 0);
 
     this.update = function (idPlayer)
@@ -111,38 +110,72 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, brake
         ctx.fillRect (4, 4, 16, 2);
         ctx.fillRect (4, 6, 20, 2);
         ctx.fillRect (12, 8, 6, 2);
-        ctx.fillRect (22, 16, 4, 4);
-        ctx.fillRect (2, 22, 4, 2);
-        ctx.fillRect (0, 24, 10, 2);
-        ctx.fillRect (0, 26, 6, 4);
-        ctx.fillRect (16, 24, 6, 2);
-        ctx.fillRect (18, 26, 4, 2);
-        ctx.fillRect (18, 28, 6, 2);
-        ctx.fillStyle = "#FF55FF";
-        ctx.fillRect (8, 8, 4, 2);
-        ctx.fillRect (8, 10, 10, 2);
-        ctx.fillRect (8, 12, 6, 2);
-        ctx.fillRect (4, 20, 14, 2);
-        ctx.fillRect (6, 22, 16, 2);
-        ctx.fillStyle = "#55FFFF";
-        ctx.fillRect (6, 14, 10, 6);
-        ctx.fillRect (16, 16, 6, 4);
-        ctx.fillRect (22, 14, 2, 2);
+        switch (this.type)
+        {
+            case 0:
+                ctx.fillRect (22, 16, 4, 4);
+                ctx.fillRect (2, 22, 4, 2);
+                ctx.fillRect (0, 24, 10, 2);
+                ctx.fillRect (0, 26, 6, 4);
+                ctx.fillRect (16, 24, 6, 2);
+                ctx.fillRect (18, 26, 4, 2);
+                ctx.fillRect (18, 28, 6, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 8, 4, 2);
+                ctx.fillRect (8, 10, 10, 2);
+                ctx.fillRect (8, 12, 6, 2);
+                ctx.fillRect (4, 20, 14, 2);
+                ctx.fillRect (6, 22, 16, 2);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (6, 14, 10, 6);
+                ctx.fillRect (16, 16, 6, 4);
+                ctx.fillRect (22, 14, 2, 2);
+            break;
+            case 2:
+                ctx.fillRect (4, 24, 6, 4);
+                ctx.fillRect (4, 28, 8, 2);
+                ctx.fillRect (18, 24, 8, 2);
+                ctx.fillRect (20, 26, 6, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 8, 4, 2);
+                ctx.fillRect (8, 10, 10, 2);
+                ctx.fillRect (8, 12, 6, 2);
+                ctx.fillRect (4, 20, 18, 4);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (6, 14, 14, 6);
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect (10, 16, 6, 2);
+                ctx.fillRect (10, 18, 10, 2);
+            break;
+            case 1:
+            case 3:
+                ctx.fillRect (22, 12, 4, 4);
+                ctx.fillRect (8, 24, 8, 2);
+                ctx.fillRect (8, 26, 6, 2);
+                ctx.fillRect (8, 28, 10, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 8, 4, 2);
+                ctx.fillRect (8, 10, 10, 2);
+                ctx.fillRect (8, 12, 8, 2);
+                ctx.fillRect (8, 20, 10, 4);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (6, 14, 10, 6);
+                ctx.fillRect (16, 14, 4, 4);
+                ctx.fillRect (18, 12, 4, 4);
+                ctx.fillRect (22, 10, 2, 2);
+            break;
+        }
         ctx.restore ();
     }
 
     this.newPos = function ()
     {
-        if (this.speedX == 0) this.brake = 0;
-        else if (this.speedX > 0)
+        if (this.speedX != 0)
         {
-            this.heading = 1;
-            this.speedX -= this.brake;
-        }
-        else if (this.speedX < 0)
-        {
-            this.heading = -1;
-            this.speedX += this.brake;
+            if (this.type < 3) this.type++;
+            else this.type = 0;
+            if (this.speedX > 0) this.heading = 1;
+            else if (this.speedX < 0) this.heading = -1;
         }
         this.speedY += gravity;
         this.x += this.speedX;
@@ -222,10 +255,10 @@ function enemy (type, x, y, heading)
                 {
                     case 3:
                         this.firing (true);
-                        break;
+                    break;
                     case 4:
                         this.firing (false);
-                        break;
+                    break;
                 }
             }
             this.radians = this.heading * Math.PI / 180;
