@@ -39,7 +39,7 @@ function gameLoadScreen (screen)
     }
     else if (gameScreen == "menu")
     {
-        if (gameMusic.active /*&& !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
+        if (gameMusic.active && !gameMusic.musics.menu.source) gameMusic.musics.menu.play ();
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
         gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 105, "center", 10));
