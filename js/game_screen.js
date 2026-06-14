@@ -62,7 +62,7 @@ function gameLoadScreen (screen)
     {
         if (gameMusic.active) gameMusic.musics.game.play ();
         generateGameMap ("level1");
-        gamePlayers.push (new player (0, "Mack", 0, gameMap.height - 30, 26, 30));
+        gamePlayers.push (new player (0, "Mack", 50, gameMap.height - 50, 26, 30));
     }
     if (document.getElementById ("blackScreen").style.display == 'block')
     {

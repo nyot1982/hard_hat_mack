@@ -178,7 +178,7 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
                 else this.type = 0;
             }
             if (this.speedX > 0) this.heading = 1;
-            else if (this.speedX < 0) this.heading = -1;
+            else this.heading = -1;
         }
         this.speedY += gravity;
         this.x += this.speedX;
@@ -191,11 +191,22 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
         var rockY = gameMap.height - this.height,
             rockX = gameMap.width - this.width;
         
-        if (this.x < 0 || this.x > rockX)
+        if (this.speedX != 0)
         {
-            if (this.x < 0) this.x = 0;
-            else this.x = rockX;
-            this.speedX = 0;
+            if (this.x < 0 || this.x > rockX)
+            {
+                if (this.x < 0) this.x = 0;
+                else this.x = rockX;
+                this.speedX = 0;
+            }
+            /*else for (var front in gameFront)
+            {
+                if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && (this.x + this.width > gameFront [front].x || this.x < gameFront [front].x + gameFront [front].width))
+                {
+                    this.x -= this.speedX;
+                    this.speedX = 0;
+                }
+            }*/
         }
         if (this.y < 0 || this.y > rockY)
         {
@@ -203,6 +214,22 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
             else this.y = rockY;
             this.speedY = -(this.speedY * this.bounce);
         }
+        /* else for (var front in gameFront)
+        {
+            if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
+            {
+                if (this.speedY > 0 && this.y + this.height > gameFront [front].y)
+                {
+                    this.y = gameFront [front].y - this.height;
+                    this.speedY = -(this.speedY * this.bounce);
+                }
+                else if (this.speedY < 0 && this.y < gameFront [front].y + gameFront [front].height)
+                {
+                    this.y = gameFront [front].y + gameFront [front].height;
+                    this.speedY = -(this.speedY * this.bounce);
+                }
+            }
+        }*/
     }
 
     this.drill = function (drilling)
