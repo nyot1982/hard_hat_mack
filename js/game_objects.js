@@ -191,22 +191,11 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
         var rockY = gameMap.height - this.height,
             rockX = gameMap.width - this.width;
         
-        if (this.speedX != 0)
+        if (this.x < 0 || this.x > rockX)
         {
-            if (this.x < 0 || this.x > rockX)
-            {
-                if (this.x < 0) this.x = 0;
-                else this.x = rockX;
-                this.speedX = 0;
-            }
-            /*else for (var front in gameFront)
-            {
-                if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && (this.x + this.width > gameFront [front].x || this.x < gameFront [front].x + gameFront [front].width))
-                {
-                    this.x -= this.speedX;
-                    this.speedX = 0;
-                }
-            }*/
+            if (this.x < 0) this.x = 0;
+            else this.x = rockX;
+            this.speedX = 0;
         }
         if (this.y < 0 || this.y > rockY)
         {
@@ -214,22 +203,38 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
             else this.y = rockY;
             this.speedY = -(this.speedY * this.bounce);
         }
-        /* else for (var front in gameFront)
+        if (this.speedX != 0 || this.speedY != 0)
         {
-            if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
+            for (var front in gameFront)
             {
-                if (this.speedY > 0 && this.y + this.height > gameFront [front].y)
+                if (this.speedX != 0 && this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                 {
-                    this.y = gameFront [front].y - this.height;
-                    this.speedY = -(this.speedY * this.bounce);
+                    if (this.speedX > 0 && this.x + this.width > gameFront [front].x && this.x < gameFront [front].x + gameFront [front].width)
+                    {
+                        this.x = gameFront [front].x - this.width;
+                        this.speedX = 0;
+                    }
+                    else if (this.speedX < 0 && this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
+                    {
+                        this.x = gameFront [front].x + gameFront [front].width;
+                        this.speedX = 0;
+                    }
                 }
-                else if (this.speedY < 0 && this.y < gameFront [front].y + gameFront [front].height)
+                if (this.speedY != 0 && this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
                 {
-                    this.y = gameFront [front].y + gameFront [front].height;
-                    this.speedY = -(this.speedY * this.bounce);
+                    if (this.speedY > 0 && this.y + this.height > gameFront [front].y)
+                    {
+                        this.y = gameFront [front].y - this.height;
+                        this.speedY = -(this.speedY * this.bounce);
+                    }
+                    else if (this.speedY < 0 && this.y < gameFront [front].y + gameFront [front].height)
+                    {
+                        this.y = gameFront [front].y + gameFront [front].height;
+                        this.speedY = -(this.speedY * this.bounce);
+                    }
                 }
             }
-        }*/
+        }
     }
 
     this.drill = function (drilling)
