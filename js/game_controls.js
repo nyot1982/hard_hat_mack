@@ -133,7 +133,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                     if (player > -1) gamePlayers [player].speedX = bt_value;
                 break;
                 case 'jump':
-                    if (player > -1 && gamePlayers [player].speedY == 0) gamePlayers [player].speedY = -5;
+                    if (player > -1 && gamePlayers [player].speedY == 0) gamePlayers [player].speedY = -3;
                 break;
                 case 'drop_drill':
                     if (player > -1) gamePlayers [player].drill (false);
@@ -203,8 +203,8 @@ function stopUserInteractions ()
         buttons: [],
         axes: []
     };
-    gamePlayers [player].firing (false);
-    gamePlayers [player].moving (0);
+    gamePlayers [player].speedX = 0;
+    gamePlayers [player].speedY = 0;
 }
 
 function mouseMove (e)
