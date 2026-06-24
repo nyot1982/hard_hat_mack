@@ -105,14 +105,14 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
         ctx.scale (this.heading, 1);
         ctx.translate (this.x * this.heading - (this.heading == -1 ? this.width : 0), this.y);
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect (8, 0, 8, 2);
-        ctx.fillRect (6, 2, 12, 2);
-        ctx.fillRect (4, 4, 16, 2);
-        ctx.fillRect (4, 6, 20, 2);
-        ctx.fillRect (12, 8, 6, 2);
         switch (this.type)
         {
             case 0:
+                ctx.fillRect (8, 0, 8, 2);
+                ctx.fillRect (6, 2, 12, 2);
+                ctx.fillRect (4, 4, 16, 2);
+                ctx.fillRect (4, 6, 20, 2);
+                ctx.fillRect (12, 8, 6, 2);
                 ctx.fillRect (22, 16, 4, 4);
                 ctx.fillRect (2, 22, 4, 2);
                 ctx.fillRect (0, 24, 10, 2);
@@ -132,6 +132,11 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
                 ctx.fillRect (22, 14, 2, 2);
             break;
             case 2:
+                ctx.fillRect (8, 0, 8, 2);
+                ctx.fillRect (6, 2, 12, 2);
+                ctx.fillRect (4, 4, 16, 2);
+                ctx.fillRect (4, 6, 20, 2);
+                ctx.fillRect (12, 8, 6, 2);
                 ctx.fillRect (4, 24, 6, 4);
                 ctx.fillRect (4, 28, 8, 2);
                 ctx.fillRect (18, 24, 8, 2);
@@ -149,6 +154,11 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
             break;
             case 1:
             case 3:
+                ctx.fillRect (8, 0, 8, 2);
+                ctx.fillRect (6, 2, 12, 2);
+                ctx.fillRect (4, 4, 16, 2);
+                ctx.fillRect (4, 6, 20, 2);
+                ctx.fillRect (12, 8, 6, 2);
                 ctx.fillRect (22, 12, 4, 4);
                 ctx.fillRect (8, 24, 8, 2);
                 ctx.fillRect (8, 26, 6, 2);
@@ -164,21 +174,77 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
                 ctx.fillRect (18, 12, 4, 4);
                 ctx.fillRect (22, 10, 2, 2);
             break;
+            case 4:
+                ctx.fillRect (8, 0, 4, 2);
+                ctx.fillRect (14, 0, 4, 2);
+                ctx.fillRect (6, 2, 6, 2);
+                ctx.fillRect (14, 2, 6, 2);
+                ctx.fillRect (6, 4, 14, 2);
+                ctx.fillRect (4, 6, 18, 2);
+                ctx.fillRect (2, 12, 6, 4);
+                ctx.fillRect (18, 12, 6, 4);
+                ctx.fillRect (4, 16, 4, 2);
+                ctx.fillRect (18, 16, 4, 2);
+                ctx.fillRect (8, 18, 4, 2);
+                ctx.fillRect (14, 18, 4, 2);
+                ctx.fillRect (8, 24, 4, 2);
+                ctx.fillRect (14, 24, 4, 2);
+                ctx.fillRect (4, 26, 6, 2);
+                ctx.fillRect (16, 26, 6, 2);
+                ctx.fillRect (2, 28, 8, 2);
+                ctx.fillRect (16, 28, 8, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 8, 10, 4);
+                ctx.fillRect (8, 20, 10, 4);
+                ctx.fillRect (4, 22, 4, 4);
+                ctx.fillRect (18, 22, 4, 4);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (8, 12, 10, 6);
+                ctx.fillRect (12, 18, 2, 2);
+            break;
+            case 5:
+                ctx.fillRect (8, 0, 8, 2);
+                ctx.fillRect (6, 2, 12, 2);
+                ctx.fillRect (4, 4, 16, 2);
+                ctx.fillRect (4, 6, 20, 2);
+                ctx.fillRect (12, 8, 6, 2);
+                ctx.fillRect (22, 16, 4, 4);
+                ctx.fillRect (0, 24, 10, 2);
+                ctx.fillRect (0, 26, 8, 2);
+                ctx.fillRect (16, 24, 8, 2);
+                ctx.fillRect (18, 26, 6, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 8, 4, 2);
+                ctx.fillRect (8, 10, 10, 2);
+                ctx.fillRect (8, 12, 6, 2);
+                ctx.fillRect (4, 20, 14, 2);
+                ctx.fillRect (4, 22, 18, 2);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (6, 14, 10, 6);
+                ctx.fillRect (16, 16, 6, 4);
+                ctx.fillRect (22, 14, 2, 2);
+            break;
         }
         ctx.restore ();
     }
 
     this.newPos = function ()
     {
-        if (this.speedX != 0)
+        if (this.speedX > 0) this.heading = 1;
+        else if (this.speedX < 0) this.heading = -1;
+        if (this.speedY != 0)
         {
-            if (gameArea.frame % 2 == 0)
+            if (this.speedX == 0) this.type = 4;
+            else this.type = 5;
+        }
+        else
+        {
+            if (this.type > 3) this.type = 1;
+            if (this.speedX != 0 && gameArea.frame % 2 == 0)
             {
                 if (this.type < 3) this.type++;
                 else this.type = 0;
             }
-            if (this.speedX > 0) this.heading = 1;
-            else this.heading = -1;
         }
         this.speedY += gravity;
         this.x += this.speedX;
@@ -205,15 +271,15 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
         }
         for (var front in gameFront)
         {
-            if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && this.x + this.width > gameFront [front].x && this.x < gameFront [front].x + gameFront [front].width)
-            {
-                this.x -= this.speedX;
-                this.speedX = 0;
-            }
             if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x && this.y + this.height > gameFront [front].y && this.y < gameFront [front].y + gameFront [front].height)
             {
                 this.y -= this.speedY;
                 this.speedY = -(this.speedY * this.bounce);
+            }
+            if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && this.x + this.width > gameFront [front].x && this.x < gameFront [front].x + gameFront [front].width)
+            {
+                this.x -= this.speedX;
+                this.speedX = 0;
             }
         }
     }

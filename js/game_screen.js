@@ -91,6 +91,7 @@ function generateGameMap (map)
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
+            gameFront.push (new floor ("white", 100, gameMap.height -60, gameMap.width - 500, 6));
         break;
         case "level2":
             gameMap =
