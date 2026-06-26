@@ -49,6 +49,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Mack", "white", canvasWidth / 2, gameText [3].y, "center", 10));
         gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 200, gameText [4].y, "center", 10));
         gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25, 26, 30));
+        gameFront.push (new beam ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
         gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 577, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 605, "left", 10));
     }
@@ -91,7 +92,9 @@ function generateGameMap (map)
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
-            gameFront.push (new floor ("white", 100, gameMap.height -60, gameMap.width - 500, 6));
+            gameFront.push (new beam ("#FF55FF", "#55FFFF", 90, gameMap.height - 50, 512));
+            gameFront.push (new beam ("#55FFFF", "#FF55FF", 700, gameMap.height - 50, 140));
+            gameFront.push (new beam ("#55FFFF", "#FF55FF", 900, gameMap.height - 50, 78));
         break;
         case "level2":
             gameMap =

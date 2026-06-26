@@ -121,16 +121,16 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
             switch (userActions [userAction].action)
             {
                 case 'move_up':
-                    if (player > -1) gamePlayers [player].speedY = -bt_value;
+                    if (player > -1) gamePlayers [player].moveY = -bt_value;
                 break;
                 case 'move_down':
-                    if (player > -1) gamePlayers [player].speedY = bt_value;
+                    if (player > -1) gamePlayers [player].moveY = bt_value;
                 break;
                  case 'move_left':
-                    if (player > -1) gamePlayers [player].speedX = -bt_value;
+                    if (player > -1) gamePlayers [player].moveX = -bt_value;
                 break;
                 case 'move_right':
-                    if (player > -1) gamePlayers [player].speedX = bt_value;
+                    if (player > -1) gamePlayers [player].moveX = bt_value;
                 break;
                 case 'jump':
                     if (player > -1 && gamePlayers [player].speedY == 0) gamePlayers [player].speedY = -2.5;
@@ -156,8 +156,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
                     var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedY = -1;
-                    else gamePlayers [player].speedY = 0;
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveY = -1;
+                    else gamePlayers [player].moveY = 0;
                 }
             break;
             case 'move_up':
@@ -165,8 +165,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
                     var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedY = 1;
-                    else gamePlayers [player].speedY = 0;
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveY = 1;
+                    else gamePlayers [player].moveY = 0;
                 }
             break;
             case 'move_left':
@@ -174,8 +174,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
                     var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedX = 1;
-                    else gamePlayers [player].speedX = 0;
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = 1;
+                    else gamePlayers [player].moveX = 0;
                 }
             break;
             case 'move_right':
@@ -183,8 +183,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                 {
                     var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
                     var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].speedX = -1;
-                    else gamePlayers [player].speedX = 0;
+                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = -1;
+                    else gamePlayers [player].moveX = 0;
                 }
             break;
         }
