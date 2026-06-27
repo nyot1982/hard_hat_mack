@@ -166,6 +166,28 @@ function column (color1, color2, color3, x, y)
     }
 }
 
+function chain (color, x, y, steps)
+{
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.steps = steps;
+    this.width = 8;
+    this.height = 8 * this.steps;
+
+    this.update = function ()
+    {
+        ctx = gameArea.ctx;
+        ctx.fillStyle = this.color;
+        for (var y = 0; y < this.steps * 8; y += 8)
+        {
+            ctx.fillRect (this.x, this.y + y, 2, 6);
+            ctx.fillRect (this.x + 6, this.y + y, 2, 6);
+            ctx.fillRect (this.x + 2, this.y + y + 6, 4, 2);
+        }
+    }
+}
+
 function player (type, name, x, y, width, height, heading, speedX, speedY, bounce)
 {
     this.type = (type != null ? type : 0);

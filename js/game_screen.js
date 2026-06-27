@@ -92,6 +92,10 @@ function generateGameMap (map)
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", 150, 438, 240));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", 396, 438, 240));
+            gameBack.push (new chain ("#55FFFF", 100, gameMap.height - 110, 4));
+            gameBack.push (new chain ("#55FFFF", 460, gameMap.height - 174, 4));
+            gameBack.push (new chain ("#55FFFF", 100, gameMap.height - 238, 4));
+            gameBack.push (new chain ("#55FFFF", 346, gameMap.height - 302, 4));
             gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
             gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", 125, gameMap.height - 46));
             gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", 225, gameMap.height - 46));
