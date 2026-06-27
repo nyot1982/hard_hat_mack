@@ -83,7 +83,7 @@ function floor (color, x, y, width, height)
     }
 }
 
-function beam (color1, color2, x, y, width, height)
+function beam_h (color1, color2, x, y, width)
 {
     this.color1 = color1;
     this.color2 = color2;
@@ -109,6 +109,60 @@ function beam (color1, color2, x, y, width, height)
                 ctx.fillRect (this.x + x + 16, this.y + 6, 6, 4);
             }
         }
+    }
+}
+
+function beam_v (color1, color2, x, y, height)
+{
+    this.color1 = color1;
+    this.color2 = color2;
+    this.x = x;
+    this.y = y;
+    this.width = 22;
+    this.height = height;
+
+    this.update = function ()
+    {
+        if (this.width - 11 > 0)
+        {
+            ctx = gameArea.ctx;
+            ctx.fillStyle = this.color1;
+            ctx.fillRect (this.x, this.y, 4, this.height);
+            ctx.fillRect (this.x + 18, this.y, 4, this.height);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (this.x + 4, this.y, 14, this.height);
+            for (var y = 24; y + 5 < this.height; y += 64)
+            {
+                ctx.fillStyle = "black";
+                ctx.fillRect (this.x + 8, this.y + y, 6, 4);
+                ctx.fillRect (this.x + 8, this.y + y + 14, 6, 4);
+            }
+        }
+    }
+}
+
+function column (color1, color2, color3, x, y)
+{
+    this.color1 = color1;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = x;
+    this.y = y;
+    this.width = 18;
+    this.height = 26;
+
+    this.update = function ()
+    {
+        ctx = gameArea.ctx;
+        ctx.fillStyle = this.color1;
+        ctx.fillRect (this.x + 2, this.y, 14, 4);
+        ctx.fillRect (this.x + 2, this.y + 16, 14, 4);
+        ctx.fillRect (this.x, this.y + 20, 18, 6);
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (this.x + 4, this.y + 4, 10, 4);
+        ctx.fillRect (this.x + 4, this.y + 12, 10, 4);
+        ctx.fillStyle = this.color3;
+        ctx.fillRect (this.x + 6, this.y + 8, 6, 4);
     }
 }
 

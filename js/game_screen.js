@@ -49,7 +49,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Mack", "white", canvasWidth / 2, gameText [3].y, "center", 10));
         gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 200, gameText [4].y, "center", 10));
         gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25, 26, 30));
-        gameFront.push (new beam ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
+        gameFront.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
         gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 577, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 605, "left", 10));
     }
@@ -63,7 +63,6 @@ function gameLoadScreen (screen)
     {
         if (gameMusic.active) gameMusic.musics.game.play ();
         generateGameMap ("level1");
-        gamePlayers.push (new player (0, "Mack", 50, gameMap.height - 50, 26, 30));
     }
     if (document.getElementById ("blackScreen").style.display == 'block')
     {
@@ -91,10 +90,19 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", 150, 438, 240));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", 396, 438, 240));
             gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
-            gameFront.push (new beam ("#FF55FF", "#55FFFF", 90, gameMap.height - 50, 512));
-            gameFront.push (new beam ("#55FFFF", "#FF55FF", 700, gameMap.height - 50, 140));
-            gameFront.push (new beam ("#55FFFF", "#FF55FF", 900, gameMap.height - 50, 78));
+            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", 125, gameMap.height - 46));
+            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", 225, gameMap.height - 46));
+            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", 325, gameMap.height - 46));
+            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", 425, gameMap.height - 46));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", 90, gameMap.height - 62, 388));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", 90, gameMap.height - 126, 388));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", 90, gameMap.height - 190, 388));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", 90, gameMap.height - 254, 388));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", 90, gameMap.height - 318, 388));
+            gamePlayers.push (new player (0, "Mack", 450, gameMap.height - 92, 26, 30, -1));
         break;
         case "level2":
             gameMap =
