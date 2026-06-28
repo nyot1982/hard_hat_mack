@@ -188,18 +188,18 @@ function chain (color, x, y, steps)
     }
 }
 
-function player (type, name, x, y, width, height, heading, speedX, speedY, bounce)
+function player (type, name, x, y, heading, speedX, speedY, bounce)
 {
     this.type = (type != null ? type : 0);
     this.name = name || null;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
-    this.width = (width != null ? width : 0);
-    this.height = (height != null ? height : 0);
     this.heading = (heading != null ? heading : 1);
     this.speedX = (speedX != null ? speedX : 0);
     this.speedY = (speedY != null ? speedY : 0);
     this.bounce = (bounce != null ? bounce : 0);
+    this.width = 26;
+    this.height = 30;
     this.moveX = 0;
     this.moveY = 0;
 
@@ -397,208 +397,162 @@ function player (type, name, x, y, width, height, heading, speedX, speedY, bounc
     }
 }
 
-function enemy (type, x, y, heading)
+function enemy (name, type, x, y)
 {
-    this.id = gameEnemies.length;
-    this.type = type;
-    this.x = x;
-    this.y = y;
-    this.heading = heading || 0;
-    this.fire = false;
-    this.lastShotFrame = -50;
-    this.weapon = 0;
-    if (this.type == 0)
-    {
-        this.width = 24;
-        this.height = 33;
-        this.speed = 4.5;
-    }
-    else if (this.type == 1)
-    {
-        this.width = 27;
-        this.height = 32;
-        this.speed = 6;
-    }
-    else if (this.type == 2)
-    {
-        this.width = 34;
-        this.height = 34;
-        this.speed = 3;
-    }
-    this.move = this.speed;
-    this.life = 10;
+    this.name = (name != null ? name : 0);
+    this.type = (type != null ? type : 0);
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = 26;
+    this.height = 32;
+    this.speedX = 0;
+    this.speedY = 0;
 
-    this.firing = function (active)
+    this.update = function (idPlayer)
     {
-        this.fire = active;
-    }
-
-    this.update = function ()
-    {
-        if (this.life > 0)
+        if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 2 == 0)
         {
-            ctx = gameArea.ctx;
-            if (gameArea.frame % 15 == 0)
-            {
-                this.action = Math.floor (Math.random () * 5);
-                switch (this.action)
+            if (this.type == 0) this.type = 1;
+            else this.type = 0;
+        }
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (this.x, this.y);
+        switch (this.name)
+        {
+            case 0:
+                switch (this.type)
                 {
-                    case 3:
-                        this.firing (true);
+                    case 0:
+                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillRect (8, 0, 4, 2);
+                        ctx.fillRect (14, 0, 4, 2);
+                        ctx.fillRect (4, 4, 6, 2);
+                        ctx.fillRect (16, 4, 6, 2);
+                        ctx.fillRect (8, 8, 10, 6);
+                        ctx.fillRect (0, 14, 2, 6);
+                        ctx.fillRect (24, 14, 2, 6);
+                        ctx.fillRect (12, 20, 2, 2);
+                        ctx.fillRect (8, 22, 10, 2);
+                        ctx.fillRect (4, 24, 6, 4);
+                        ctx.fillRect (16, 24, 6, 6);
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (2, 2, 2, 2);
+                        ctx.fillRect (10, 2, 6, 2);
+                        ctx.fillRect (22, 2, 2, 2);
+                        ctx.fillRect (12, 4, 2, 2);
+                        ctx.fillRect (6, 6, 14, 2);
+                        ctx.fillRect (6, 14, 14, 6);
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect (8, 10, 10, 2);
+                        ctx.fillRect (2, 12, 4, 2);
+                        ctx.fillRect (20, 12, 4, 2);
+                        ctx.fillRect (10, 14, 6, 2);
+                        ctx.fillRect (8, 24, 4, 2);
+                        ctx.fillRect (14, 24, 4, 2)
+                        ctx.fillRect (2, 28, 8, 2);
+                        ctx.fillRect (16, 30, 8, 2);
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (12, 10, 2, 2);
                     break;
-                    case 4:
-                        this.firing (false);
+                    case 1:
+                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillRect (8, 0, 2, 2);
+                        ctx.fillRect (4, 2, 16, 2);
+                        ctx.fillRect (16, 4, 6, 2);
+                        ctx.fillRect (20, 6, 2, 2);
+                        ctx.fillRect (8, 8, 10, 6);
+                        ctx.fillRect (0, 18, 2, 4);
+                        ctx.fillRect (24, 18, 2, 4);
+                        ctx.fillRect (12, 20, 2, 2);
+                        ctx.fillRect (8, 22, 10, 2);
+                        ctx.fillRect (4, 24, 6, 6);
+                        ctx.fillRect (16, 24, 6, 4);
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (2, 0, 2, 2);
+                        ctx.fillRect (14, 0, 2, 2);
+                        ctx.fillRect (18, 0, 2, 2);
+                        ctx.fillRect (22, 2, 2, 2);
+                        ctx.fillRect (2, 4, 2, 2);
+                        ctx.fillRect (10, 4, 2, 4);
+                        ctx.fillRect (6, 6, 2, 2);
+                        ctx.fillRect (14, 6, 2, 2);
+                        ctx.fillRect (6, 16, 14, 4);
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect (8, 10, 10, 2);
+                        ctx.fillRect (4, 14, 4, 2);
+                        ctx.fillRect (10, 14, 6, 2);
+                        ctx.fillRect (18, 14, 4, 2);
+                        ctx.fillRect (0, 16, 4, 2);
+                        ctx.fillRect (22, 16, 4, 2);
+                        ctx.fillRect (8, 24, 4, 2);
+                        ctx.fillRect (14, 24, 4, 2)
+                        ctx.fillRect (2, 30, 8, 2);
+                        ctx.fillRect (16, 28, 8, 2);
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (12, 10, 2, 2);
                     break;
                 }
-            }
-            this.radians = this.heading * Math.PI / 180;
-            if (this.move != 0)
-            {
-                this.x += this.move * Math.sin (this.radians);
-                this.y -= this.move * Math.cos (this.radians);
-                if (this.x < 0) this.x = gameMap.width;
-                else if (this.x > gameMap.width) this.x = 0;
-                if (this.y < 0) this.y = gameMap.height;
-                else if (this.y > gameMap.height) this.y = 0;
-            }
-            ctx.save ();
-            ctx.translate (this.x, this.y);
-            ctx.rotate (this.radians);
-            ctx.translate (-(this.width / 2), -(this.height / 2));
-            if (this.type == 0)
-            {
-                ctx.beginPath ();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = "#FFFFFFCC";
-                ctx.fillStyle = "black";
-                ctx.ellipse (6, 16.5, 16.5, 5, Math.PI * 0.50, 0, Math.PI);
-                ctx.stroke ();
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.ellipse (18, 16.5, 16.5, 5, Math.PI * 0.50, 0, Math.PI, true);
-                ctx.stroke ();
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.lineWidth = 2;
-                ctx.arc (12, 20, 6, 0, 2 * Math.PI);
-                ctx.strokeStyle = "#000000CC";
-                ctx.stroke ();
-                ctx.fillStyle = "#4A4A4A";
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.arc (12, 18, 3, 0, 2 * Math.PI);
-                ctx.strokeStyle = "#C2C2C2";
-                ctx.stroke ();
-                ctx.fillStyle = "black";
-                ctx.fill ();
-            }
-            else if (this.type == 1)
-            {
-                ctx.beginPath ();
-                ctx.strokeStyle = "#000000CC";
-                ctx.lineWidth = 2;
-                ctx.moveTo (12, 1);
-                ctx.lineTo (14, 1);
-                ctx.lineTo (18, 14);
-                ctx.lineTo (25, 22);
-                ctx.lineTo (25, 27);
-                ctx.lineTo (22, 31);
-                ctx.lineTo (4, 31);
-                ctx.lineTo (1, 27);
-                ctx.lineTo (1, 22);
-                ctx.lineTo (8, 14);
-                ctx.closePath ();
-                ctx.stroke ();
-                ctx.fillStyle = "#4A4A4A";
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.lineWidth = 0;
-                ctx.moveTo (10.5, 6);
-                ctx.lineTo (13, 6);
-                ctx.lineTo (13, 28);
-                ctx.lineTo (2, 28);
-                ctx.lineTo (0, 26);
-                ctx.lineTo (0, 23);
-                ctx.lineTo (7.5, 14.5);
-                ctx.closePath ();
-                ctx.fillStyle = "#000";
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.moveTo (13, 6);
-                ctx.lineTo (15, 15);
-                ctx.lineTo (22, 23);
-                ctx.lineTo (22, 26);
-                ctx.lineTo (20, 28);
-                ctx.lineTo (6, 28);
-                ctx.lineTo (4, 26);
-                ctx.lineTo (4, 23);
-                ctx.lineTo (11, 15);
-                ctx.closePath ();
-                ctx.fillStyle = "#B2B2B2";
-                ctx.fill ();
-                ctx.beginPath ();
-                ctx.lineWidth = 3;
-                ctx.moveTo (13, 24);
-                ctx.lineTo (13, 28);
-                ctx.strokeStyle = "black";
-                ctx.stroke ();
-            }
-            else if (this.type == 2)
-            {
-                ctx.beginPath ();
-                ctx.lineWidth = 8;
-                ctx.arc (17, 17, 13, 0, 2 * Math.PI);
-                ctx.strokeStyle = "#000000CC";
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = 4;
-                ctx.moveTo (17, 7);
-                ctx.lineTo (17, 27);
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = 2;
-                ctx.moveTo (15, 23);
-                ctx.lineTo (12, 12);
-                ctx.lineTo (8, 22);
-                ctx.moveTo (19, 23);
-                ctx.lineTo (22, 12);
-                ctx.lineTo (26, 22);
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = 5;
-                ctx.arc (17, 17, 13, 0, 2 * Math.PI);
-                ctx.strokeStyle = "#B2B2B2";
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = 2;
-                ctx.moveTo (17, 6);
-                ctx.lineTo (17, 28);
-                ctx.stroke ();
-                ctx.beginPath ();
-                ctx.lineWidth = 1;
-                ctx.moveTo (16, 24);
-                ctx.lineTo (12, 12);
-                ctx.lineTo (8, 22);
-                ctx.moveTo (18, 24);
-                ctx.lineTo (22, 12);
-                ctx.lineTo (26, 22);
-                ctx.stroke ();
-            }
-            ctx.restore ();
+            break;
+            case 1:
+                switch (this.type)
+                {
+                    case 0:
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (8, 0, 10, 10);
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect (6, 2, 14, 6);
+                        ctx.fillRect (0, 10, 4, 4);
+                        ctx.fillRect (10, 10, 6, 2);
+                        ctx.fillRect (22, 10, 4, 4);
+                        ctx.fillRect (4, 12, 18, 4);
+                        ctx.fillRect (6, 16, 6, 12);
+                        ctx.fillRect (14, 16, 6, 14);
+                        ctx.fillRect (4, 28, 8, 2);
+                        ctx.fillRect (14, 30, 8, 2);
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (10, 4, 6, 2);
+                        ctx.fillRect (12, 12, 2, 2);
+                        ctx.fillRect (10, 14, 6, 6);
+                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillRect (2, 10, 2, 2);
+                        ctx.fillRect (6, 20, 6, 6);
+                        ctx.fillRect (14, 20, 6, 8);
+                    break;
+                    case 1:
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (8, 0, 10, 10);
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect (6, 2, 14, 6);
+                        ctx.fillRect (0, 6, 4, 4);
+                        ctx.fillRect (2, 12, 2, 2);
+                        ctx.fillRect (10, 10, 6, 2);
+                        ctx.fillRect (22, 12, 2, 2);
+                        ctx.fillRect (22, 6, 4, 4);
+                        ctx.fillRect (4, 12, 18, 4);
+                        ctx.fillRect (6, 16, 6, 14);
+                        ctx.fillRect (14, 16, 6, 12);
+                        ctx.fillRect (4, 30, 8, 2);
+                        ctx.fillRect (14, 28, 8, 2);
+                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillRect (10, 4, 6, 2);
+                        ctx.fillRect (12, 12, 2, 2);
+                        ctx.fillRect (10, 14, 6, 6);
+                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillRect (2, 6, 2, 6);
+                        ctx.fillRect (22, 10, 2, 2);
+                        ctx.fillRect (6, 20, 6, 8);
+                        ctx.fillRect (14, 20, 6, 6);
+                    break;
+                }
+            break;
         }
-        else if (this.life > 0)
-        {
-            this.life = 0;
-            if (gameSound.active)
-            {
-                gameSound.sounds ["hit0"].stop ();
-                gameSound.sounds ["hit0"].play ();
-            }
-        }
+        ctx.restore ();
     }
 }
 
-function component (type, src, color, x, y, width, height, max, backColor)
+function component (type, src, color, x, y, width, height)
 {
     this.type = type;
     this.src = src;
@@ -612,8 +566,6 @@ function component (type, src, color, x, y, width, height, max, backColor)
     this.y = y;
     this.width = width;
     this.height = height;
-    this.max = max;
-    this.backColor = backColor;
 
     this.update = function (idComponent)
     {
@@ -635,24 +587,307 @@ function component (type, src, color, x, y, width, height, max, backColor)
         }
         else if (this.type == "text")
         {
-            ctx.textAlign = this.width;
-            ctx.textBaseline = "middle";
-            ctx.font = this.height + "px PressStart2P";
-            
-            if (this.backColor != null)
-            {
-                ctx.beginPath ();
-                var textMeasure = ctx.measureText (this.src);
-                ctx.roundRect (this.x - textMeasure.width / 2 - (this.height < 10 ? 4 : 6), this.y - this.height / 2 - (this.height < 10 ? 2 : 4), textMeasure.width + (this.height < 10 ? 8 : 12), this.height + (this.height < 10 ? 4 : 8), 2 * Math.PI);
-                ctx.fillStyle = this.backColor;
-                ctx.fill ();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = this.color + "CC";
-                ctx.stroke ();
-            }
             ctx.fillStyle = this.color;
-            if (this.max != null) ctx.fillText (this.src, this.x, this.y + 1, this.max);
-            else ctx.fillText (this.src, this.x, this.y + 1);
+            this.width = 0;
+            for (var x = 0; x < this.src.length; x++) this.character (this.src.substr (x, 1).toUpperCase (), this.x + this.width, this.y);
+        }
+    }
+
+    this.character = function (char, x, y)
+    {
+        switch (char)
+        {
+            case " ":
+                this.width += 14;
+            break;
+            case "0":
+                ctx.fillRect (x + 2, y, 8, 2);
+                ctx.fillRect (x, y + 2, 4, 10);
+                ctx.fillRect (x + 8, y + 2, 4, 10);
+                ctx.fillRect (x + 6, y + 4, 2, 4);
+                ctx.fillRect (x + 4, y + 6, 2, 4);
+                ctx.fillRect (x + 2, y + 12, 8, 2);
+                this.width += 14;
+            break;
+            case "1":
+                ctx.fillRect (x + 4, y, 4, 12);
+                ctx.fillRect (x + 2, y + 2, 2, 4);
+                ctx.fillRect (x, y + 4, 2, 2);
+                ctx.fillRect (x, y + 12, 12, 2);
+                this.width += 14;
+            break;
+            case "2":
+                ctx.fillRect (x + 2, y, 8, 2);
+                ctx.fillRect (x, y + 2, 4, 2);
+                ctx.fillRect (x + 8, y + 2, 4, 4);
+                ctx.fillRect (x + 6, y + 6, 4, 2);
+                ctx.fillRect (x + 4, y + 8, 4, 2);
+                ctx.fillRect (x + 2, y + 10, 4, 2);
+                ctx.fillRect (x, y + 12, 12, 2);
+                this.width += 14;
+            break;
+            case "3":
+                ctx.fillRect (x + 2, y, 8, 2);
+                ctx.fillRect (x, y + 2, 4, 2);
+                ctx.fillRect (x + 8, y + 2, 4, 4);
+                ctx.fillRect (x + 4, y + 6, 6, 2);
+                ctx.fillRect (x + 8, y + 8, 4, 4);
+                ctx.fillRect (x, y + 10, 4, 2);
+                ctx.fillRect (x + 2, y + 12, 8, 2);
+                this.width += 14;
+            break;
+            case "4":
+                ctx.fillRect (x + 6, y, 2, 2);
+                ctx.fillRect (x + 8, y, 4, 14);
+                ctx.fillRect (x + 4, y + 2, 4, 2);
+                ctx.fillRect (x + 2, y + 4, 4, 2);
+                ctx.fillRect (x, y + 6, 4, 2);
+                ctx.fillRect (x, y + 8, 8, 2);
+                this.width += 14;
+            break;
+            case "5":
+                ctx.fillRect (x, y, 12, 2);
+                ctx.fillRect (x, y + 2, 4, 4);
+                ctx.fillRect (x, y + 6, 10, 2);
+                ctx.fillRect (x + 8, y + 8, 4, 4);
+                ctx.fillRect (x, y + 10, 4, 2);
+                ctx.fillRect (x + 2, y + 12, 8, 2);
+                this.width += 14;
+            break;
+            case "6":
+                ctx.fillRect (x + 4, y, 6, 2);
+                ctx.fillRect (x + 2, y + 2, 4, 2);
+                ctx.fillRect (x, y + 4, 4, 8);
+                ctx.fillRect (x + 4, y + 6, 6, 2);
+                ctx.fillRect (x + 8, y + 8, 4, 4);
+                ctx.fillRect (x + 2, y + 12, 8, 2);
+                this.width += 14;
+            break;
+            case "7":
+                ctx.fillRect (x, y, 12, 2);
+                ctx.fillRect (x, y + 2, 4, 2);
+                ctx.fillRect (x + 8, y + 2, 4, 2);
+                ctx.fillRect (x + 6, y + 4, 4, 2);
+                ctx.fillRect (x + 4, y + 6, 4, 8);
+                this.width += 14;
+            break;
+            case "8":
+                ctx.fillRect (x + 2, y, 8, 2);
+                ctx.fillRect (x, y + 2, 4, 4);
+                ctx.fillRect (x + 8, y + 2, 4, 4);
+                ctx.fillRect (x + 2, y + 6, 8, 2);
+                ctx.fillRect (x, y + 8, 4, 4);
+                ctx.fillRect (x + 8, y + 8, 4, 4);
+                ctx.fillRect (x + 2, y + 12, 8, 2);
+                this.width += 14;
+            break;
+            case "9":
+                ctx.fillRect (x + 2, y, 8, 2);
+                ctx.fillRect (x, y + 2, 4, 4);
+                ctx.fillRect (x + 8, y + 2, 4, 4);
+                ctx.fillRect (x + 2, y + 6, 10, 2);
+                ctx.fillRect (x + 8, y + 8, 4, 2);
+                ctx.fillRect (x + 6, y + 10, 4, 2);
+                ctx.fillRect (x + 4, y + 12, 4, 2);
+                this.width += 14;
+            break;
+            case "A":
+                ctx.fillRect (x + 2, y, 8, 2);
+                ctx.fillRect (x, y + 2, 4, 12);
+                ctx.fillRect (x + 8, y + 2, 4, 12);
+                ctx.fillRect (x + 4, y + 6, 4, 2);
+                this.width += 14;
+            break;
+            case "B":
+
+                this.width += 14;
+            break;
+            case "C":
+
+                this.width += 14;
+            break;
+            case "D":
+
+                this.width += 14;
+            break;
+            case "E":
+
+                this.width += 14;
+            break;
+            case "F":
+
+                this.width += 14;
+            break;
+            case "G":
+
+                this.width += 14;
+            break;
+            case "H":
+                ctx.fillRect (x, y, 4, 14);
+                ctx.fillRect (x + 8, y, 4, 14);
+                ctx.fillRect (x + 4, y + 6, 4, 2);
+                this.width += 14;
+            break;
+            case "I":
+                ctx.fillRect (x, y, 12, 2);
+                ctx.fillRect (x + 4, y + 2, 4, 10);
+                ctx.fillRect (x, y + 12, 12, 2);
+                this.width += 14;
+            break;
+            case "J":
+
+                this.width += 14;
+            break;
+            case "K":
+
+                this.width += 14;
+            break;
+            case "L":
+                ctx.fillRect (x, y, 4, 12);
+                ctx.fillRect (x, y + 12, 12, 2);
+                this.width += 14;
+            break;
+            case "M":
+                ctx.fillRect (x, y, 4, 14);
+                ctx.fillRect (x + 8, y, 4, 14);
+                ctx.fillRect (x + 4, y + 2, 4, 2);
+                this.width += 14;
+            break;
+            case "N":
+
+                this.width += 14;
+            break;
+            case "O":
+
+                this.width += 14;
+            break;
+            case "P":
+
+                this.width += 14;
+            break;
+            case "Q":
+
+                this.width += 14;
+            break;
+            case "R":
+
+                this.width += 14;
+            break;
+            case "S":
+
+                this.width += 14;
+            break;
+            case "T":
+                ctx.fillRect (x, y, 12, 2);
+                ctx.fillRect (x + 4, y + 2, 4, 12);
+                this.width += 14;
+            break;
+            case "U":
+                ctx.fillRect (x, y, 4, 12);
+                ctx.fillRect (x + 8, y, 4, 12);
+                ctx.fillRect (x + 2, y + 12, 8, 2);
+                this.width += 14;
+            break;
+            case "V":
+                ctx.fillRect (x, y, 4, 10);
+                ctx.fillRect (x + 8, y, 4, 10);
+                ctx.fillRect (x + 2, y + 10, 8, 2);
+                ctx.fillRect (x + 4, y + 12, 4, 2);
+                this.width += 14;
+            break;
+            case "W":
+                ctx.fillRect (x, y, 4, 14);
+                ctx.fillRect (x + 8, y, 4, 14);
+                ctx.fillRect (x + 4, y + 10, 4, 2);
+                this.width += 14;
+            break;
+            case "X":
+                ctx.fillRect (x, y, 4, 4);
+                ctx.fillRect (x + 8, y, 4, 4);
+                ctx.fillRect (x + 2, y + 4, 8, 2);
+                ctx.fillRect (x + 4, y + 6, 4, 2);
+                ctx.fillRect (x + 2, y + 8, 8, 2);
+                ctx.fillRect (x, y + 10, 4, 4);
+                ctx.fillRect (x + 8, y + 10, 4, 4);
+                this.width += 14;
+            break;
+            case "Y":
+                ctx.fillRect (x, y, 4, 6);
+                ctx.fillRect (x + 8, y, 4, 6);
+                ctx.fillRect (x + 2, y + 6, 8, 2);
+                ctx.fillRect (x + 4, y + 8, 4, 6);
+                this.width += 14;
+            break;
+            case "Z":
+                ctx.fillRect (x, y, 12, 2);
+                ctx.fillRect (x + 8, y + 2, 4, 2);
+                ctx.fillRect (x + 6, y + 4, 4, 2);
+                ctx.fillRect (x + 4, y + 6, 4, 2);
+                ctx.fillRect (x + 2, y + 8, 4, 2);
+                ctx.fillRect (x, y + 10, 4, 2);
+                ctx.fillRect (x, y + 12, 12, 2);
+                this.width += 14;
+            break;
+            case "&":
+                ctx.fillRect (x + 2, y, 6, 2);
+                ctx.fillRect (x, y + 2, 4, 4);
+                ctx.fillRect (x + 8, y + 2, 2, 2);
+                ctx.fillRect (x + 2, y + 6, 4, 2);
+                ctx.fillRect (x, y + 8, 4, 4);
+                ctx.fillRect (x + 6, y + 8, 2, 2);
+                ctx.fillRect (x + 10, y + 8, 2, 2);
+                ctx.fillRect (x + 8, y + 10, 2, 2);
+                ctx.fillRect (x + 2, y + 12, 6, 2);
+                ctx.fillRect (x + 10, y + 12, 2, 2);
+                this.width += 14;
+            break;
+            case "-":
+                ctx.fillRect (x, y + 5, 12, 4);
+                this.width += 14;
+            break;
+            case "+":
+                ctx.fillRect (x + 4, y + 1, 4, 12);
+                ctx.fillRect (x, y + 5, 12, 4);
+                this.width += 14;
+            break;
+            case ".":
+                ctx.fillRect (x, y + 10, 4, 4);
+                this.width += 6;
+            break;
+            case ",":
+                ctx.fillRect (x, y + 10, 4, 4);
+                ctx.fillRect (x + 2, y + 14, 2, 2);
+                ctx.fillRect (x, y + 16, 2, 2);
+                this.width += 6;
+            break;
+            case ":":
+                ctx.fillRect (x, y + 4, 4, 4);
+                ctx.fillRect (x, y + 10, 4, 4);
+                this.width += 6;
+            break;
+            case ";":
+                ctx.fillRect (x, y + 4, 4, 4);
+                ctx.fillRect (x, y + 10, 4, 4);
+                ctx.fillRect (x + 2, y + 14, 2, 2);
+                ctx.fillRect (x, y + 16, 2, 2);
+                this.width += 6;
+            break;
+            case "(":
+                ctx.fillRect (x + 4, y, 6, 2);
+                ctx.fillRect (x + 2, y + 2, 6, 2);
+                ctx.fillRect (x, y + 4, 6, 6);
+                ctx.fillRect (x + 2, y + 10, 6, 2);
+                ctx.fillRect (x + 4, y + 12, 6, 2);
+                this.width += 12;
+            break;
+            case ")":
+                ctx.fillRect (x, y, 6, 2);
+                ctx.fillRect (x + 2, y + 2, 6, 2);
+                ctx.fillRect (x + 4, y + 4, 6, 6);
+                ctx.fillRect (x + 2, y + 10, 6, 2);
+                ctx.fillRect (x, y + 12, 6, 2);
+                this.width += 12;
+            break;
         }
     }
 }
