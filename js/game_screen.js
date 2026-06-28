@@ -34,27 +34,26 @@ function gameLoadScreen (screen)
     if (gameScreen == "start")
     {
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameText.push (new component ("text", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&-+.,:;()", "white", 300, canvasHeight / 2 - 15));
-        //gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", 300, canvasHeight / 2 - 15));
-        //gameText.push (new component ("text", "Press any key to start...", "white", 300, gameText [0].y + 30));
+        gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", 345, canvasHeight / 2 - 15));
+        gameText.push (new component ("text", "Press any key to start...", "white", 350, gameText [0].y + 30));
     }
     else if (gameScreen == "menu")
     {
         if (gameMusic.active/* && !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 100, gameTitle.y + 105));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 100, gameText [0].y + 25));
-        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using HTML5 + JavaScript + Canvas.", "white", 100, gameText [1].y + 25));
-        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 200, gameText [2].y + 50));
-        gameText.push (new component ("text", "Mack", "white", canvasWidth / 2, gameText [3].y));
-        gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 200, gameText [4].y));
+        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 56, gameTitle.y + 105));
+        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 90, gameText [0].y + 25));
+        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", 27, gameText [1].y + 25));
+        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 83));
+        gameText.push (new component ("text", "Mack", "white", canvasWidth / 2 - 27, gameText [3].y));
+        gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 173, gameText [4].y));
         gameText.push (new enemy (0, 0, canvasWidth / 2 - 214, gameText [5].y + 23));
         gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25));
         gameText.push (new enemy (1, 0, canvasWidth / 2 + 186, gameText [5].y + 23));
-        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
-        gameText.push (new component ("image", "img/electronic_arts.png", "", canvasWidth / 2 - 300, 577, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 50, 605));
+        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 545));
+        gameText.push (new component ("image", "img/electronic_arts.png", "", 124, 577, 192, 66));
+        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2, 596));
     }
     else if (gameScreen == "high_scores")
     {
