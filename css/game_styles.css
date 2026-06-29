@@ -41,15 +41,6 @@
 
 /* INICIALS */
 
-@font-face
-{
-    font-family: "PressStart2P";
-    font-style: normal;
-    font-weight: 400;
-    font-display: block;
-    src: url(../webfonts/PressStart2P-Regular.ttf) format("truetype");
-}
-
 html
 {
     margin: 0;
@@ -62,7 +53,6 @@ body
     padding: 0;
     background-color: var(--color11);
     font-size: 6pt;
-    font-family: "PressStart2P";
     text-align: left;
 }
 
@@ -337,7 +327,6 @@ select
     padding: 0;
     box-sizing: border-box;
     outline: 0;
-    font-family: "PressStart2P";
     font-size: 10px;
     color: var(--color10);
     background-color: var(--color5);
