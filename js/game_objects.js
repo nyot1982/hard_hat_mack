@@ -250,9 +250,9 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
                 this.speedY = -(this.speedY * this.bounce);
             }
             if (this.y == rockY) this.state = "ground";
-            else if (this.state != "chain") 
+            else if (this.state != "chain") this.state = "air";
+            if (this.state != "chain") 
             {
-                this.state = "air";
                 for (var front in gameFront)
                 {
                     if ((this.x - this.speedX < gameFront [front].x + gameFront [front].width && this.x - this.speedX >= gameFront [front].x) || (this.x - this.speedX + this.width > gameFront [front].x && this.x - this.speedX + this.width <= gameFront [front].x + gameFront [front].width))
