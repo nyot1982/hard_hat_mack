@@ -214,17 +214,10 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
             var rockX = gameMap.width - this.width,
                 rockY = gameMap.height - this.height;
 
-            this.state = "air";
-
-            if (this.state != "rope")
-            {
-                this.speedX = this.moveX;
-                if (this.speedX > 0) this.heading = 1;
-                else if (this.speedX < 0) this.heading = -1;
-                if (this.state == "ground") this.speedY = this.moveY;
-                else this.speedY += gravity;
-            }
-            else this.speedY = this.moveY;
+            this.speedX = this.moveX;
+            this.speedY += gravity;
+            if (this.speedX > 0) this.heading = 1;
+            else if (this.speedX < 0) this.heading = -1;
             this.x += this.speedX; 
             this.y += this.speedY;
             if (this.x < 0 || this.x > rockX)
@@ -236,13 +229,12 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
             if (this.y < 0 || this.y > rockY)
             {
                 if (this.y < 0) this.y = 0;
-                else
-                {
-                    this.y = rockY;
-                    this.state = "ground";
-                }
+                else this.y = rockY;
                 this.speedY = -(this.speedY * this.bounce);
             }
+            if (this.y == rockY) this.state = "ground";
+            else this.state = "air";
+
             for (var front in gameFront)
             {
                 if ((this.x - this.speedX < gameFront [front].x + gameFront [front].width && this.x - this.speedX >= gameFront [front].x) || (this.x - this.speedX + this.width > gameFront [front].x && this.x - this.speedX + this.width <= gameFront [front].x + gameFront [front].width))
