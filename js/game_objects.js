@@ -203,9 +203,88 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
     this.moveX = 0;
     this.moveY = 0;
 
+    this.drill = function (drilling)
+    {
+    }
+
     this.update = function (idPlayer)
     {
-        if (gameScreen == "game") this.newPos ();
+        if (gameScreen == "game")
+        {
+            var rockX = gameMap.width - this.width,
+                rockY = gameMap.height - this.height;
+
+            this.state = "air";
+
+            if (this.state != "rope")
+            {
+                this.speedX = this.moveX;
+                if (this.speedX > 0) this.heading = 1;
+                else if (this.speedX < 0) this.heading = -1;
+                if (this.state == "ground") this.speedY = this.moveY;
+                else this.speedY += gravity;
+            }
+            else this.speedY = this.moveY;
+            this.x += this.speedX; 
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > rockX)
+            {
+                if (this.x < 0) this.x = 0;
+                else this.x = rockX;
+                this.speedX = 0;
+            }
+            if (this.y < 0 || this.y > rockY)
+            {
+                if (this.y < 0) this.y = 0;
+                else
+                {
+                    this.y = rockY;
+                    this.state = "ground";
+                }
+                this.speedY = -(this.speedY * this.bounce);
+            }
+            for (var front in gameFront)
+            {
+                if ((this.x - this.speedX < gameFront [front].x + gameFront [front].width && this.x - this.speedX >= gameFront [front].x) || (this.x - this.speedX + this.width > gameFront [front].x && this.x - this.speedX + this.width <= gameFront [front].x + gameFront [front].width))
+                {
+                    if ((this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height) || (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y))
+                    {
+                        if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y) this.state = "air";
+                        else this.state = "ground";
+                        this.y -= this.speedY;
+                        this.speedY = -(this.speedY * this.bounce);
+                    }
+                }
+                if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && this.x + this.width > gameFront [front].x && this.x < gameFront [front].x + gameFront [front].width)
+                {
+                    this.x -= this.speedX;
+                    this.speedX = 0;
+                }
+            }
+            if (this.state == "ground")
+            {
+                if (this.type > 3) this.type = 1;
+                if (this.speedX != 0 && gameArea.frame % 2 == 0)
+                {
+                    if (this.type < 3) this.type++;
+                    else this.type = 0;
+                }
+            }
+            else if (this.state == "rope")
+            {
+                if (this.speedY == 0) this.type = 4;
+                else if (gameArea.frame % 2 == 0)
+                {
+                    if (this.type == 4) this.type = 5;
+                    else this.type = 4;
+                }
+            }
+            else if (this.state == "air")
+            {
+                if (this.speedX == 0) this.type = 4;
+                else this.type = 6;
+            }
+        }
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
@@ -310,6 +389,34 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
                 ctx.fillRect (12, 18, 2, 2);
             break;
             case 5:
+                ctx.fillRect (8, 0, 4, 2);
+                ctx.fillRect (14, 0, 4, 2);
+                ctx.fillRect (6, 2, 6, 2);
+                ctx.fillRect (14, 2, 6, 2);
+                ctx.fillRect (6, 4, 14, 2);
+                ctx.fillRect (4, 6, 18, 2);
+                ctx.fillRect (2, 12, 6, 4);
+                ctx.fillRect (18, 12, 6, 4);
+                ctx.fillRect (4, 16, 4, 2);
+                ctx.fillRect (18, 16, 4, 2);
+                ctx.fillRect (8, 18, 4, 2);
+                ctx.fillRect (14, 18, 4, 2);
+                ctx.fillRect (8, 24, 4, 2);
+                ctx.fillRect (14, 24, 4, 2);
+                ctx.fillRect (4, 26, 6, 2);
+                ctx.fillRect (16, 26, 6, 2);
+                ctx.fillRect (2, 28, 8, 2);
+                ctx.fillRect (16, 28, 8, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 8, 10, 4);
+                ctx.fillRect (8, 20, 10, 4);
+                ctx.fillRect (4, 22, 4, 4);
+                ctx.fillRect (18, 22, 4, 4);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (8, 12, 10, 6);
+                ctx.fillRect (12, 18, 2, 2);
+            break;
+            case 6:
                 ctx.fillRect (8, 0, 8, 2);
                 ctx.fillRect (6, 2, 12, 2);
                 ctx.fillRect (4, 4, 16, 2);
@@ -330,70 +437,8 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
                 ctx.fillRect (6, 14, 10, 6);
                 ctx.fillRect (16, 16, 6, 4);
                 ctx.fillRect (22, 14, 2, 2);
-            break;
         }
         ctx.restore ();
-    }
-
-    this.newPos = function ()
-    {
-        if (this.speedX > 0) this.heading = 1;
-        else if (this.speedX < 0) this.heading = -1;
-        if (this.speedY != 0)
-        {
-            if (this.speedX == 0) this.type = 4;
-            else this.type = 5;
-        }
-        else
-        {
-            if (this.type > 3) this.type = 1;
-            if (this.speedX != 0 && gameArea.frame % 2 == 0)
-            {
-                if (this.type < 3) this.type++;
-                else this.type = 0;
-            }
-        }
-        this.speedX = this.moveX;
-        this.speedY += gravity;
-        this.x += this.speedX; 
-        this.y += this.speedY;
-        this.collisions ();
-    }
-
-    this.collisions = function ()
-    {
-        var rockX = gameMap.width - this.width,
-            rockY = gameMap.height - this.height;
-
-        if (this.x < 0 || this.x > rockX)
-        {
-            if (this.x < 0) this.x = 0;
-            else this.x = rockX;
-            this.speedX = 0;
-        }
-        if (this.y < 0 || this.y > rockY)
-        {
-            if (this.y < 0) this.y = 0;
-            else this.y = rockY;
-            this.speedY = -(this.speedY * this.bounce);
-        }
-        for (var front in gameFront)
-        {
-            if (this.x - this.speedX < gameFront [front].x + gameFront [front].width && this.x - this.speedX + this.width > gameFront [front].x && this.y + this.height > gameFront [front].y && this.y < gameFront [front].y + gameFront [front].height)
-            {
-                this.y -= this.speedY;
-                this.speedY = -(this.speedY * this.bounce);
-            }
-            if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && this.x + this.width > gameFront [front].x && this.x < gameFront [front].x + gameFront [front].width)
-            {
-                this.x -= this.speedX;
-                this.speedX = 0;
-            }
-        }
-    }
-
-    this.drill = function (drilling)
-    {
     }
 }
 

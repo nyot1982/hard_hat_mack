@@ -133,11 +133,10 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                     if (player > -1) gamePlayers [player].moveX = bt_value;
                 break;
                 case 'jump':
-                    if (player > -1 && gamePlayers [player].speedY == 0) gamePlayers [player].speedY = -2;
+                    if (player > -1 && gamePlayers [player].state == "ground") gamePlayers [player].speedY = -2;
                 break;
                 case 'drop_drill':
                     if (player > -1) gamePlayers [player].drill (false);
-                break;
             }
         }
     }
@@ -186,7 +185,6 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = -1;
                     else gamePlayers [player].moveX = 0;
                 }
-            break;
         }
     }
 }

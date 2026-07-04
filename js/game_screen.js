@@ -98,11 +98,11 @@ function generateGameMap (map)
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 + 178, gameMap.height - 174, 4));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 238, 4));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 + 60, gameMap.height - 302, 4));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 159, gameMap.height - 46));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 59, gameMap.height - 46));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 41, gameMap.height - 46));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 141, gameMap.height - 46));
             gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
-            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 159, gameMap.height - 46));
-            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 59, gameMap.height - 46));
-            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 41, gameMap.height - 46));
-            gameFront.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 141, gameMap.height - 46));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 62, 388));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 126, 388));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 190, 388));
