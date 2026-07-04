@@ -188,18 +188,18 @@ function chain (color, x, y, steps)
     }
 }
 
-function player (type, name, x, y, heading, speedX, speedY, bounce)
+function player (type, name, x, y, heading, bounce)
 {
     this.type = (type != null ? type : 0);
     this.name = name || null;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.heading = (heading != null ? heading : 1);
-    this.speedX = (speedX != null ? speedX : 0);
-    this.speedY = (speedY != null ? speedY : 0);
     this.bounce = (bounce != null ? bounce : 0);
     this.width = 26;
     this.height = 30;
+    this.speedX = 0;
+    this.speedY = 0;
     this.moveX = 0;
     this.moveY = 0;
     this.jump = 0;
@@ -215,24 +215,20 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
             var rockX = gameMap.width - this.width,
                 rockY = gameMap.height - this.height;
 
-            this.chain = false;
             for (var back in gameBack)
             {
                 if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
                 {
-                    this.chain = true;
-                    if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y) this.state = "chain";
+                    if ((this.y - 18 == gameBack [back].y && this.moveY > 0) || (this.y + this.height + 16 == gameBack [back].y && this.moveY < 0)) this.speedY = 0;
+                    else this.speedY = this.moveY;
+                    if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 > gameBack [back].y) this.state = "chain";
                     else this.state = "ground";
                 }
             }
             if (this.state == "ground" && this.jump != 0) this.speedY = this.jump;
-            if (this.chain) this.speedY = this.moveY;
             if (this.state == "chain") this.speedX = 0;
-            else
-            {
-                this.speedX = this.moveX;
-                this.speedY = Number ((this.speedY + gravity).toFixed (2));    
-            }
+            else this.speedX = this.moveX;
+            if (this.state == "air") this.speedY = Number ((this.speedY + gravity).toFixed (2));
             if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
             this.x += this.speedX; 
@@ -259,9 +255,16 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
                     {
                         if ((this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height) || (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y))
                         {
-                            if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y) this.state = "air";
-                            else this.state = "ground";
-                            this.y -= this.speedY;
+                            if (this.y < gameFront [front].y + gameFront [front].height && this.y > gameFront [front].y)
+                            {
+                                this.y = gameFront [front].y + gameFront [front].height;
+                                this.state = "air";
+                            }
+                            else
+                            {
+                                this.y = gameFront [front].y - this.height;
+                                this.state = "ground";
+                            }
                             this.speedY = -(this.speedY * this.bounce);
                         }
                     }
@@ -463,13 +466,140 @@ function enemy (name, type, x, y)
     this.height = 32;
     this.speedX = 0;
     this.speedY = 0;
+    this.direction = Math.floor (Math.random () * 2);
 
     this.update = function (idPlayer)
     {
-        if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 2 == 0)
+        if (gameScreen == "game")
         {
-            if (this.type == 0) this.type = 1;
-            else this.type = 0;
+            if (this.direction == 0)
+            {
+                if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 94)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 94)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 158)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 158)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 222)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 222)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 286)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 286)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 286 && this.speedX == -1)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 350 && this.speedY == -1)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 350)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 350)
+                {
+                    this.speedX = 0;
+                    this.direction = 1;
+                }
+            }
+            else
+            {
+                if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 94)
+                {
+                    this.speedX = 0;
+                    this.direction = 0;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 94)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 158)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 158)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 222)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 222)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 286)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 286)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 286 && this.speedY == 1)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 350 && this.speedX == -1)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 350)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+            }
+            this.x += this.speedX; 
+            this.y += this.speedY;
+            if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 4 == 0)
+            {
+                if (this.type == 0) this.type = 1;
+                else this.type = 0;
+            }
         }
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
