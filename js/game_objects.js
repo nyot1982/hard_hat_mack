@@ -202,6 +202,7 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
     this.height = 30;
     this.moveX = 0;
     this.moveY = 0;
+    this.jump = 0;
 
     this.drill = function (drilling)
     {
@@ -214,8 +215,22 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
             var rockX = gameMap.width - this.width,
                 rockY = gameMap.height - this.height;
 
+            for (var back in gameBack)
+            {
+                console.log (this.y);
+                console.log (gameBack [back].y);
+                if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y)
+                {
+                    this.chain = true;
+                    if (this.y < gameBack [back].y - 16 && this.y < gameBack [back].y + gameBack [back].height - 14) this.state = "chain";
+                    console.log (this.chain);
+                    console.log (this.state);
+                }
+            }
             this.speedX = this.moveX;
-            this.speedY += gravity;
+            if (this.state == "ground" && this.jump != 0) this.speedY = this.jump;
+            if (this.chain) this.speedY = this.moveY;
+            if (this.state != "chain") this.speedY += gravity;
             if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
             this.x += this.speedX; 
@@ -234,8 +249,7 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
             }
             if (this.y == rockY) this.state = "ground";
             else this.state = "air";
-
-            for (var front in gameFront)
+            if (this.state != "chain") for (var front in gameFront)
             {
                 if ((this.x - this.speedX < gameFront [front].x + gameFront [front].width && this.x - this.speedX >= gameFront [front].x) || (this.x - this.speedX + this.width > gameFront [front].x && this.x - this.speedX + this.width <= gameFront [front].x + gameFront [front].width))
                 {
@@ -262,7 +276,7 @@ function player (type, name, x, y, heading, speedX, speedY, bounce)
                     else this.type = 0;
                 }
             }
-            else if (this.state == "rope")
+            else if (this.state == "chain")
             {
                 if (this.speedY == 0) this.type = 4;
                 else if (gameArea.frame % 2 == 0)
