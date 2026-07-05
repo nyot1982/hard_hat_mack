@@ -212,92 +212,76 @@ function player (type, name, x, y, heading, bounce)
     {
         if (gameScreen == "game")
         {
-            var rockX = gameMap.width - this.width,
-                rockY = gameMap.height - this.height;
-
+            this.state = "air";
             for (var back in gameBack)
             {
                 if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
                 {
-                    if ((this.y - 18 == gameBack [back].y && this.moveY > 0) || (this.y + this.height + 16 == gameBack [back].y && this.moveY < 0)) this.speedY = 0;
+                    if (this.y - 18 == gameBack [back].y && this.moveY > 0 || this.y + this.height + 16 == gameBack [back].y && this.moveY < 0) this.speedY = 0;
                     else this.speedY = this.moveY;
                     if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 > gameBack [back].y) this.state = "chain";
                     else this.state = "ground";
                 }
             }
-            if (this.state == "ground" && this.jump != 0) this.speedY = this.jump;
-            if (this.state == "chain") this.speedX = 0;
-            else this.speedX = this.moveX;
-            if (this.state == "air") this.speedY = Number ((this.speedY + gravity).toFixed (2));
-            if (this.speedX > 0) this.heading = 1;
-            else if (this.speedX < 0) this.heading = -1;
-            this.x += this.speedX; 
-            this.y = Number ((this.y + this.speedY).toFixed (2));
-            if (this.x < 0 || this.x > rockX)
-            {
-                if (this.x < 0) this.x = 0;
-                else this.x = rockX;
-                this.speedX = 0;
-            }
-            if (this.y < 0 || this.y > rockY)
-            {
-                if (this.y < 0) this.y = 0;
-                else this.y = rockY;
-                this.speedY = -(this.speedY * this.bounce);
-            }
-            if (this.y == rockY) this.state = "ground";
-            else if (this.state != "chain") this.state = "air";
             if (this.state != "chain") 
             {
+                if (this.x < 0) this.x = 0;
+                else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
+                if (this.x == 0 || this.x == gameMap.width - this.width) this.speedX = 0;
+                if (this.y < 0) this.y = 0;
+                else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
+                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = -(this.speedY * this.bounce);
+                if (this.y == gameMap.height - this.height) this.state = "ground";
                 for (var front in gameFront)
                 {
-                    if ((this.x - this.speedX < gameFront [front].x + gameFront [front].width && this.x - this.speedX >= gameFront [front].x) || (this.x - this.speedX + this.width > gameFront [front].x && this.x - this.speedX + this.width <= gameFront [front].x + gameFront [front].width))
+                    if (this.x <= gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width >= gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                     {
-                        if ((this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height) || (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y))
-                        {
-                            if (this.y < gameFront [front].y + gameFront [front].height && this.y > gameFront [front].y)
-                            {
-                                this.y = gameFront [front].y + gameFront [front].height;
-                                this.state = "air";
-                            }
-                            else
-                            {
-                                this.y = gameFront [front].y - this.height;
-                                this.state = "ground";
-                            }
-                            this.speedY = -(this.speedY * this.bounce);
-                        }
+                        if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height) this.y = gameFront [front].y - this.height;
+                        else if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y) this.y = gameFront [front].y + gameFront [front].height;
+                        if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = -(this.speedY * this.bounce);
+                        if (this.y == gameFront [front].y - this.height) this.state = "ground";
                     }
-                    if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y && this.x + this.width > gameFront [front].x && this.x < gameFront [front].x + gameFront [front].width)
+                    if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                     {
-                        this.x -= this.speedX;
-                        this.speedX = 0;
+                        if (this.x + this.width == gameFront [front].x || this.x == gameFront [front].x + gameFront [front].width) this.speedX = 0;
                     }
                 }
             }
-            if (this.state == "ground")
+            if (this.state == "chain")
             {
-                if (this.type > 3) this.type = 1;
-                if (this.speedX != 0 && gameArea.frame % 2 == 0)
-                {
-                    if (this.type < 3) this.type++;
-                    else this.type = 0;
-                }
-            }
-            else if (this.state == "chain")
-            {
+                this.speedX = 0;
                 if (this.speedY == 0) this.type = 4;
-                else if (gameArea.frame % 2 == 0)
+                else if (gameArea.frame % 5 == 0)
                 {
                     if (this.type == 4) this.type = 5;
                     else this.type = 4;
                 }
             }
-            else if (this.state == "air")
+            else 
             {
-                if (this.speedX == 0) this.type = 4;
-                else this.type = 6;
+                this.speedX = this.moveX;
+                if (this.state == "air")
+                {
+                    this.speedY = Number ((this.speedY + gravity).toFixed (2));
+                    if (this.speedX == 0) this.type = 4;
+                    else this.type = 6;
+                }
+                else if (this.state == "ground")
+                {
+                    if (this.jump != 0) this.speedY = this.jump;
+                    if (this.type > 3) this.type = 1;
+                    if (this.speedX != 0 && gameArea.frame % 5 == 0)
+                    {
+                        if (this.type < 3) this.type++;
+                        else this.type = 0;
+                    }
+                }
+                if (this.speedX > 0) this.heading = 1;
+                else if (this.speedX < 0) this.heading = -1;
             }
+            this.x += this.speedX; 
+            this.y = Number ((this.y + this.speedY).toFixed (2));
+            //console.log ("state: " + this.state + ", x: " + this.x + ", y: " + this.y);
         }
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
@@ -403,32 +387,27 @@ function player (type, name, x, y, heading, bounce)
                 ctx.fillRect (12, 18, 2, 2);
             break;
             case 5:
-                ctx.fillRect (8, 0, 4, 2);
-                ctx.fillRect (14, 0, 4, 2);
-                ctx.fillRect (6, 2, 6, 2);
-                ctx.fillRect (14, 2, 6, 2);
-                ctx.fillRect (6, 4, 14, 2);
-                ctx.fillRect (4, 6, 18, 2);
-                ctx.fillRect (2, 12, 6, 4);
-                ctx.fillRect (18, 12, 6, 4);
-                ctx.fillRect (4, 16, 4, 2);
-                ctx.fillRect (18, 16, 4, 2);
-                ctx.fillRect (8, 18, 4, 2);
-                ctx.fillRect (14, 18, 4, 2);
-                ctx.fillRect (8, 24, 4, 2);
-                ctx.fillRect (14, 24, 4, 2);
+                ctx.fillRect (8, 4, 4, 2);
+                ctx.fillRect (14, 4, 4, 2);
+                ctx.fillRect (6, 6, 6, 2);
+                ctx.fillRect (14, 6, 6, 2);
+                ctx.fillRect (6, 8, 14, 2);
+                ctx.fillRect (4, 10, 18, 2);
+                ctx.fillRect (2, 16, 22, 4);
+                ctx.fillRect (8, 20, 4, 6);
+                ctx.fillRect (14, 20, 4, 6);
                 ctx.fillRect (4, 26, 6, 2);
                 ctx.fillRect (16, 26, 6, 2);
                 ctx.fillRect (2, 28, 8, 2);
                 ctx.fillRect (16, 28, 8, 2);
                 ctx.fillStyle = "#FF55FF";
-                ctx.fillRect (8, 8, 10, 4);
-                ctx.fillRect (8, 20, 10, 4);
-                ctx.fillRect (4, 22, 4, 4);
-                ctx.fillRect (18, 22, 4, 4);
+                ctx.fillRect (8, 12, 10, 4);
+                ctx.fillRect (8, 22, 10, 2);
+                ctx.fillRect (4, 24, 2, 2);
+                ctx.fillRect (20, 24, 2, 2);
                 ctx.fillStyle = "#55FFFF";
-                ctx.fillRect (8, 12, 10, 6);
-                ctx.fillRect (12, 18, 2, 2);
+                ctx.fillRect (8, 16, 10, 4);
+                ctx.fillRect (12, 20, 2, 2);
             break;
             case 6:
                 ctx.fillRect (8, 0, 8, 2);
@@ -595,7 +574,7 @@ function enemy (name, type, x, y)
             }
             this.x += this.speedX; 
             this.y += this.speedY;
-            if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 4 == 0)
+            if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 5 == 0)
             {
                 if (this.type == 0) this.type = 1;
                 else this.type = 0;
@@ -1168,13 +1147,13 @@ function component (type, src, color, x, y, width, height)
         }
         if (char == "Á" || char == "É" || char == "Í" || char == "Ó" || char == "Ú")
         {
-            ctx.fillRect (x + 4, y - 4, 2, 2);
-            ctx.fillRect (x + 6, y - 6, 2, 2);
+            ctx.fillRect (x + 4, y - 4, 4, 2);
+            ctx.fillRect (x + 6, y - 6, 4, 2);
         }
         else if (char == "À" || char == "È" || char == "Ì" || char == "Ò" || char == "Ù")
         {
-            ctx.fillRect (x + 4, y - 6, 2, 2);
-            ctx.fillRect (x + 6, y - 4, 2, 2);
+            ctx.fillRect (x + 2, y - 6, 4, 2);
+            ctx.fillRect (x + 4, y - 4, 4, 2);
         }
     }
 }
