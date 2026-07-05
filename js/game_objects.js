@@ -213,17 +213,29 @@ function player (type, name, x, y, heading, bounce)
         if (gameScreen == "game")
         {
             this.state = "air";
+            this.chain = false;
             for (var back in gameBack)
             {
                 if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
                 {
+                    this.chain = true;
                     if (this.y - 18 == gameBack [back].y && this.moveY > 0 || this.y + this.height + 16 == gameBack [back].y && this.moveY < 0) this.speedY = 0;
                     else this.speedY = this.moveY;
                     if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 > gameBack [back].y) this.state = "chain";
                     else this.state = "ground";
                 }
             }
-            if (this.state != "chain") 
+            if (this.state == "chain")
+            {
+                this.speedX = 0;
+                if (this.speedY == 0) this.type = 4;
+                else if (gameArea.frame % 5 == 0)
+                {
+                    if (this.type == 4) this.type = 5;
+                    else this.type = 4;
+                }
+            }
+            else 
             {
                 if (this.x < 0) this.x = 0;
                 else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
@@ -246,19 +258,6 @@ function player (type, name, x, y, heading, bounce)
                         if (this.x + this.width == gameFront [front].x || this.x == gameFront [front].x + gameFront [front].width) this.speedX = 0;
                     }
                 }
-            }
-            if (this.state == "chain")
-            {
-                this.speedX = 0;
-                if (this.speedY == 0) this.type = 4;
-                else if (gameArea.frame % 5 == 0)
-                {
-                    if (this.type == 4) this.type = 5;
-                    else this.type = 4;
-                }
-            }
-            else 
-            {
                 this.speedX = this.moveX;
                 if (this.state == "air")
                 {
@@ -279,9 +278,11 @@ function player (type, name, x, y, heading, bounce)
                 if (this.speedX > 0) this.heading = 1;
                 else if (this.speedX < 0) this.heading = -1;
             }
+                                if (this.chain) this.speedY = this.moveY;
+
             this.x += this.speedX; 
             this.y = Number ((this.y + this.speedY).toFixed (2));
-            //console.log ("state: " + this.state + ", x: " + this.x + ", y: " + this.y);
+            console.log ("state: " + this.state + ", x: " + this.x + ", y: " + this.y + ", this.speedX: " + this.speedX + ", this.speedY: " + this.speedY);
         }
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
