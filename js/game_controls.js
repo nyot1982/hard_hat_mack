@@ -61,7 +61,7 @@ function stopControl (id_control, control, bt_type, bt_code)
 
 function userActionStart (control, bt_type, bt_code, bt_value, player)
 {
-    if (gameScreen == "start" && control == "keyboard")
+    if (gameScreen == "start" && control == "keyboard" && gameSound.sounds.length == 0 && gameMusic.musics.length == 0 && loadScreen == null)
     {
         gameSound.sounds =
         {
@@ -79,38 +79,8 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
             game: new audio ("music/game.mp3", true)
         };
     }
-    else if (gameScreen == "menu")
-    {
-        if (!blackScreen)
-        {
-            blackScreen = true;
-            $("#blackScreen").fadeIn (1000);
-            setTimeout
-            (
-                () =>
-                {
-                    gameLoadScreen ("game");
-                },
-                1000
-            );
-        }
-    }
-    else if (gameScreen == "high_scores")
-    {
-        if (!blackScreen)
-        {
-            blackScreen = true;
-            $("#blackScreen").fadeIn (1000);
-            setTimeout
-            (
-                () =>
-                {
-                    gameLoadScreen ("menu");
-                },
-                1000
-            );
-        }
-    }
+    else if (gameScreen == "menu") gameLoadScreen ("game");
+    else if (gameScreen == "high_scores") gameLoadScreen ("menu");
     else if (gameScreen == "game")
     {
         if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));

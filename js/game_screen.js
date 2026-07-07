@@ -21,62 +21,85 @@ function gameHighScores (max_high_scores, high_scores)
 
 function gameLoadScreen (screen)
 {
-    gameTitle = null;
-    gameBack = [];
-    gameFront = [];
-    gamePlayers = [];
-    gameEnemies = [];
-    gameText = [];
+    if (loadScreen == null)
+    {
+        loadScreen = screen;
+        if (screen == "start")
+        {
+            gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+            gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", 345, canvasHeight / 2 - 15));
+            gameText.push (new component ("text", "Press any key to start...", "white", 350, gameText [0].y + 30));
+            gameArea.start ();
+            gameScreen = screen;
+            $("preloader").fadeOut (1000);
+            setTimeout
+            (
+                () =>
+                {
+                    loadScreen = null;
+                },
+                1000
+            );
+        }
+        else
+        {
+            $("#blackScreen").fadeIn (1000);
+            setTimeout
+            (
+                () =>
+                {
+                    gameTitle = null;
+                    gameBack = [];
+                    gameFront = [];
+                    gamePlayers = [];
+                    gameEnemies = [];
+                    gameText = [];
 
-    if (gameScreen == "game" && screen == "menu" && gameMusic.active) gameMusic.musics.game.stop ();
-    else if (gameScreen == "menu" && screen == "game" && gameMusic.active) gameMusic.musics.menu.stop ();
-    gameScreen = screen;
-    if (gameScreen == "start")
-    {
-        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameText.push (new component ("text", "Welcome to Hard Hat Mack.", "white", 345, canvasHeight / 2 - 15));
-        gameText.push (new component ("text", "Press any key to start...", "white", 350, gameText [0].y + 30));
-    }
-    else if (gameScreen == "menu")
-    {
-        if (gameMusic.active/* && !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
-        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 56, gameTitle.y + 105));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 90, gameText [0].y + 25));
-        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", 27, gameText [1].y + 25));
-        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 83));
-        gameText.push (new component ("text", "Mack", "white", canvasWidth / 2 - 27, gameText [3].y));
-        gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 173, gameText [4].y));
-        gameText.push (new enemy (0, 0, canvasWidth / 2 - 214, gameText [5].y + 23));
-        gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25));
-        gameText.push (new enemy (1, 0, canvasWidth / 2 + 186, gameText [5].y + 23));
-        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 545));
-        gameText.push (new component ("image", "img/electronic_arts.png", "", 124, 577, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2, 596));
-    }
-    else if (gameScreen == "high_scores")
-    {
-        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
-        gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105));
-    }
-    else if (gameScreen == "game")
-    {
-        if (gameMusic.active) gameMusic.musics.game.play ();
-        generateGameMap ("level1");
-    }
-    if (document.getElementById ("blackScreen").style.display == 'block')
-    {
-        $("#blackScreen").fadeOut (1000);
-        setTimeout
-        (
-            () =>
-            {
-                blackScreen = false;
-            },
-            1000
-        );
+                    if (gameScreen == "game" && screen == "menu" && gameMusic.active) gameMusic.musics.game.stop ();
+                    else if (gameScreen == "menu" && screen == "game" && gameMusic.active) gameMusic.musics.menu.stop ();
+                    gameScreen = screen;
+                    if (gameScreen == "menu")
+                    {
+                        if (gameMusic.active/* && !gameMusic.musics.menu.source*/) gameMusic.musics.menu.play ();
+                        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+                        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 150, 362, 40);
+                        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 56, gameTitle.y + 105));
+                        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 90, gameText [0].y + 25));
+                        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", 27, gameText [1].y + 25));
+                        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 83));
+                        gameText.push (new component ("text", "Mack", "white", canvasWidth / 2 - 27, gameText [3].y));
+                        gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 173, gameText [4].y));
+                        gameText.push (new enemy (0, 0, canvasWidth / 2 - 214, gameText [5].y + 23));
+                        gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25));
+                        gameText.push (new enemy (1, 0, canvasWidth / 2 + 186, gameText [5].y + 23));
+                        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 545));
+                        gameText.push (new component ("image", "img/electronic_arts.png", "", 124, 577, 192, 66));
+                        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2, 596));
+                    }
+                    else if (gameScreen == "high_scores")
+                    {
+                        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+                        gameTitle = new component ("image", "img/title.png", "", canvasWidth / 2, 100, 362, 40);
+                        gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105));
+                    }
+                    else if (gameScreen == "game")
+                    {
+                        if (gameMusic.active) gameMusic.musics.game.play ();
+                        generateGameMap ("level1");
+                    }
+                    $("#blackScreen").fadeOut (1000);
+                    setTimeout
+                    (
+                        () =>
+                        {
+                            loadScreen = null;
+                        },
+                        1000
+                    );
+                },
+                1000
+            );
+        }
     }
 }
 

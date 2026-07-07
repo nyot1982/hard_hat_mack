@@ -1,7 +1,7 @@
 var canvasWidth = 1024,
     canvasHeight = 740,
     gravity = 0.1,
-    blackScreen = false,
+    loadScreen = null,
     gameScreen = null,
     gameTitle = null,
     gameMap =
@@ -228,12 +228,7 @@ var canvasWidth = 1024,
         }
     };
 
-$(document).ready (function ()
-{
-    $("preloader").fadeOut (1000);
-    gameLoadScreen ("start");
-    gameArea.start ();
-});
+$(document).ready (function () { gameLoadScreen ("start"); });
 
 function updateGameArea ()
 {
@@ -250,18 +245,7 @@ function updateGameArea ()
             for (var music in gameMusic.musics) if (gameMusic.musics [music].duration > 0) loadedAudio++;
             gameText [1].src = "Loading audio: " + loadedAudio + "/" + (Object.keys (gameSound.sounds).length + Object.keys (gameMusic.musics).length) + " Files.";
             gameText [1].color = "#0C0";
-            if (loadedAudio == Object.keys (gameSound.sounds).length + Object.keys (gameMusic.musics).length)
-            {
-                $("#blackScreen").fadeIn (1000);
-                setTimeout
-                (
-                    () =>
-                    {
-                        gameLoadScreen ("menu");
-                    },
-                    1000
-                );
-            }
+            if (loadedAudio == Object.keys (gameSound.sounds).length + Object.keys (gameMusic.musics).length) gameLoadScreen ("menu");
         }
     }
     else if (gameScreen == "game")
