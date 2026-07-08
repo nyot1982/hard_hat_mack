@@ -72,7 +72,7 @@ function gameLoadScreen (screen)
                         gameText.push (new enemy (0, 0, canvasWidth / 2 - 214, gameText [5].y + 23));
                         gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25));
                         gameText.push (new enemy (1, 0, canvasWidth / 2 + 186, gameText [5].y + 23));
-                        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 545));
+                        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
                         gameText.push (new component ("image", "img/electronic_arts.png", "", 124, 577, 192, 66));
                         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2, 596));
                     }

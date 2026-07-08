@@ -409,19 +409,19 @@ function player (type, name, x, y, heading, bounce)
                 ctx.fillRect (12, 18, 2, 2);
             break;
             case 5:
-                ctx.fillRect (8, 4, 4, 2);
-                ctx.fillRect (14, 4, 4, 2);
-                ctx.fillRect (6, 6, 6, 2);
-                ctx.fillRect (14, 6, 6, 2);
-                ctx.fillRect (6, 8, 14, 2);
-                ctx.fillRect (4, 10, 18, 2);
-                ctx.fillRect (2, 16, 22, 4);
-                ctx.fillRect (8, 20, 4, 6);
-                ctx.fillRect (14, 20, 4, 6);
-                ctx.fillRect (4, 26, 6, 2);
-                ctx.fillRect (16, 26, 6, 2);
-                ctx.fillRect (2, 28, 8, 2);
-                ctx.fillRect (16, 28, 8, 2);
+                ctx.fillRect (8, 0, 4, 2);
+                ctx.fillRect (14, 0, 4, 2);
+                ctx.fillRect (6, 2, 6, 2);
+                ctx.fillRect (14, 2, 6, 2);
+                ctx.fillRect (6, 4, 14, 2);
+                ctx.fillRect (4, 6, 18, 2);
+                ctx.fillRect (2, 12, 22, 4);
+                ctx.fillRect (8, 16, 4, 6);
+                ctx.fillRect (14, 16, 4, 6);
+                ctx.fillRect (4, 22, 6, 2);
+                ctx.fillRect (16, 22, 6, 2);
+                ctx.fillRect (2, 24, 8, 2);
+                ctx.fillRect (16, 24, 8, 2);
                 ctx.fillStyle = "#FF55FF";
                 ctx.fillRect (8, 12, 10, 4);
                 ctx.fillRect (8, 22, 10, 2);
@@ -452,6 +452,41 @@ function player (type, name, x, y, heading, bounce)
                 ctx.fillRect (6, 14, 10, 6);
                 ctx.fillRect (16, 16, 6, 4);
                 ctx.fillRect (22, 14, 2, 2);
+            break;
+            case 7:
+                ctx.fillRect (8, 10, 4, 2);
+                ctx.fillRect (14, 10, 4, 2);
+                ctx.fillRect (6, 12, 14, 2);
+                ctx.fillRect (4, 14, 18, 2);
+                ctx.fillRect (0, 18, 26, 2);
+                ctx.fillRect (8, 22, 10, 2);
+                ctx.fillRect (4, 26, 6, 2);
+                ctx.fillRect (16, 26, 6, 2);
+                ctx.fillRect (2, 28, 8, 2);
+                ctx.fillRect (16, 28, 8, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 16, 10, 2);
+                ctx.fillRect (4, 24, 18, 2);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (8, 18, 10, 2);
+                ctx.fillRect (6, 20, 14, 2);
+                ctx.fillRect (12, 22, 2, 2);
+            break;
+            case 8:
+                ctx.fillRect (8, 16, 4, 2);
+                ctx.fillRect (14, 16, 4, 2);
+                ctx.fillRect (4, 18, 18, 2);
+                ctx.fillRect (2, 22, 22, 2);
+                ctx.fillRect (8, 24, 4, 4);
+                ctx.fillRect (14, 24, 4, 4);
+                ctx.fillRect (2, 28, 8, 2);
+                ctx.fillRect (16, 28, 8, 2);
+                ctx.fillStyle = "#FF55FF";
+                ctx.fillRect (8, 20, 10, 2);
+                ctx.fillRect (4, 26, 4, 2);
+                ctx.fillRect (18, 26, 4, 2);
+                ctx.fillStyle = "#55FFFF";
+                ctx.fillRect (8, 22, 10, 2);
         }
         ctx.restore ();
     }
