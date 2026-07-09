@@ -203,6 +203,8 @@ function player (type, name, x, y, heading, bounce)
     this.moveX = 0;
     this.moveY = 0;
     this.jump = 0;
+    this.dead = false;
+    this.lives = 3;
 
     this.drill = function (drilling)
     {
@@ -214,18 +216,29 @@ function player (type, name, x, y, heading, bounce)
         {
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
+            if (!this.dead) for (var enemy in gameEnemies)
+            {
+                if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
+                {
+                    if (this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y >= gameEnemies [enemy].y || this.y + this.height >= gameEnemies [enemy].y && this.y + this.height <= gameEnemies [enemy].y + gameEnemies [enemy].height) this.dead = true;
+                }
+            }
             if (this.state != "chain")
             {
                 this.state = "air";
-                this.speedX = this.moveX;
+                if  (!this.dead) this.speedX = this.moveX;
                 for (var front in gameFront)
                 {
                     if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                     {
                         if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
                         else if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
+                        if (this.y == gameFront [front].y - this.height)
+                        {
+                            this.state = "ground";
+                            if (this.speedY > 2) this.dead = true;
+                        }
                         if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = -(this.speedY * this.bounce);
-                        if (this.y == gameFront [front].y - this.height) this.state = "ground";
                     }
                     if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                     {
@@ -237,16 +250,23 @@ function player (type, name, x, y, heading, bounce)
                 if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0) this.speedX = 0;
                 if (this.y < 0) this.y = 0;
                 else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
-                if (this.y == 0 && this.speedY > 0 || this.y == gameMap.height - this.height && this.speedY < 0) this.speedY = -(this.speedY * this.bounce);
-                if (this.y == gameMap.height - this.height) this.state = "ground";
+                if (this.y == gameMap.height - this.height)
+                {
+                    this.state = "ground";
+                    if (this.speedY > 2) this.dead = true;
+                }
+                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = -(this.speedY * this.bounce);
             }
             if (this.state == "air")
             {
                 this.speedY = Number ((this.speedY + gravity).toFixed (2));
-                if (this.speedX == 0) this.type = 4;
-                else this.type = 6;
+                if (!this.dead)
+                {
+                    if (this.speedX == 0) this.type = 4;
+                    else this.type = 6;
+                }
             }
-            else
+            else if (!this.dead)
             {
                 this.chain_bottom = false;
                 this.chain_top = false;
@@ -268,7 +288,7 @@ function player (type, name, x, y, heading, bounce)
                 {
                     this.speedX = 0;
                     this.speedY = this.moveY;
-                    if (this.speedY == 0) this.type = 4;
+                    if (this.speedY >= 0) this.type = 4;
                     else if (gameArea.frame % 5 == 0)
                     {
                         if (this.type == 4) this.type = 5;
@@ -291,9 +311,43 @@ function player (type, name, x, y, heading, bounce)
                     }
                 }
             }
-            if (this.speedX > 0) this.heading = 1;
+            if (this.dead)
+            {
+                this.speedX = 0;
+                if (this.state != "air") this.speedY = 0;
+                if (this.type != 8 && gameArea.frame % 5 == 0)
+                {
+                    if (this.type == 7)
+                    {
+                        this.type = 8;
+                        setTimeout
+                        (
+                            () =>
+                            {
+                                this.lives--;
+                                this.dead = false;
+                                this.x = gameMap.width / 2 + 160;
+                                this.y = gameMap.height - 92;
+                                this.heading = -1;
+                                this.type = 0;
+                                this.state = "ground";
+                                gameEnemies [0].name = Math.floor (Math.random () * 2);
+                                gameEnemies [0].direction = Math.floor (Math.random () * 2);
+                                gameEnemies [0].x = gameMap.width / 2 - 194;
+                                gameEnemies [0].y = gameMap.height - 158;
+                            },
+                            2000
+                        );
+                    }
+                    else if (this.type == 4) this.type = 7;
+                    else this.type = 4; 
+                }
+                
+            }
+            else if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
             /*console.clear ();
+            console.log ("lives = " + this.lives);
             console.log ("x = " + this.x);
             console.log ("y = " + this.y);
             console.log ("speedX = " + this.speedX);
@@ -423,13 +477,13 @@ function player (type, name, x, y, heading, bounce)
                 ctx.fillRect (2, 24, 8, 2);
                 ctx.fillRect (16, 24, 8, 2);
                 ctx.fillStyle = "#FF55FF";
-                ctx.fillRect (8, 12, 10, 4);
-                ctx.fillRect (8, 22, 10, 2);
-                ctx.fillRect (4, 24, 2, 2);
-                ctx.fillRect (20, 24, 2, 2);
+                ctx.fillRect (8, 8, 10, 4);
+                ctx.fillRect (8, 18, 10, 2);
+                ctx.fillRect (4, 20, 2, 2);
+                ctx.fillRect (20, 20, 2, 2);
                 ctx.fillStyle = "#55FFFF";
-                ctx.fillRect (8, 16, 10, 4);
-                ctx.fillRect (12, 20, 2, 2);
+                ctx.fillRect (8, 12, 10, 4);
+                ctx.fillRect (12, 16, 2, 2);
             break;
             case 6:
                 ctx.fillRect (8, 0, 8, 2);
