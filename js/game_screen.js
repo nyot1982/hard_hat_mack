@@ -105,6 +105,11 @@ function gameLoadScreen (screen)
 
 function generateGameMap (map)
 {
+    gameText.push (new component ("text", "M", "white", gameMap.width - 218, gameMap.height - 108));
+    gameText.push (new component ("text", "A", "white", gameMap.width - 218, gameMap.height - 92));
+    gameText.push (new component ("text", "C", "white", gameMap.width - 218, gameMap.height - 76));
+    gameText.push (new component ("text", "K", "white", gameMap.width - 218, gameMap.height - 60));
+    gameText.push (new component ("text", "3", "white", gameMap.width - 218, gameMap.height - 28));
     switch (map)
     {
         case "level1":
@@ -125,7 +130,7 @@ function generateGameMap (map)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 59, gameMap.height - 46));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 41, gameMap.height - 46));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 141, gameMap.height - 46));
-            gameFront.push (new floor ("white", 40, gameMap.height -20, gameMap.width - 80, 6));
+            gameFront.push (new floor ("white", gameMap.width / 2 - 256, gameMap.height -20, 512, 6));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 62, 388));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 126, 388));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 190, 388));

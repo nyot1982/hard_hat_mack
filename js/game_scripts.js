@@ -252,6 +252,7 @@ function updateGameArea ()
     {
         gameObjects = gameEnemies.concat (gamePlayers);
         for (var object in gameObjects) gameObjects [object].update (object);
+        for (var text in gameText) if (gameText [text]) gameText [text].update (text);
     }
     if (gameScreen != "game")
     {

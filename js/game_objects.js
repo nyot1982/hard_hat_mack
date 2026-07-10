@@ -203,7 +203,7 @@ function player (type, name, x, y, heading, bounce)
     this.moveX = 0;
     this.moveY = 0;
     this.jump = 0;
-    this.dead = false;
+    this.dead = 0;
     this.lives = 3;
 
     this.drill = function (drilling)
@@ -216,17 +216,17 @@ function player (type, name, x, y, heading, bounce)
         {
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
-            if (!this.dead) for (var enemy in gameEnemies)
+            if (this.dead == 0) for (var enemy in gameEnemies)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
                 {
-                    if (this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y >= gameEnemies [enemy].y || this.y + this.height >= gameEnemies [enemy].y && this.y + this.height <= gameEnemies [enemy].y + gameEnemies [enemy].height) this.dead = true;
+                    if (this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y >= gameEnemies [enemy].y || this.y + this.height >= gameEnemies [enemy].y && this.y + this.height <= gameEnemies [enemy].y + gameEnemies [enemy].height) this.dead = 2;
                 }
             }
             if (this.state != "chain")
             {
                 this.state = "air";
-                if  (!this.dead) this.speedX = this.moveX;
+                if  (this.dead == 0) this.speedX = this.moveX;
                 for (var front in gameFront)
                 {
                     if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
@@ -236,7 +236,7 @@ function player (type, name, x, y, heading, bounce)
                         if (this.y == gameFront [front].y - this.height)
                         {
                             this.state = "ground";
-                            if (this.speedY > 2) this.dead = true;
+                            if (this.speedY > 2) this.dead = 1;
                         }
                         if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = -(this.speedY * this.bounce);
                     }
@@ -253,20 +253,20 @@ function player (type, name, x, y, heading, bounce)
                 if (this.y == gameMap.height - this.height)
                 {
                     this.state = "ground";
-                    if (this.speedY > 2) this.dead = true;
+                    if (this.speedY > 2) this.dead = 1;
                 }
                 if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = -(this.speedY * this.bounce);
             }
             if (this.state == "air")
             {
                 this.speedY = Number ((this.speedY + gravity).toFixed (2));
-                if (!this.dead)
+                if (this.dead == 0)
                 {
                     if (this.speedX == 0) this.type = 4;
                     else this.type = 6;
                 }
             }
-            else if (!this.dead)
+            else if (this.dead == 0)
             {
                 this.chain_bottom = false;
                 this.chain_top = false;
@@ -311,7 +311,7 @@ function player (type, name, x, y, heading, bounce)
                     }
                 }
             }
-            if (this.dead)
+            if (this.dead > 0)
             {
                 this.speedX = 0;
                 if (this.state != "air") this.speedY = 0;
@@ -324,8 +324,9 @@ function player (type, name, x, y, heading, bounce)
                         (
                             () =>
                             {
+                                this.dead = 0;
                                 this.lives--;
-                                this.dead = false;
+                                gameText [4].src = "" + this.lives + ""; 
                                 this.x = gameMap.width / 2 + 160;
                                 this.y = gameMap.height - 92;
                                 this.heading = -1;
