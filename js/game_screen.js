@@ -105,10 +105,7 @@ function gameLoadScreen (screen)
 
 function generateGameMap (map)
 {
-    gameText.push (new component ("text", "M", "white", gameMap.width - 218, gameMap.height - 108));
-    gameText.push (new component ("text", "A", "white", gameMap.width - 218, gameMap.height - 92));
-    gameText.push (new component ("text", "C", "white", gameMap.width - 218, gameMap.height - 76));
-    gameText.push (new component ("text", "K", "white", gameMap.width - 218, gameMap.height - 60));
+    gameText.push (new component ("text", "MACK", "white", gameMap.width - 218, gameMap.height - 108, true));
     gameText.push (new component ("text", "3", "white", gameMap.width - 218, gameMap.height - 28));
     switch (map)
     {
