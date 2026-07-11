@@ -197,28 +197,93 @@ function bouncy (color, color2, color3, x, y)
     this.y = y;
     this.width = 26;
     this.height = 24;
+    this.type = 0;
 
     this.update = function ()
     {
+        if (gameArea.frame % 5 == 0 && this.type > 0 && this.type < 4) this.type++;
         ctx = gameArea.ctx;
         ctx.fillStyle = this.color;
-        ctx.fillRect (this.x + 2, this.y, 22, 2);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (this.x + 8, this.y + 6, 10, 14);
-        ctx.fillRect (this.x + 6, this.y + 10, 14, 6);
-        ctx.fillRect (this.x + 2, this.y + 20, 22, 4);
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (this.x, this.y + 2, 26, 4);
-        ctx.fillRect (this.x + 10, this.y + 6, 2, 4);
-        ctx.fillRect (this.x + 14, this.y + 6, 2, 4);
-        ctx.fillRect (this.x + 8, this.y + 10, 2, 4);
-        ctx.fillRect (this.x + 12, this.y + 10, 2, 4);
-        ctx.fillRect (this.x + 16, this.y + 10, 2, 4);
-        ctx.fillRect (this.x + 10, this.y + 14, 2, 4);
-        ctx.fillRect (this.x + 14, this.y + 14, 2, 4);
-        ctx.fillRect (this.x + 8, this.y + 18, 2, 2);
-        ctx.fillRect (this.x + 12, this.y + 18, 2, 2);
-        ctx.fillRect (this.x + 16, this.y + 18, 2, 2);
+        switch (this.type)
+        {
+            case 0:
+            case 4:
+                if (this.height != 24)
+                {
+                    if (this.type == 4)
+                    {
+                        this.y -= 4;
+                        gamePlayers [0].y -= 4;
+                        gamePlayers [0].speedY = -4;
+                        this.type = 0;
+                    }
+                    this.height = 24;
+                }
+                ctx.fillRect (this.x + 2, this.y, 22, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (this.x + 8, this.y + 6, 10, 14);
+                ctx.fillRect (this.x + 6, this.y + 10, 14, 6);
+                ctx.fillRect (this.x + 2, this.y + 20, 22, 4);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (this.x, this.y + 2, 26, 4);
+                ctx.fillRect (this.x + 10, this.y + 6, 2, 4);
+                ctx.fillRect (this.x + 14, this.y + 6, 2, 4);
+                ctx.fillRect (this.x + 8, this.y + 10, 2, 4);
+                ctx.fillRect (this.x + 12, this.y + 10, 2, 4);
+                ctx.fillRect (this.x + 16, this.y + 10, 2, 4);
+                ctx.fillRect (this.x + 10, this.y + 14, 2, 4);
+                ctx.fillRect (this.x + 14, this.y + 14, 2, 4);
+                ctx.fillRect (this.x + 8, this.y + 18, 2, 2);
+                ctx.fillRect (this.x + 12, this.y + 18, 2, 2);
+                ctx.fillRect (this.x + 16, this.y + 18, 2, 2);
+            break;
+            case 1:
+            case 3:
+                if (this.height != 20)
+                {
+                    if (this.type == 1)
+                    {
+                        this.y += 4;
+                        gamePlayers [0].y += 4;
+                    }
+                    else
+                    {
+                        this.y -= 10;
+                        gamePlayers [0].y -= 10;
+                    }
+                    this.height = 20;
+                }
+                ctx.fillRect (this.x + 2, this.y, 22, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (this.x + 6, this.y + 6, 14, 10);
+                ctx.fillRect (this.x + 2, this.y + 10, 22, 2);
+                ctx.fillRect (this.x + 2, this.y + 16, 22, 4);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (this.x, this.y + 2, 26, 4);
+                ctx.fillRect (this.x + 8, this.y + 6, 2, 2);
+                ctx.fillRect (this.x + 12, this.y + 6, 2, 2);
+                ctx.fillRect (this.x + 16, this.y + 6, 2, 2);
+                ctx.fillRect (this.x + 4, this.y + 8, 4, 6);
+                ctx.fillRect (this.x + 10, this.y + 8, 2, 6);
+                ctx.fillRect (this.x + 14, this.y + 8, 2, 6);
+                ctx.fillRect (this.x + 18, this.y + 8, 4, 6);
+                ctx.fillRect (this.x + 8, this.y + 14, 2, 2);
+                ctx.fillRect (this.x + 12, this.y + 14, 2, 2);
+                ctx.fillRect (this.x + 16, this.y + 14, 2, 2);
+            break;
+            case 2:
+                if (this.height != 10)
+                {
+                    this.y += 10;
+                    gamePlayers [0].y += 10;
+                    this.height = 10;
+                }
+                ctx.fillRect (this.x + 2, this.y, 22, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (this.x + 2, this.y + 6, 22, 4);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (this.x, this.y + 2, 26, 4);
+        }
     }
 }
 
@@ -238,9 +303,11 @@ function player (type, name, x, y, heading, bounce)
     this.moveY = 0;
     this.jump = 0;
     this.jumping = false;
+    this.bouncy = false;
     this.dead = 0;
     this.deadFrame = 0;
     this.lives = 3;
+    this.floor = 0;
 
     this.drill = function (drilling)
     {
@@ -261,6 +328,7 @@ function player (type, name, x, y, heading, bounce)
             }
             if (this.state != "chain")
             {
+                if (this.dead == 0 && this.state == "ground") this.speedX = this.moveX;
                 this.state = "air";
                 for (var front in gameFront)
                 {
@@ -271,7 +339,13 @@ function player (type, name, x, y, heading, bounce)
                         if (this.y == gameFront [front].y - this.height)
                         {
                             this.state = "ground";
-                            if (this.speedY > 2.8) this.dead = 1;
+                            if (gameFront [front].constructor.name == "bouncy" && !this.bouncy)
+                            {
+                                this.bouncy = true;
+                                gameFront [front].type = 1;
+                            }
+                            else if (this.speedY > 2.8) this.dead = 1;
+                            else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
                         }
                         if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = -(this.speedY * this.bounce);
                     }
@@ -302,7 +376,16 @@ function player (type, name, x, y, heading, bounce)
                         this.jumping = false;
                     }
                 }
-                this.speedY = Number ((this.speedY + gravity).toFixed (2));
+                if (this.bouncy)
+                {
+                    if ((this.floor > gameMap.height - 318 - this.height && this.y <= this.floor - 64) || (this.y <= gameMap.height - 62 - this.height))
+                    {
+                        this.bouncy = false;
+                        this.speedX = -1;
+                        this.speedY = -2;
+                    }
+                }
+                else this.speedY = Number ((this.speedY + gravity).toFixed (2));
                 if (this.dead == 0)
                 {
                     if (this.speedX == 0) this.type = 4;
@@ -340,7 +423,6 @@ function player (type, name, x, y, heading, bounce)
                 }
                 else if (this.state == "ground")
                 {
-                    if (this.dead == 0) this.speedX = this.moveX;
                     if (this.chain_bottom && this.moveY < 0 || this.chain_top && this.moveY > 0)
                     {
                         this.speedY = this.moveY;
