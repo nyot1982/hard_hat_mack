@@ -105,8 +105,16 @@ function gameLoadScreen (screen)
 
 function generateGameMap (map)
 {
-    gameText.push (new component ("text", "MACK", "white", gameMap.width - 218, gameMap.height - 108, true));
-    gameText.push (new component ("text", "3", "white", gameMap.width - 218, gameMap.height - 28));
+    gameText.push (new component ("text", "Bonus:", "white", gameMap.width / 2 - 251, gameMap.height - 398));
+    gameText.push (new component ("text", "04700", "white", gameMap.width / 2 - 161, gameMap.height - 398));
+    gameText.push (new component ("text", "Score:", "white", gameMap.width / 2 - 69, gameMap.height - 398));
+    gameText.push (new component ("text", "00000", "white", gameMap.width / 2 + 21, gameMap.height - 398));
+    gameText.push (new component ("text", "Hi-score:", "white", gameMap.width / 2 + 113, gameMap.height - 398));
+    gameText.push (new component ("text", "03150", "white", gameMap.width / 2 + 245, gameMap.height - 398));
+    gameText.push (new component ("text", "Level", "white", gameMap.width - 217, gameMap.height - 268, true));
+    gameText.push (new component ("text", "01", "white", gameMap.width - 231, gameMap.height - 172));
+    gameText.push (new component ("text", "Mack", "white", gameMap.width - 217, gameMap.height - 108, true));
+    gameText.push (new component ("text", "3", "white", gameMap.width - 217, gameMap.height - 28));
     switch (map)
     {
         case "level1":
@@ -117,8 +125,8 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 - 140, 438, 240));
-            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 + 118, 438, 240));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 - 139, 438, 240));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 + 117, 438, 240));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 110, 4));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 + 178, gameMap.height - 174, 4));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 238, 4));
@@ -127,12 +135,13 @@ function generateGameMap (map)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 59, gameMap.height - 46));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 41, gameMap.height - 46));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 141, gameMap.height - 46));
-            gameFront.push (new floor ("white", gameMap.width / 2 - 256, gameMap.height -20, 512, 6));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 62, 388));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 126, 388));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 190, 388));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 254, 388));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 194, gameMap.height - 318, 388));
+            gameFront.push (new floor ("white", gameMap.width / 2 - 267, gameMap.height -20, 534, 6));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 62, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 126, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 190, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 254, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 318, 390));
+            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 241, gameMap.height - 44))
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.width / 2 - 194, gameMap.height - 158));
             gamePlayers.push (new player (0, "Mack", gameMap.width / 2 + 160, gameMap.height - 92, -1));
         break;
