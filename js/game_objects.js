@@ -195,6 +195,7 @@ function bouncy (color, color2, color3, x, y)
     this.color3 = color3;
     this.x = x;
     this.y = y;
+    this.backupY = y;
     this.width = 26;
     this.height = 24;
     this.type = 0;
@@ -210,14 +211,14 @@ function bouncy (color, color2, color3, x, y)
             case 4:
                 if (this.height != 24)
                 {
+                    this.y = this.backupY;
+                    this.height = 24;
                     if (this.type == 4)
                     {
-                        this.y -= 4;
-                        gamePlayers [0].y -= 4;
+                        gamePlayers [0].y = this.y - 30;
                         gamePlayers [0].speedY = -4;
                         this.type = 0;
                     }
-                    this.height = 24;
                 }
                 ctx.fillRect (this.x + 2, this.y, 22, 2);
                 ctx.fillStyle = this.color2;
@@ -241,17 +242,9 @@ function bouncy (color, color2, color3, x, y)
             case 3:
                 if (this.height != 20)
                 {
-                    if (this.type == 1)
-                    {
-                        this.y += 4;
-                        gamePlayers [0].y += 4;
-                    }
-                    else
-                    {
-                        this.y -= 10;
-                        gamePlayers [0].y -= 10;
-                    }
+                    this.y = this.backupY + 4;
                     this.height = 20;
+                    gamePlayers [0].y = this.y - 30;
                 }
                 ctx.fillRect (this.x + 2, this.y, 22, 2);
                 ctx.fillStyle = this.color2;
@@ -274,9 +267,9 @@ function bouncy (color, color2, color3, x, y)
             case 2:
                 if (this.height != 10)
                 {
-                    this.y += 10;
-                    gamePlayers [0].y += 10;
+                    this.y = this.backupY + 14;
                     this.height = 10;
+                    gamePlayers [0].y = this.y - 30;
                 }
                 ctx.fillRect (this.x + 2, this.y, 22, 2);
                 ctx.fillStyle = this.color2;
