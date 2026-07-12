@@ -371,7 +371,7 @@ function player (type, name, x, y, heading, bounce)
                 }
                 if (this.bouncy)
                 {
-                    if (this.floor > gameMap.height - 318 - this.height && this.y <= this.floor - 64 || this.floor == gameMap.height - 318 - this.height && this.y <= gameMap.height - 62 - this.height)
+                    if (this.floor > gameMap.height - 318 - this.height && this.y <= this.floor - 60 || this.floor == gameMap.height - 318 - this.height && this.y <= gameMap.height - 58 - this.height)
                     {
                         this.jumping = this.y;
                         this.bouncy = false;

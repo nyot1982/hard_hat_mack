@@ -141,7 +141,7 @@ function generateGameMap (map)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 190, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 254, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 318, 390));
-            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 241, gameMap.height - 44))
+            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 233, gameMap.height - 44))
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.width / 2 - 194, gameMap.height - 158));
             gamePlayers.push (new player (0, "Mack", gameMap.width / 2 + 160, gameMap.height - 92, -1));
         break;
