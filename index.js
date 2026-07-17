@@ -2,7 +2,6 @@ const sdl = require ('@kmamal/sdl');
 const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
-//const { /*audio, */back, floor, beam_h, beam_v, column, chain, bouncy, player, enemy, component } = require ('./game_objects');
 
 var canvasWidth = 1024,
     canvasHeight = 740,
