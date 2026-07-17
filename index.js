@@ -1,4 +1,6 @@
 const sdl = require ('@kmamal/sdl');
+const fs = require ('fs');
+const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 //const { /*audio, */back, floor, beam_h, beam_v, column, chain, bouncy, player, enemy, component } = require ('./game_objects');
 
@@ -1860,17 +1862,11 @@ window.on
 
 window.on ("keyDown", (event) => { startControl (99, "keyboard", "keys", event.scancode, event.key); });
 window.on ("keyUp", (event) => { stopControl (99, "keyboard", "keys", event.scancode); });
-async function loadIcon (src)
-{
-    try
-    {
-        var buffer = await loadImage (src);
-        window.setIcon (32, 32, 32 * 4, 'argb8888', Buffer.alloc (32 * 32 * 4, 255));
-    }
-    catch (err)
-    {
-        console.error ('Error loading picture: ', err);
-    }
-}
-loadIcon ('./img/icon.png');
+
+const pngBuffer = fs.readFileSync ('./img/icon.png');
+const png = PNG.sync.read (pngBuffer);
+const { width, height, data } = png;
+
+// 4. Asignar el icono a la ventana
+window.setIcon (width, height, width * 4, 'rgba32', data); 
 gameLoadScreen ("menu");
