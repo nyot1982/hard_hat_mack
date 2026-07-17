@@ -1,4 +1,3 @@
-const fs = require ('fs');
 const sdl = require ('@kmamal/sdl');
 const { createCanvas, loadImage } = require ('canvas');
 //const { /*audio, */back, floor, beam_h, beam_v, column, chain, bouncy, player, enemy, component } = require ('./game_objects');
@@ -11,7 +10,8 @@ var canvasWidth = 1024,
         {
             title: "Hard Hat Mack",
             width: canvasWidth,
-            height: canvasHeight
+            height: canvasHeight,
+            resizable: true,
         }
     ),
     gameScreen = null,
@@ -1858,7 +1858,19 @@ window.on
     }
 );
 
-window.on ("keyDown", (event) => { startControl (99, "keyboard", "keys", event.scancode, event.key); console.log (event); });
-window.on ("keyUp", (event) => { stopControl (99, "keyboard", "keys", event.scancode); console.log (event); });
-
+window.on ("keyDown", (event) => { startControl (99, "keyboard", "keys", event.scancode, event.key); });
+window.on ("keyUp", (event) => { stopControl (99, "keyboard", "keys", event.scancode); });
+async function loadIcon (src)
+{
+    try
+    {
+        var buffer = await loadImage (src);
+        window.setIcon (32, 32, 32 * 4, 'argb8888', Buffer.alloc (32 * 32 * 4, 255));
+    }
+    catch (err)
+    {
+        console.error ('Error loading picture: ', err);
+    }
+}
+loadIcon ('./img/icon.png');
 gameLoadScreen ("menu");
