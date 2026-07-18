@@ -3,21 +3,20 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-var canvasWidth = 1024,
-    canvasHeight = 740,
-    gravity = 0.1,
+var canvasWidth = sdl.video.displays [0].geometry.width, //1024
+    canvasHeight = sdl.video.displays [0].geometry.height, //740
     window = sdl.video.createWindow
     (
         {
             title: "Hard Hat Mack",
             width: canvasWidth,
             height: canvasHeight,
-            resizable: true,
+            fullscreen: true
         }
     ),
+    gravity = 0.1,
     gameScreen = null,
     gameTitle = null,
-
     gameMap =
     {
         name: null,
@@ -56,6 +55,44 @@ var canvasWidth = 1024,
     highScoreSave = [],
     userActions =
     [
+        {
+            screen: ["menu"],
+            action: "exit",
+            title: "Exit",
+            keyboard:
+            {
+                keys: [41] // Esc
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
+        {
+            screen: ["game"],
+            action: "exit",
+            title: "Exit",
+            keyboard:
+            {
+                keys: [41] // Esc
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
         {
             screen: ["game"],
             action: "move_up",
@@ -1168,9 +1205,8 @@ var canvasWidth = 1024,
         this.y = y;
         if (this.type == "text")
         {
-            this.vertical = (width ? true : false);
-            this.width = 0;
-            this.height = 0;
+            this.startX = this.x;
+            this.direction = (width ? width : "left");
         }
         else
         {
@@ -1199,7 +1235,10 @@ var canvasWidth = 1024,
             }
             else if (this.type == "text")
             {
-                ctx.fillStyle = this.color;
+                if (this.width) ctx.fillStyle = this.color;
+                else ctx.fillStyle = "transparent";
+                this.width = 0;
+                this.height = 0;
                 for (var i = 0, x = this.x, y = this.y; i < this.src.length; i++)
                 {
                     var char = this.src.substr (i, 1).toUpperCase (),
@@ -1208,14 +1247,14 @@ var canvasWidth = 1024,
     
                     if (char == "Á" || char == "É" || char == "Í" || char == "Ó" || char == "Ú")
                     {
-                        if (!this.vertical) y -= 6;
+                        if (this.direction != "vertical") y -= 6;
                         ctx.fillRect (x + 6, y, 4, 2);
                         ctx.fillRect (x + 4, y + 2, 4, 2);
                         y += 6;
                     }
                     else if (char == "À" || char == "È" || char == "Ì" || char == "Ò" || char == "Ù")
                     {
-                        if (!this.vertical) y -= 6;
+                        if (this.direction != "vertical") y -= 6;
                         ctx.fillRect (x + 2, y, 4, 2);
                         ctx.fillRect (x + 4, y + 2, 4, 2);
                         y += 6;
@@ -1568,7 +1607,7 @@ var canvasWidth = 1024,
                             ctx.fillRect (x + 10, y + 10, 2, 4);
                             width = 12;
                     }
-                    if (this.vertical)
+                    if (this.direction == "vertical")
                     {
                         this.height += height;
                         y += height;
@@ -1581,6 +1620,7 @@ var canvasWidth = 1024,
                         if (height > this.height) this.height = height;
                     }   
                 }
+                if (this.direction == "center") this.x = this.startX - this.width / 2;
             }
         }
     }
@@ -1613,17 +1653,23 @@ function stopControl (id_control, control, bt_type, bt_code)
 
 function userActionStart (control, bt_type, bt_code, bt_value, player)
 {
-    if (gameScreen == "menu") gameLoadScreen ("game");
-    else if (gameScreen == "high_scores") gameLoadScreen ("menu");
+    if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
+    else var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
+
+    if (gameScreen == "menu")
+    {
+        if (userAction == -1) gameLoadScreen ("game");
+        else if (userActions [userAction].action == "exit") window.destroy ();
+    }
     else if (gameScreen == "game")
     {
-        if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
-        else var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
-
         if (userAction > -1)
         {
             switch (userActions [userAction].action)
             {
+                case 'exit':
+                    if (player > -1) gameLoadScreen ("menu");
+                break;
                 case 'move_up':
                     if (player > -1) gamePlayers [player].moveY = -bt_value;
                 break;
@@ -1724,13 +1770,12 @@ function gameLoadScreen (screen)
     gameScreen = screen;
     if (gameScreen == "menu")
     {
-                    gameArea.start ();
-
+        gameArea.start ();
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "title.png", "", canvasWidth / 2, 150, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", 56, gameTitle.y + 105));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", 90, gameText [0].y + 25));
-        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", 27, gameText [1].y + 25));
+        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 105, "center"));
+        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", canvasWidth / 2, gameText [0].y + 25, "center"));
+        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", canvasWidth / 2, gameText [1].y + 25, "center"));
         gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 83));
         gameText.push (new component ("text", "Mack", "white", canvasWidth / 2 - 27, gameText [3].y));
         gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 173, gameText [4].y));
@@ -1761,10 +1806,10 @@ function generateGameMap (map)
     gameText.push (new component ("text", "00000", "white", gameMap.width / 2 + 21, gameMap.height - 398));
     gameText.push (new component ("text", "Hi-score:", "white", gameMap.width / 2 + 113, gameMap.height - 398));
     gameText.push (new component ("text", "03150", "white", gameMap.width / 2 + 245, gameMap.height - 398));
-    gameText.push (new component ("text", "Level", "white", gameMap.width - 217, gameMap.height - 268, true));
-    gameText.push (new component ("text", "01", "white", gameMap.width - 231, gameMap.height - 172));
-    gameText.push (new component ("text", "Mack", "white", gameMap.width - 217, gameMap.height - 108, true));
-    gameText.push (new component ("text", "3", "white", gameMap.width - 217, gameMap.height - 28));
+    gameText.push (new component ("text", "Level", "white", gameMap.width / 2 + 300, gameMap.height - 268, "vertical"));
+    gameText.push (new component ("text", "01", "white", gameMap.width / 2 + 300, gameMap.height - 172));
+    gameText.push (new component ("text", "Mack", "white", gameMap.width / 2 + 300, gameMap.height - 108, "vertical"));
+    gameText.push (new component ("text", "3", "white", gameMap.width / 2 + 300, gameMap.height - 28));
     switch (map)
     {
         case "level1":
@@ -1775,8 +1820,8 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 - 139, 438, 240));
-            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 + 117, 438, 240));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 - 139, gameMap.height - 302, 240));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 + 117, gameMap.height - 302, 240));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 110, 4));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 + 178, gameMap.height - 174, 4));
             gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 238, 4));
@@ -1858,8 +1903,7 @@ window.on
         process.exit (0);
     }
 );
-
-window.on ("keyDown", (event) => { startControl (99, "keyboard", "keys", event.scancode, event.key); });
+window.on ("keyDown", (event) => { startControl (99, "keyboard", "keys", event.scancode, event.key); console.log (event); });
 window.on ("keyUp", (event) => { stopControl (99, "keyboard", "keys", event.scancode); });
 
 const pngBuffer = fs.readFileSync ('./img/icon.png');
