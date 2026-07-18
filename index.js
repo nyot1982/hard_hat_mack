@@ -1934,7 +1934,7 @@ async function escribirArchivo (file)
     (
         './' + file,
         '1543287n',
-        'base64',
+        'base64url',
         (err) =>
         {
             if (err)
