@@ -1910,6 +1910,64 @@ const pngBuffer = fs.readFileSync ('./img/icon.png');
 const png = PNG.sync.read (pngBuffer);
 const { width, height, data } = png;
 
+async function leerArchivo (file)
+{
+    await fs.readFile
+    (
+        './' + file,
+        'base64url',
+        (err, data) =>
+        {
+            if (err)
+            {
+                console.error ('Error reading file:', err.message);
+                return;
+            }
+            console.log (data);
+        }
+    );
+}
+
+async function escribirArchivo (file)
+{
+    await fs.writeFile
+    (
+        './' + file,
+        '1543287n',
+        'base64',
+        (err) =>
+        {
+            if (err)
+            {
+                console.error ('Error writing file:', err.message);
+                return;
+            }
+            console.log ('File has been written successfully!');
+        }
+    );
+}
+
+async function eliminarArchivo (file)
+{
+    await fs.unlink
+    (
+        './' + file,
+        (err) =>
+        {
+            if (err)
+            {
+                console.error ('Error deletig file:', err.message);
+                return;
+            }
+            console.log ('File has been deleted successfully!');
+        }
+    );
+}
+
+escribirArchivo ('data.b64');
+leerArchivo ('data.b64');
+
+
 // 4. Asignar el icono a la ventana
 window.setIcon (width, height, width * 4, 'rgba32', data); 
 gameLoadScreen ("menu");
