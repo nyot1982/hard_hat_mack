@@ -56,6 +56,44 @@ var canvasWidth = sdl.video.displays [0].geometry.width, //1024
     [
         {
             screen: ["menu"],
+            action: "play",
+            title: "Play",
+            keyboard:
+            {
+                keys: [44] // Space
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
+        {
+            screen: ["menu"],
+            action: "config",
+            title: "Config",
+            keyboard:
+            {
+                keys: [40] // Enter
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
+        {
+            screen: ["menu"],
             action: "exit",
             title: "Exit",
             keyboard:
@@ -302,8 +340,20 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
 
     if (gameScreen == "menu")
     {
-        if (userAction == -1) gameLoadScreen ("game");
-        else if (userActions [userAction].action == "exit") window.destroy ();
+        if (userAction > -1)
+        {
+            switch (userActions [userAction].action)
+            {
+                case 'play':
+                    gameLoadScreen ("game");
+                break;
+                case 'config':
+                    gameLoadScreen ("config");
+                break;
+                case 'exit':
+                    window.destroy ();
+            }
+        }
     }
     else if (gameScreen == "game")
     {
@@ -546,6 +596,12 @@ async function fileRead (file)
                 return;
             }
             userData = JSON.parse (decodeBase64Url (data));
+            userActions [4].keyboard.keys = [userData.up];
+            userActions [5].keyboard.keys = [userData.down];
+            userActions [6].keyboard.keys = [userData.left];
+            userActions [7].keyboard.keys = [userData.right];
+            userActions [8].keyboard.keys = [userData.jump];
+            userActions [9].keyboard.keys = [userData.drop];
         }
     );
 }
