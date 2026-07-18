@@ -1964,8 +1964,8 @@ async function eliminarArchivo (file)
     );
 }
 
-escribirArchivo ('data.b64');
-leerArchivo ('data.b64');
+escribirArchivo ('data.bin');
+leerArchivo ('data.bin');
 
 
 // 4. Asignar el icono a la ventana
