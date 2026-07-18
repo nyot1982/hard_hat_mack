@@ -17,12 +17,15 @@ var canvasWidth = sdl.video.displays [0].geometry.width, //1024
     userData =
     {
         highscore: 0,
-        up: 82,
-        down: 81,
-        left: 80,
-        right: 79,
-        jump: 44,
-        drop: 40
+        controls:
+        {
+            up: 82,
+            down: 81,
+            left: 80,
+            right: 79,
+            jump: 44,
+            drop: 40
+        }
     },
     gravity = 0.1,
     gameScreen = null,
@@ -254,9 +257,7 @@ var canvasWidth = sdl.video.displays [0].geometry.width, //1024
             const png = PNG.sync.read (pngBuffer);
             const { width, height, data } = png;
             window.setIcon (width, height, width * 4, 'rgba32', data);
-            //fileWrite ('user.bin');
             fileRead ('user.bin');
-
             this.canvas.id = "hardHatMack";
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
@@ -480,11 +481,11 @@ function gameLoadScreen (screen)
         gameText.push (new component ("image", "electronic_arts.png", "", 124, 577, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2, 596));
     }
-    else if (gameScreen == "high_scores")
+    else if (gameScreen == "config")
     {
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "title.png", "", canvasWidth / 2, 100, 362, 40);
-        gameText.push (new component ("text", "High Scores:", "white", 310, gameTitle.y + 105));
+        gameTitle = new component ("text", "Configuration menu", "white", canvasWidth / 2, 100, "center");
+        gameText.push (new component ("text", "Press key for left:", "white", canvasWidth / 2 - 500, gameTitle.y + 105));
     }
     else if (gameScreen == "game")
     {
@@ -499,9 +500,9 @@ function generateGameMap (map)
     gameText.push (new component ("text", "Score:", "white", gameMap.width / 2 - 69, gameMap.height - 398));
     gameText.push (new component ("text", "00000", "white", gameMap.width / 2 + 21, gameMap.height - 398));
     gameText.push (new component ("text", "Hi-score:", "white", gameMap.width / 2 + 113, gameMap.height - 398));
-    gameText.push (new component ("text", "" + userData.highscore + "", "white", gameMap.width / 2 + 245, gameMap.height - 398));
+    gameText.push (new component ("text", (userData.highscore < 10 ? "0000" : userData.highscore < 100 ? "000" : userData.highscore < 1000 ? "00" : userData.highscore < 10000 ? "0" : "") + userData.highscore + "", "white", gameMap.width / 2 + 245, gameMap.height - 398));
     gameText.push (new component ("text", "Level", "white", gameMap.width / 2 + 300, gameMap.height - 268, "vertical"));
-    gameText.push (new component ("text", "01", "white", gameMap.width / 2 + 300, gameMap.height - 172));
+    gameText.push (new component ("text", "01", "white", gameMap.width / 2 + 286, gameMap.height - 172));
     gameText.push (new component ("text", "Mack", "white", gameMap.width / 2 + 300, gameMap.height - 108, "vertical"));
     gameText.push (new component ("text", "3", "white", gameMap.width / 2 + 300, gameMap.height - 28));
     switch (map)
@@ -530,7 +531,8 @@ function generateGameMap (map)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 190, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 254, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 318, 390));
-            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 233, gameMap.height - 44))
+            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 233, gameMap.height - 44));
+            gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 286, gameMap.height - 342));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.width / 2 - 194, gameMap.height - 158));
             gamePlayers.push (new player (0, "Mack", gameMap.width / 2 + 160, gameMap.height - 92, -1));
         break;
@@ -596,12 +598,12 @@ async function fileRead (file)
                 return;
             }
             userData = JSON.parse (decodeBase64Url (data));
-            userActions [4].keyboard.keys = [userData.up];
-            userActions [5].keyboard.keys = [userData.down];
-            userActions [6].keyboard.keys = [userData.left];
-            userActions [7].keyboard.keys = [userData.right];
-            userActions [8].keyboard.keys = [userData.jump];
-            userActions [9].keyboard.keys = [userData.drop];
+            userActions [4].keyboard.keys = [userData.controls.up];
+            userActions [5].keyboard.keys = [userData.controls.down];
+            userActions [6].keyboard.keys = [userData.controls.left];
+            userActions [7].keyboard.keys = [userData.controls.right];
+            userActions [8].keyboard.keys = [userData.controls.jump];
+            userActions [9].keyboard.keys = [userData.controls.drop];
         }
     );
 }
@@ -794,7 +796,7 @@ function bouncy (color, color2, color3, x, y)
     this.color3 = color3;
     this.x = x;
     this.y = y;
-    this.backupY = y;
+    this.startY = y;
     this.width = 26;
     this.height = 24;
     this.type = 0;
@@ -810,7 +812,7 @@ function bouncy (color, color2, color3, x, y)
             case 4:
                 if (this.height != 24)
                 {
-                    this.y = this.backupY;
+                    this.y = this.startY;
                     this.height = 24;
                     if (this.type == 4)
                     {
@@ -841,7 +843,7 @@ function bouncy (color, color2, color3, x, y)
             case 3:
                 if (this.height != 20)
                 {
-                    this.y = this.backupY + 4;
+                    this.y = this.startY + 4;
                     this.height = 20;
                     gamePlayers [0].y = this.y - 30;
                 }
@@ -866,7 +868,7 @@ function bouncy (color, color2, color3, x, y)
             case 2:
                 if (this.height != 10)
                 {
-                    this.y = this.backupY + 14;
+                    this.y = this.startY + 14;
                     this.height = 10;
                     gamePlayers [0].y = this.y - 30;
                 }
@@ -876,6 +878,72 @@ function bouncy (color, color2, color3, x, y)
                 ctx.fillStyle = this.color3;
                 ctx.fillRect (this.x, this.y + 2, 26, 4);
         }
+    }
+}
+
+function machine (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = x;
+    this.y = y;
+    this.width = 26;
+    this.height = 32;
+    this.type = 0;
+
+    this.update = function (idPlayer)
+    {
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (this.x, this.y);
+        ctx.fillStyle = this.color;
+        switch (this.type)
+        {
+            case 0:
+                ctx.fillRect (14, 0, 6, 2);
+                ctx.fillRect (12, 2, 10, 2);
+                ctx.fillRect (16, 4, 4, 4);
+                ctx.fillRect (8, 8, 14, 18);
+                ctx.fillRect (22, 10, 4, 16);
+                ctx.fillRect (4, 30, 20, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (8, 8, 6, 4);
+                ctx.fillRect (0, 10, 8, 6);
+                ctx.fillRect (4, 16, 8, 10);
+                ctx.fillRect (16, 14, 2, 2);
+                ctx.fillRect (12, 16, 14, 2);
+                ctx.fillRect (6, 26, 20, 4);
+                ctx.fillRect (4, 28, 2, 2);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (14, 8, 2, 10);
+                ctx.fillRect (18, 14, 2, 4);
+                ctx.fillRect (16, 18, 6, 8);
+            break;
+            case 1:
+                ctx.fillRect (14, 2, 6, 2);
+                ctx.fillRect (12, 4, 10, 2);
+                ctx.fillRect (16, 6, 4, 4);
+                ctx.fillRect (0, 10, 24, 2);
+                ctx.fillRect (8, 12, 18, 14);
+                ctx.fillRect (4, 30, 22, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (0, 8, 2, 2);
+                ctx.fillRect (4, 8, 2, 2);
+                ctx.fillRect (0, 12, 2, 2);
+                ctx.fillRect (6, 10, 8, 4);
+                ctx.fillRect (4, 12, 4, 6);
+                ctx.fillRect (4, 18, 8, 6);
+                ctx.fillRect (0, 20, 4, 2);
+                ctx.fillRect (6, 24, 6, 4);
+                ctx.fillRect (12, 26, 14, 4);
+                ctx.fillRect (0, 28, 12, 2);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (14, 10, 2, 10);
+                ctx.fillRect (16, 20, 6, 6);
+        }
+        ctx.restore ();
     }
 }
 
