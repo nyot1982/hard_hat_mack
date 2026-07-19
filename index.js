@@ -469,18 +469,18 @@ function gameLoadScreen (screen)
         gameArea.start ();
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "title.png", "", canvasWidth / 2, 150, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 105, "center"));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", canvasWidth / 2, gameText [0].y + 25, "center"));
-        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", canvasWidth / 2, gameText [1].y + 25, "center"));
-        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 83));
+        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 250, "center"));
+        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", canvasWidth / 2, gameText [0].y + 50, "center"));
+        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", canvasWidth / 2, gameText [1].y + 50, "center"));
+        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 100));
         gameText.push (new component ("text", "Mack", "white", canvasWidth / 2 - 27, gameText [3].y));
         gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 173, gameText [4].y));
         gameText.push (new enemy (0, 0, canvasWidth / 2 - 214, gameText [5].y + 23));
         gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25));
         gameText.push (new enemy (1, 0, canvasWidth / 2 + 186, gameText [5].y + 23));
         gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
-        gameText.push (new component ("image", "electronic_arts.png", "", 124, 577, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2, 596));
+        gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
+        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 325, canvasHeight - 150));
     }
     else if (gameScreen == "config")
     {
@@ -567,18 +567,18 @@ function generateGameMap (map)
 function updateGameArea ()
 {
     gameArea.clear ();
-    for (let back in gameBack) gameBack [back].update ();
-    for (let front in gameFront) gameFront [front].update ();
+    for (let back = 0; back < gameBack.length; back++) gameBack [back].update ();
+    for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
         gameObjects = gameEnemies.concat (gamePlayers);
-        for (let object in gameObjects) gameObjects [object].update (object);
-        for (let text in gameText) if (gameText [text]) gameText [text].update (text);
+        for (let object = 0; object < gameObjects.length; object++) gameObjects [object].update (object);
+        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
     }
     if (gameScreen != "game")
     {
         if (gameTitle) gameTitle.update ();
-        for (let text in gameText) if (gameText [text]) gameText [text].update (text);
+        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
     }
     const buffer = gameArea.canvas.toBuffer ('raw');
     window.render (canvasWidth, canvasHeight, canvasWidth * 4, 'argb8888', buffer);
@@ -962,7 +962,7 @@ function bolt (color, x, y, bounce)
     this.x = x;
     this.y = y;
     this.bounce = (bounce != null ? bounce : 0.6);
-    this.bounced = ['5'];
+    this.bounced = [5];
     this.width = 10;
     this.height = 10;
     this.speedX = -(Math.floor (Math.random () * 6 + 1));
@@ -972,7 +972,7 @@ function bolt (color, x, y, bounce)
     {
         this.x = Number ((this.x + this.speedX).toFixed (2));
         this.y = Number ((this.y + this.speedY).toFixed (2));
-        for (let front in gameFront)
+        for (let front = 0; front < gameFront.length; front++)
         {
             if (gameFront [front].constructor.name == "beam_h" && !this.bounced.includes (front)) 
             {
@@ -987,8 +987,7 @@ function bolt (color, x, y, bounce)
                 }
             }
         }
-        if (this.x < 0 || this.x > gameMap.width - this.width || this.y < 0 || this.y > gameMap.height - this.height) gameEnemies.splice (gameEnemies.length, 1);
-        if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = -(this.speedY * this.bounce);
+        if (this.y > gameMap.height - this.height) gameEnemies.splice (gameEnemies.length, 1);
         this.speedY = Number ((this.speedY + gravity).toFixed (2));
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
@@ -1033,7 +1032,7 @@ function player (type, name, x, y, heading, bounce)
         {
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
-            if (this.dead == 0) for (let enemy in gameEnemies)
+            if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
                 {
@@ -1044,7 +1043,7 @@ function player (type, name, x, y, heading, bounce)
             {
                 if (this.dead == 0 && this.state == "ground") this.speedX = this.moveX;
                 this.state = "air";
-                for (let front in gameFront)
+                for (let front = 0; front < gameFront.length; front++)
                 {
                     if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                     {
@@ -1111,7 +1110,7 @@ function player (type, name, x, y, heading, bounce)
             {
                 this.chain_bottom = false;
                 this.chain_top = false;
-                for (let back in gameBack)
+                for (let back = 0; back < gameBack.length; back++)
                 {
                     if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
                     {
