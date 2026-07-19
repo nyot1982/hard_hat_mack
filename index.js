@@ -115,6 +115,25 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
             }
         },
         {
+            screen: ["config"],
+            action: "exit",
+            title: "Exit",
+            keyboard:
+            {
+                keys: [41] // Esc
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
+        {
             screen: ["game"],
             action: "exit",
             title: "Exit",
@@ -357,6 +376,20 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
             }
         }
     }
+    else if (gameScreen == "config")
+    {
+        if (userAction > -1)
+        {
+            switch (userActions [userAction].action)
+            {
+                case 'exit':
+                    gameLoadScreen ("menu");
+                break;
+                default:
+                    userData.controls
+            }
+        }
+    }
     else if (gameScreen == "game")
     {
         if (userAction > -1)
@@ -466,7 +499,6 @@ function gameLoadScreen (screen)
     gameScreen = screen;
     if (gameScreen == "menu")
     {
-        gameArea.start ();
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("image", "title.png", "", canvasWidth / 2, 150, 362, 40);
         gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 250, "center"));
@@ -599,12 +631,12 @@ async function fileRead (file)
                 return;
             }
             userData = JSON.parse (decodeBase64Url (data));
-            userActions [4].keyboard.keys = [userData.controls.up];
-            userActions [5].keyboard.keys = [userData.controls.down];
-            userActions [6].keyboard.keys = [userData.controls.left];
-            userActions [7].keyboard.keys = [userData.controls.right];
-            userActions [8].keyboard.keys = [userData.controls.jump];
-            userActions [9].keyboard.keys = [userData.controls.drop];
+            userActions [5].keyboard.keys = [userData.controls.up];
+            userActions [6].keyboard.keys = [userData.controls.down];
+            userActions [7].keyboard.keys = [userData.controls.left];
+            userActions [8].keyboard.keys = [userData.controls.right];
+            userActions [9].keyboard.keys = [userData.controls.jump];
+            userActions [10].keyboard.keys = [userData.controls.drop];
         }
     );
 }
@@ -2162,4 +2194,5 @@ window.on
     }
 );
 
+gameArea.start ();
 gameLoadScreen ("menu");
