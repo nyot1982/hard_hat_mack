@@ -3,7 +3,7 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-var canvasWidth = sdl.video.displays [0].geometry.width, //1024
+let canvasWidth = sdl.video.displays [0].geometry.width, //1024
     canvasHeight = sdl.video.displays [0].geometry.height, //740
     window = sdl.video.createWindow
     (
@@ -313,7 +313,7 @@ function startControl (id_control, control, bt_type, bt_code, bt_value)
     if (!pressed [bt_type][id_control].includes (bt_code) || bt_type == "axes")
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
-        var player = -1;
+        let player = -1;
         if (gameScreen == "game" && gamePlayers.length > 0) player = gamePlayers.findIndex (player => player.name == "Mack");
         if (control == "keyboard") bt_value = 1;
         userActionStart (control, bt_type, bt_code, bt_value, player);
@@ -325,7 +325,7 @@ function stopControl (id_control, control, bt_type, bt_code)
     if (pressed [bt_type][id_control].includes (bt_code))
     {
         pressed [bt_type][id_control].splice (pressed [bt_type][id_control].indexOf (bt_code), 1);
-        var player = -1;
+        let player = -1;
         if (gameScreen == "game" && gamePlayers.length > 0)
         {
             player = gamePlayers.findIndex (player => player.name == "Mack");
@@ -336,8 +336,9 @@ function stopControl (id_control, control, bt_type, bt_code)
 
 function userActionStart (control, bt_type, bt_code, bt_value, player)
 {
-    if (bt_type == null) var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
-    else var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
+    let userAction = null;
+    if (bt_type == null) userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
+    else userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
     if (gameScreen == "menu")
     {
@@ -389,7 +390,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
 
 function userActionStop (id_control, control, bt_type, bt_code, player)
 {
-    var userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
+    let userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
     if (userAction > -1)
     {
@@ -398,8 +399,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
             case 'move_down':
                 if (player > -1)
                 {
-                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
+                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveY = -1;
                     else gamePlayers [player].moveY = 0;
                 }
@@ -407,8 +408,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
             case 'move_up':
                 if (player > -1)
                 {
-                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
+                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveY = 1;
                     else gamePlayers [player].moveY = 0;
                 }
@@ -416,8 +417,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
             case 'move_left':
                 if (player > -1)
                 {
-                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
+                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = 1;
                     else gamePlayers [player].moveX = 0;
                 }
@@ -425,8 +426,8 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
             case 'move_right':
                 if (player > -1)
                 {
-                    var userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
-                    var bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
+                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
                     if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = -1;
                     else gamePlayers [player].moveX = 0;
                 }
@@ -439,7 +440,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
 
 function stopUserInteractions ()
 {
-    var player = gamePlayers.findIndex (player => player.name == "Mack");
+    let player = gamePlayers.findIndex (player => player.name == "Mack");
     pressed =
     {
         keys:
@@ -566,18 +567,18 @@ function generateGameMap (map)
 function updateGameArea ()
 {
     gameArea.clear ();
-    for (var back in gameBack) gameBack [back].update ();
-    for (var front in gameFront) gameFront [front].update ();
+    for (let back in gameBack) gameBack [back].update ();
+    for (let front in gameFront) gameFront [front].update ();
     if (gameScreen == "game")
     {
         gameObjects = gameEnemies.concat (gamePlayers);
-        for (var object in gameObjects) gameObjects [object].update (object);
-        for (var text in gameText) if (gameText [text]) gameText [text].update (text);
+        for (let object in gameObjects) gameObjects [object].update (object);
+        for (let text in gameText) if (gameText [text]) gameText [text].update (text);
     }
     if (gameScreen != "game")
     {
         if (gameTitle) gameTitle.update ();
-        for (var text in gameText) if (gameText [text]) gameText [text].update (text);
+        for (let text in gameText) if (gameText [text]) gameText [text].update (text);
     }
     const buffer = gameArea.canvas.toBuffer ('raw');
     window.render (canvasWidth, canvasHeight, canvasWidth * 4, 'argb8888', buffer);
@@ -703,7 +704,7 @@ function beam_h (color1, color2, x, y, width)
             ctx.fillRect (this.x, this.y + 12, this.width, 4);
             ctx.fillStyle = this.color2;
             ctx.fillRect (this.x + 6, this.y + 4, this.width - 12, 8);
-            for (var x = 28; x + 7 < this.width; x += 104)
+            for (let x = 28; x + 7 < this.width; x += 104)
             {
                 ctx.fillStyle = "black";
                 ctx.fillRect (this.x + x, this.y + 6, 6, 4);
@@ -732,7 +733,7 @@ function beam_v (color1, color2, x, y, height)
             ctx.fillRect (this.x + 18, this.y, 4, this.height);
             ctx.fillStyle = this.color2;
             ctx.fillRect (this.x + 4, this.y, 14, this.height);
-            for (var y = 24; y + 5 < this.height; y += 64)
+            for (let y = 24; y + 5 < this.height; y += 64)
             {
                 ctx.fillStyle = "black";
                 ctx.fillRect (this.x + 8, this.y + y, 6, 4);
@@ -780,7 +781,7 @@ function chain (color, x, y, steps)
     {
         ctx = gameArea.ctx;
         ctx.fillStyle = this.color;
-        for (var y = 0; y < this.steps * 8; y += 8)
+        for (let y = 0; y < this.steps * 8; y += 8)
         {
             ctx.fillRect (this.x, this.y + y, 2, 6);
             ctx.fillRect (this.x + 6, this.y + y, 2, 6);
@@ -892,8 +893,14 @@ function machine (color, color2, color3, x, y)
     this.height = 32;
     this.type = 0;
 
-    this.update = function (idPlayer)
+    this.update = function ()
     {
+        if (gameArea.frame % 300 == 0 && this.type == 0)
+        {
+            this.type = 1;
+            gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
+        }
+        else if (gameArea.frame % 120 == 0 && this.type == 1) this.type = 0;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
@@ -934,6 +941,8 @@ function machine (color, color2, color3, x, y)
                 ctx.fillRect (0, 12, 2, 2);
                 ctx.fillRect (6, 10, 8, 4);
                 ctx.fillRect (4, 12, 4, 6);
+                ctx.fillRect (16, 16, 4, 2);
+                ctx.fillRect (12, 18, 14, 2);
                 ctx.fillRect (4, 18, 8, 6);
                 ctx.fillRect (0, 20, 4, 2);
                 ctx.fillRect (6, 24, 6, 4);
@@ -943,6 +952,51 @@ function machine (color, color2, color3, x, y)
                 ctx.fillRect (14, 10, 2, 10);
                 ctx.fillRect (16, 20, 6, 6);
         }
+        ctx.restore ();
+    }
+}
+
+function bolt (color, x, y, bounce)
+{
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.bounce = (bounce != null ? bounce : 0.6);
+    this.bounced = ['5'];
+    this.width = 10;
+    this.height = 10;
+    this.speedX = -(Math.floor (Math.random () * 6 + 1));
+    this.speedY = -(Math.floor (Math.random () * 4 - 2));
+
+    this.update = function ()
+    {
+        this.x = Number ((this.x + this.speedX).toFixed (2));
+        this.y = Number ((this.y + this.speedY).toFixed (2));
+        for (let front in gameFront)
+        {
+            if (gameFront [front].constructor.name == "beam_h" && !this.bounced.includes (front)) 
+            {
+                if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
+                {
+                    if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                    if (this.y == gameFront [front].y - this.height)
+                    {
+                        this.speedY = -(this.speedY * this.bounce);
+                        this.bounced.push (front);
+                    }
+                }
+            }
+        }
+        if (this.x < 0 || this.x > gameMap.width - this.width || this.y < 0 || this.y > gameMap.height - this.height) gameEnemies.splice (gameEnemies.length, 1);
+        if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = -(this.speedY * this.bounce);
+        this.speedY = Number ((this.speedY + gravity).toFixed (2));
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (this.x, this.y);
+        ctx.fillStyle = this.color;
+        ctx.fillRect (0, 0, 10, 4);
+        ctx.fillRect (2, 4, 6, 6);
         ctx.restore ();
     }
 }
@@ -979,7 +1033,7 @@ function player (type, name, x, y, heading, bounce)
         {
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
-            if (this.dead == 0) for (var enemy in gameEnemies)
+            if (this.dead == 0) for (let enemy in gameEnemies)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
                 {
@@ -990,7 +1044,7 @@ function player (type, name, x, y, heading, bounce)
             {
                 if (this.dead == 0 && this.state == "ground") this.speedX = this.moveX;
                 this.state = "air";
-                for (var front in gameFront)
+                for (let front in gameFront)
                 {
                     if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                     {
@@ -1038,12 +1092,12 @@ function player (type, name, x, y, heading, bounce)
                 }
                 if (this.bouncy)
                 {
-                    if (this.floor > gameMap.height - 318 - this.height && this.y <= this.floor - 60 || this.floor == gameMap.height - 318 - this.height && this.y <= gameMap.height - 58 - this.height)
+                    if (this.floor > gameMap.height - 318 - this.height && this.y <= this.floor - 60 || this.floor == gameMap.height - 318 - this.height && this.y <= gameMap.height - 60 - this.height)
                     {
                         this.jumping = this.y;
                         this.bouncy = false;
-                        this.speedX = -1;
-                        this.speedY = -2;
+                        this.speedX = -1.2;
+                        this.speedY = -1.8;
                     }
                 }
                 else this.speedY = Number ((this.speedY + gravity).toFixed (2));
@@ -1057,7 +1111,7 @@ function player (type, name, x, y, heading, bounce)
             {
                 this.chain_bottom = false;
                 this.chain_top = false;
-                for (var back in gameBack)
+                for (let back in gameBack)
                 {
                     if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
                     {
@@ -1095,7 +1149,7 @@ function player (type, name, x, y, heading, bounce)
                         this.jumping = this.y;
                     }
                     else this.jumping = false;
-                    if (this.type > 3) this.type = 1;
+                    if (this.type > 3 && !this.bouncy) this.type = 1;
                     if (this.speedX != 0 && gameArea.frame % 3 == 0)
                     {
                         if (this.type < 3) this.type++;
@@ -1696,9 +1750,9 @@ function component (type, src, color, x, y, width, height)
             else ctx.fillStyle = "transparent";
             this.width = 0;
             this.height = 0;
-            for (var i = 0, x = this.x, y = this.y; i < this.src.length; i++)
+            for (let i = 0, x = this.x, y = this.y; i < this.src.length; i++)
             {
-                var char = this.src.substr (i, 1).toUpperCase (),
+                let char = this.src.substr (i, 1).toUpperCase (),
                     width = 14,
                     height = 16;
 
