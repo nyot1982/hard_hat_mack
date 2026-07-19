@@ -14,19 +14,39 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
             fullscreen: true
         }
     ),
-    userData =
-    {
-        highscore: 0,
-        controls:
+    highscore = 0,
+    editKey = 0,
+    controls =
+    [
         {
-            up: 82,
-            down: 81,
-            left: 80,
-            right: 79,
-            jump: 44,
-            drop: 40
+            key: "up",
+            code: 82
+        },
+        {
+            key: "down",
+            code: 81
+        },
+        {
+            key: "left",
+            code: 80
+        },
+        {
+            key: "right",
+            code: 79
+        },
+        {
+            key: "jump",
+            code: 44
+        },
+        {
+            key: "drop",
+            code: 40
+        },
+        {
+            key: "pause",
+            code: 19
         }
-    },
+    ],
     gravity = 0.1,
     gameScreen = null,
     gameTitle = null,
@@ -35,10 +55,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         name: null,
         width: canvasWidth,
         height: canvasHeight
-    },
-    gameControls =
-    {
-        99: "keyboard"
     },
     pressed =
     {
@@ -102,6 +118,25 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
             keyboard:
             {
                 keys: [41] // Esc
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
+        {
+            screen: ["config"],
+            action: "edit",
+            title: "Edit",
+            keyboard:
+            {
+                keys: [] 
             },
             gamepad:
             {
@@ -378,16 +413,20 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
     }
     else if (gameScreen == "config")
     {
-        if (userAction > -1)
+        if (userAction == -1) userAction = 3;
+        switch (userActions [userAction].action)
         {
-            switch (userActions [userAction].action)
-            {
-                case 'exit':
+            case 'exit':
+                gameLoadScreen ("menu");
+            break;
+            case 'edit':
+                editKey++;
+                if (editKey == controls.length)
+                {
+                    editKey = 0;
                     gameLoadScreen ("menu");
-                break;
-                default:
-                    userData.controls
-            }
+                }
+                else gameText [0].src = "Press key for " + controls [editKey].key + ":";
         }
     }
     else if (gameScreen == "game")
@@ -518,7 +557,7 @@ function gameLoadScreen (screen)
     {
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
         gameTitle = new component ("text", "Configuration menu", "white", canvasWidth / 2, 100, "center");
-        gameText.push (new component ("text", "Press key for left:", "white", canvasWidth / 2 - 500, gameTitle.y + 105));
+        gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", canvasWidth / 2 - 500, gameTitle.y + 105));
     }
     else if (gameScreen == "game")
     {
@@ -533,7 +572,7 @@ function generateGameMap (map)
     gameText.push (new component ("text", "Score:", "white", gameMap.width / 2 - 69, gameMap.height - 398));
     gameText.push (new component ("text", "00000", "white", gameMap.width / 2 + 21, gameMap.height - 398));
     gameText.push (new component ("text", "Hi-score:", "white", gameMap.width / 2 + 113, gameMap.height - 398));
-    gameText.push (new component ("text", (userData.highscore < 10 ? "0000" : userData.highscore < 100 ? "000" : userData.highscore < 1000 ? "00" : userData.highscore < 10000 ? "0" : "") + userData.highscore + "", "white", gameMap.width / 2 + 245, gameMap.height - 398));
+    gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", gameMap.width / 2 + 245, gameMap.height - 398));
     gameText.push (new component ("text", "Level", "white", gameMap.width / 2 + 300, gameMap.height - 268, "vertical"));
     gameText.push (new component ("text", "01", "white", gameMap.width / 2 + 286, gameMap.height - 172));
     gameText.push (new component ("text", "Mack", "white", gameMap.width / 2 + 300, gameMap.height - 108, "vertical"));
@@ -630,13 +669,14 @@ async function fileRead (file)
                 console.error ('Error reading file:', err.message);
                 return;
             }
-            userData = JSON.parse (decodeBase64Url (data));
-            userActions [5].keyboard.keys = [userData.controls.up];
+            let userData = JSON.parse (decodeBase64Url (data));
+            highscore = userData.highscore;
+            /*userActions [5].keyboard.keys = [userData.controls.up];
             userActions [6].keyboard.keys = [userData.controls.down];
             userActions [7].keyboard.keys = [userData.controls.left];
             userActions [8].keyboard.keys = [userData.controls.right];
             userActions [9].keyboard.keys = [userData.controls.jump];
-            userActions [10].keyboard.keys = [userData.controls.drop];
+            userActions [10].keyboard.keys = [userData.controls.drop];*/
         }
     );
 }
@@ -646,7 +686,7 @@ async function fileWrite (file)
     await fs.writeFile
     (
         './' + file,
-        encodeBase64Url (JSON.stringify (userData)),
+        encodeBase64Url (JSON.stringify ({ highscore: highscore, controls: controls })),
         'utf8',
         (err) =>
         {
