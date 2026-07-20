@@ -170,25 +170,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         },
         {
             screen: ["game"],
-            action: "exit",
-            title: "Exit",
-            keyboard:
-            {
-                keys: [41] // Esc
-            },
-            gamepad:
-            {
-                buttons: [],
-                axes: []
-            },
-            joystick:
-            {
-                buttons: [],
-                axes: []
-            }
-        },
-        {
-            screen: ["game"],
             action: "move_up",
             title: "Move up",
             keyboard:
@@ -300,6 +281,44 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
                 buttons: [1],
                 axes: []
             }
+        },
+        {
+            screen: ["game"],
+            action: "pause",
+            title: "Pause",
+            keyboard:
+            {
+                keys: [19] // p
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
+        },
+        {
+            screen: ["game"],
+            action: "exit",
+            title: "Exit",
+            keyboard:
+            {
+                keys: [41] // Esc
+            },
+            gamepad:
+            {
+                buttons: [],
+                axes: []
+            },
+            joystick:
+            {
+                buttons: [],
+                axes: []
+            }
         }
     ],
     gameArea =
@@ -319,7 +338,7 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
             this.ctx.imageSmoothingEnabled = true;
             this.ctx.imageSmoothingQuality = "high";
             this.frame = 0;
-            this.time = 0;
+            this.fps = 60;
             this.play ();
         },
         play: function ()
@@ -330,17 +349,19 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
                 {
                     updateGameArea ();
                 },
-                1000/60
+                1000/this.fps
             );
         },
         pause: function ()
         {
             clearInterval (this.animation);
+            this.animation = null;
         },
         stop: function ()
         {
             stopUserInteractions ();
             clearInterval (this.animation);
+            this.animation = null;
             this.frame = null;
             this.ctx = null;
             this.canvas = null;
@@ -420,13 +441,18 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                 gameLoadScreen ("menu");
             break;
             case 'edit':
-                editKey++;
-                if (editKey == controls.length)
+                if (bt_code != 41)
                 {
-                    editKey = 0;
-                    gameLoadScreen ("menu");
+                    controls [editKey].code = bt_code;
+                    editKey++;
+                    if (editKey == controls.length)
+                    {
+                        editKey = 0;
+                        fileWrite ('user.bin');
+                        gameLoadScreen ("menu");
+                    }
+                    else gameText [0].src = "Press key for " + controls [editKey].key + ":";
                 }
-                else gameText [0].src = "Press key for " + controls [editKey].key + ":";
         }
     }
     else if (gameScreen == "game")
@@ -435,6 +461,13 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
         {
             switch (userActions [userAction].action)
             {
+                case 'pause':
+                    if (player > -1)
+                    {
+                        if (gameArea.animation == null) gameArea.play ();
+                        else  gameArea.pause ();
+                    }
+                break;
                 case 'exit':
                     if (player > -1) gameLoadScreen ("menu");
                 break;
@@ -671,12 +704,14 @@ async function fileRead (file)
             }
             let userData = JSON.parse (decodeBase64Url (data));
             highscore = userData.highscore;
-            /*userActions [5].keyboard.keys = [userData.controls.up];
-            userActions [6].keyboard.keys = [userData.controls.down];
-            userActions [7].keyboard.keys = [userData.controls.left];
-            userActions [8].keyboard.keys = [userData.controls.right];
-            userActions [9].keyboard.keys = [userData.controls.jump];
-            userActions [10].keyboard.keys = [userData.controls.drop];*/
+            controls = userData.controls;
+            userActions [5].keyboard.keys = [controls [0].code];
+            userActions [6].keyboard.keys = [controls [1].code];
+            userActions [7].keyboard.keys = [controls [2].code];
+            userActions [8].keyboard.keys = [controls [3].code];
+            userActions [9].keyboard.keys = [controls [4].code];
+            userActions [10].keyboard.keys = [controls [5].code];
+            userActions [11].keyboard.keys = [controls [6].code];
         }
     );
 }
