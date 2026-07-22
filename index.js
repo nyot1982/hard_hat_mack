@@ -3,14 +3,16 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let canvasWidth = sdl.video.displays [0].geometry.width, //1024
-    canvasHeight = sdl.video.displays [0].geometry.height, //740
+let windowWidth = sdl.video.displays [0].geometry.width,
+    windowHeight = sdl.video.displays [0].geometry.height,
+    canvasWidth = windowWidth, //1024
+    canvasHeight = windowHeight, //740
     window = sdl.video.createWindow
     (
         {
             title: "Hard Hat Mack",
-            width: canvasWidth,
-            height: canvasHeight,
+            width: windowWidth,
+            height: windowHeight,
             fullscreen: true
         }
     ),
