@@ -76,7 +76,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["menu"],
             action: "play",
-            title: "Play",
             keyboard:
             {
                 keys: [44] // Space
@@ -95,7 +94,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["menu"],
             action: "config",
-            title: "Config",
             keyboard:
             {
                 keys: [40] // Enter
@@ -114,7 +112,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["menu"],
             action: "exit",
-            title: "Exit",
             keyboard:
             {
                 keys: [41] // Esc
@@ -133,7 +130,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["config"],
             action: "edit",
-            title: "Edit",
             keyboard:
             {
                 keys: [] 
@@ -152,7 +148,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["config"],
             action: "exit",
-            title: "Exit",
             keyboard:
             {
                 keys: [41] // Esc
@@ -171,7 +166,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "move_up",
-            title: "Move up",
             keyboard:
             {
                 keys: [82] // Up
@@ -190,7 +184,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "move_down",
-            title: "Move down",
             keyboard:
             {
                 keys: [81] // Down
@@ -209,7 +202,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "move_left",
-            title: "Move left",
             keyboard:
             {
                 keys: [80] // Left
@@ -228,7 +220,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "move_right",
-            title: "Move right",
             keyboard:
             {
                 keys: [79] // Right
@@ -247,7 +238,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "jump",
-            title: "Jump",
             keyboard:
             {
                 keys: [44] // Space
@@ -266,7 +256,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "drop_drill",
-            title: "Drop drill",
             keyboard:
             {
                 keys: [40] // Enter
@@ -285,7 +274,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "pause",
-            title: "Pause",
             keyboard:
             {
                 keys: [19] // p
@@ -304,7 +292,6 @@ let canvasWidth = sdl.video.displays [0].geometry.width, //1024
         {
             screen: ["game"],
             action: "exit",
-            title: "Exit",
             keyboard:
             {
                 keys: [41] // Esc
@@ -444,6 +431,7 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                 if (bt_code != 41)
                 {
                     controls [editKey].code = bt_code;
+                    userActions [editKey + 5].keyboard.keys = [controls [editKey].code];
                     editKey++;
                     if (editKey == controls.length)
                     {
