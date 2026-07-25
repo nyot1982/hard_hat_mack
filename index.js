@@ -67,11 +67,10 @@ let windowWidth = sdl.video.displays [0].geometry.width,
         buttons: [],
         axes: []
     },
-    gameObjects = [],
     gameBack = [],
     gameFront = [],
-    gamePlayers = [],
     gameEnemies = [],
+    gamePlayers = [],
     gameText = [],
     userActions =
     [
@@ -665,8 +664,8 @@ function updateGameArea ()
     for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
-        gameObjects = gameEnemies.concat (gamePlayers);
-        for (let object = 0; object < gameObjects.length; object++) gameObjects [object].update (object);
+        for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
+        for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
     }
     if (gameScreen != "game")
@@ -1065,7 +1064,7 @@ function bolt (color, x, y, bounce)
     this.speedX = -(Math.floor (Math.random () * 6 + 1));
     this.speedY = -(Math.floor (Math.random () * 4 - 2));
 
-    this.update = function ()
+    this.update = function (idEnemy)
     {
         this.x = Number ((this.x + this.speedX).toFixed (2));
         this.y = Number ((this.y + this.speedY).toFixed (2));
@@ -1084,7 +1083,7 @@ function bolt (color, x, y, bounce)
                 }
             }
         }
-        if (this.y > gameMap.height - this.height) gameEnemies.splice (gameEnemies.length, 1);
+        if (this.y > gameMap.height - this.height) gameEnemies.splice (idEnemy, 1);
         this.speedY = Number ((this.speedY + gravity).toFixed (2));
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
@@ -1521,7 +1520,7 @@ function enemy (name, type, x, y)
     this.speedY = 0;
     this.direction = Math.floor (Math.random () * 2);
 
-    this.update = function (idPlayer)
+    this.update = function (idEnemy)
     {
         if (gameScreen == "game")
         {
