@@ -5,14 +5,14 @@ const { createCanvas, loadImage } = require ('canvas');
 
 let windowWidth = sdl.video.displays [0].geometry.width,
     windowHeight = sdl.video.displays [0].geometry.height,
-    canvasWidth = windowWidth, //1024
-    canvasHeight = windowHeight, //740
+    canvasWidth = windowWidth,
+    canvasHeight = windowHeight,
     window = sdl.video.createWindow
     (
         {
             title: "Hard Hat Mack",
-            width: windowWidth,
-            height: windowHeight,
+            width: canvasWidth,
+            height: canvasHeight,
             fullscreen: true
         }
     ),
@@ -337,7 +337,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,
                 {
                     updateGameArea ();
                 },
-                1000/this.fps
+                1000 / this.fps
             );
         },
         pause: function ()
@@ -560,45 +560,43 @@ function gameLoadScreen (screen)
     gameScreen = screen;
     if (gameScreen == "menu")
     {
+        canvasWidth = windowWidth;;
+        canvasHeight = windowHeight;
+        gameArea.canvas.width = canvasWidth;
+        gameArea.canvas.height = canvasHeight;
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "title.png", "", canvasWidth / 2, 150, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", canvasWidth / 2, gameTitle.y + 250, "center"));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", canvasWidth / 2, gameText [0].y + 50, "center"));
-        gameText.push (new component ("text", "Web version developed by Marc Pinyot Gascón using JavaScript + Canvas.", "white", canvasWidth / 2, gameText [1].y + 50, "center"));
-        gameText.push (new component ("text", "Vandal", "white", canvasWidth / 2 - 241, gameText [2].y + 100));
-        gameText.push (new component ("text", "Mack", "white", canvasWidth / 2 - 27, gameText [3].y));
-        gameText.push (new component ("text", "Osha", "white", canvasWidth / 2 + 173, gameText [4].y));
-        gameText.push (new enemy (0, 0, canvasWidth / 2 - 214, gameText [5].y + 23));
-        gameText.push (new player (0, "Mack", canvasWidth / 2 - 13, gameText [5].y + 25));
-        gameText.push (new enemy (1, 0, canvasWidth / 2 + 186, gameText [5].y + 23));
-        gameText.push (new beam_h ("#FF55FF", "#55FFFF", canvasWidth / 2 - 256, gameText [5].y + 55, 512));
+        gameTitle = new component ("image", "title.png", "", Math.round (canvasWidth / 2), 150, 362, 40);
+        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", Math.round (canvasWidth / 2), gameTitle.y + 250, "center"));
+        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", Math.round (canvasWidth / 2), gameText [0].y + 50, "center"));
+        gameText.push (new component ("text", "This remake was developed by Marc Pinyot Gascón using Node.js.", "white", Math.round (canvasWidth / 2), gameText [1].y + 50, "center"));
+        gameText.push (new component ("text", "Vandal", "white", Math.round (canvasWidth / 2) - 241, gameText [2].y + 100));
+        gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
+        gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 173, gameText [4].y));
+        gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 214, gameText [5].y + 23));
+        gameText.push (new player (0, "Mack", Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
+        gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 186, gameText [5].y + 23));
+        gameText.push (new beam_h ("#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 256, gameText [5].y + 55, 512));
         gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", canvasWidth / 2 + 325, canvasHeight - 150));
+        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", Math.round (canvasWidth / 2) + 325, canvasHeight - 150));
     }
     else if (gameScreen == "config")
     {
         gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("text", "Configuration menu", "white", canvasWidth / 2, 100, "center");
-        gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", canvasWidth / 2 - 500, gameTitle.y + 105));
+        gameTitle = new component ("text", "Configuration menu", "white", Math.round (canvasWidth / 2), 100, "center");
+        gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", Math.round (canvasWidth / 2) - 500, gameTitle.y + 105));
     }
     else if (gameScreen == "game")
     {
+        canvasHeight = 400;
+        canvasWidth = Math.round (canvasHeight * windowWidth / windowHeight);
+        gameArea.canvas.width = canvasWidth;
+        gameArea.canvas.height = canvasHeight;
         generateGameMap ("level1");
     }
 }
 
 function generateGameMap (map)
 {
-    gameText.push (new component ("text", "Bonus:", "white", gameMap.width / 2 - 251, gameMap.height - 398));
-    gameText.push (new component ("text", "04700", "white", gameMap.width / 2 - 161, gameMap.height - 398));
-    gameText.push (new component ("text", "Score:", "white", gameMap.width / 2 - 69, gameMap.height - 398));
-    gameText.push (new component ("text", "00000", "white", gameMap.width / 2 + 21, gameMap.height - 398));
-    gameText.push (new component ("text", "Hi-score:", "white", gameMap.width / 2 + 113, gameMap.height - 398));
-    gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", gameMap.width / 2 + 245, gameMap.height - 398));
-    gameText.push (new component ("text", "Level", "white", gameMap.width / 2 + 300, gameMap.height - 268, "vertical"));
-    gameText.push (new component ("text", "01", "white", gameMap.width / 2 + 286, gameMap.height - 172));
-    gameText.push (new component ("text", "Mack", "white", gameMap.width / 2 + 300, gameMap.height - 108, "vertical"));
-    gameText.push (new component ("text", "3", "white", gameMap.width / 2 + 300, gameMap.height - 28));
     switch (map)
     {
         case "level1":
@@ -609,26 +607,26 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 - 139, gameMap.height - 302, 240));
-            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", gameMap.width / 2 + 117, gameMap.height - 302, 240));
-            gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 110, 4));
-            gameBack.push (new chain ("#55FFFF", gameMap.width / 2 + 178, gameMap.height - 174, 4));
-            gameBack.push (new chain ("#55FFFF", gameMap.width / 2 - 186, gameMap.height - 238, 4));
-            gameBack.push (new chain ("#55FFFF", gameMap.width / 2 + 60, gameMap.height - 302, 4));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 159, gameMap.height - 46));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 - 59, gameMap.height - 46));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 41, gameMap.height - 46));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 141, gameMap.height - 46));
-            gameFront.push (new floor ("white", gameMap.width / 2 - 267, gameMap.height -20, 534, 6));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 62, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 126, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 190, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 254, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", gameMap.width / 2 - 195, gameMap.height - 318, 390));
-            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 233, gameMap.height - 44));
-            gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.width / 2 + 286, gameMap.height - 342));
-            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.width / 2 - 194, gameMap.height - 158));
-            gamePlayers.push (new player (0, "Mack", gameMap.width / 2 + 160, gameMap.height - 92, -1));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 96, 240));
+            gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) + 117, 96, 240));
+            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 60, 96, 4));
+            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 160, 4));
+            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 178, 224, 4));
+            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 288, 4));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 159, 352));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
+            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
+            gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 286, 54));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 208, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 390));
+            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
+            gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
+            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
+            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
+            gamePlayers.push (new player (0, "Mack", Math.round (gameMap.width / 2) + 160, 310, -1));
         break;
         case "level2":
             gameMap =
@@ -638,9 +636,6 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameEnemies.push (new enemy (3, 200, 100, 0));
-            gameEnemies.push (new enemy (4, 400, 100, 0));
-            gameEnemies.push (new enemy (5, 600, 100, 0));
         break;
         case "level3":
             gameMap =
@@ -650,11 +645,17 @@ function generateGameMap (map)
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameEnemies.push (new enemy (7, 110, 100, 0));
-            gameEnemies.push (new enemy (7, 310, 100, 0));
-            gameEnemies.push (new enemy (7, 510, 100, 0));
-        break;
     }
+    gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 267, 0));
+    gameText.push (new component ("text", "04700", "white", Math.round (gameMap.width / 2) - 177, 0));
+    gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 69, 0));
+    gameText.push (new component ("text", "00000", "white", Math.round (gameMap.width / 2) + 21, 0));
+    gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 113, 0));
+    gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", Math.round (gameMap.width / 2) + 245, 0));
+    gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 300, 128, "vertical"));
+    gameText.push (new component ("text", "01", "white", Math.round (gameMap.width / 2) + 286, 224));
+    gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 300, 288, "vertical"));
+    gameText.push (new component ("text", "3", "white", Math.round (gameMap.width / 2) + 300, 368));
 }
 
 function updateGameArea ()
@@ -775,7 +776,7 @@ function floor (color, x, y, width, height)
         patternContext.fillRect (0, 0, 2, 2);
         patternContext.fillRect (2, 2, 2, 4);
         ctx = gameArea.ctx;
-        this.pattern = ctx.createPattern (patternCanvas, "repeat");
+        this.pattern = ctx.createPattern (patternCanvas);
         ctx.fillStyle = this.pattern;
         ctx.fillRect (this.x, this.y, this.width, this.height);
     }
@@ -1187,7 +1188,7 @@ function player (type, name, x, y, heading, bounce)
                 }
                 if (this.bouncy)
                 {
-                    if (this.floor > gameMap.height - 318 - this.height && this.y <= this.floor - 60 || this.floor == gameMap.height - 318 - this.height && this.y <= gameMap.height - 60 - this.height)
+                    if (this.floor > 80 - this.height && this.y <= this.floor - 60 || this.floor == 80 - this.height && this.y <= 354 - this.height)
                     {
                         this.jumping = this.y;
                         this.bouncy = false;
@@ -1285,7 +1286,7 @@ function player (type, name, x, y, heading, bounce)
                                 gameText [9].src = "" + this.lives + ""; 
                                 if (this.lives == 0)
                                 {
-                                    gameText.push (new component ("text", "Game over", "white", canvasWidth / 2 - 60, canvasHeight - 220));
+                                    gameText.push (new component ("text", "Game over", "white", Math.round (gameMap.width / 2) - 60, 178));
                                     setTimeout
                                     (
                                         () =>
@@ -1299,15 +1300,15 @@ function player (type, name, x, y, heading, bounce)
                                 {
                                     this.dead = 0;
                                     this.deadFrame = 0;
-                                    this.x = gameMap.width / 2 + 160;
-                                    this.y = gameMap.height - 92;
+                                    this.x = Math.round (gameMap.width / 2) + 160;
+                                    this.y = 310;
                                     this.heading = -1;
                                     this.type = 0;
                                     this.state = "ground";
                                     gameEnemies [0].name = Math.floor (Math.random () * 2);
                                     gameEnemies [0].direction = Math.floor (Math.random () * 2);
-                                    gameEnemies [0].x = gameMap.width / 2 - 194;
-                                    gameEnemies [0].y = gameMap.height - 158;
+                                    gameEnemies [0].x = Math.round (gameMap.width / 2) - 194;
+                                    gameEnemies [0].y = 240;
                                 }
                             },
                             2000
@@ -1526,62 +1527,62 @@ function enemy (name, type, x, y)
         {
             if (this.direction == 0)
             {
-                if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 94)
+                if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 304)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 94)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 304)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 158)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 240)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 158)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 240)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 222)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 176)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 222)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 176)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 286)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 112)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 286)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 112)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 286 && this.speedX == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 112 && this.speedX == -1)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 350 && this.speedY == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 48 && this.speedY == -1)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 350)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 48)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 350)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 48)
                 {
                     this.speedX = 0;
                     this.direction = 1;
@@ -1589,57 +1590,57 @@ function enemy (name, type, x, y)
             }
             else
             {
-                if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 94)
+                if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 304)
                 {
                     this.speedX = 0;
                     this.direction = 0;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 94)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 304)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 158)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 240)
                 {
                     this.speedX = 0;
                     this.speedY = 1;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 158)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 240)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 222)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 176)
                 {
                     this.speedX = 0;
                     this.speedY = 1;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 222)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 176)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 - 194 && this.y == gameMap.height - 286)
+                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 112)
                 {
                     this.speedX = 0;
                     this.speedY = 1;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 286)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 112)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 286 && this.speedY == 1)
+                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 112 && this.speedY == 1)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == gameMap.width / 2 + 52 && this.y == gameMap.height - 350 && this.speedX == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 48 && this.speedX == -1)
                 {
                     this.speedX = 0;
                     this.speedY = 1;
                 }
-                else if (this.x == gameMap.width / 2 + 168 && this.y == gameMap.height - 350)
+                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 48)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
@@ -1730,7 +1731,6 @@ function enemy (name, type, x, y)
                         ctx.fillRect (16, 28, 8, 2);
                         ctx.fillStyle = "#FF55FF";
                         ctx.fillRect (12, 10, 2, 2);
-                    break;
                 }
             break;
             case 1:
@@ -1782,9 +1782,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (22, 10, 2, 2);
                         ctx.fillRect (6, 20, 6, 8);
                         ctx.fillRect (14, 20, 6, 6);
-                    break;
                 }
-            break;
         }
         ctx.restore ();
     }
@@ -2226,7 +2224,7 @@ function component (type, src, color, x, y, width, height)
                     if (height > this.height) this.height = height;
                 }   
             }
-            if (this.direction == "center") this.x = this.startX - this.width / 2;
+            if (this.direction == "center") this.x = this.startX - Math.round (this.width / 2);
         }
     }
 }
