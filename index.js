@@ -646,10 +646,10 @@ function generateGameMap (map)
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
     }
-    gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 267, 0));
-    gameText.push (new component ("text", "04700", "white", Math.round (gameMap.width / 2) - 177, 0));
-    gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 69, 0));
-    gameText.push (new component ("text", "00000", "white", Math.round (gameMap.width / 2) + 21, 0));
+    gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 300, 0));
+    gameText.push (new component ("text", "04700", "white", Math.round (gameMap.width / 2) - 210, 0));
+    gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 90, 0));
+    gameText.push (new component ("text", "00000", "white", Math.round (gameMap.width / 2), 0));
     gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 113, 0));
     gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", Math.round (gameMap.width / 2) + 245, 0));
     gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 300, 128, "vertical"));
@@ -720,7 +720,7 @@ async function fileWrite (file)
                 console.error ('Error writing file:', err.message);
                 return;
             }
-            console.log ('File has been written successfully!');
+            //console.log ('File has been written successfully!');
         }
     );
 }
@@ -737,7 +737,7 @@ async function fileDelete (file)
                 console.error ('Error deletig file:', err.message);
                 return;
             }
-            console.log ('File has been deleted successfully!');
+            //console.log ('File has been deleted successfully!');
         }
     );
 }
@@ -1064,6 +1064,7 @@ function bolt (color, x, y, bounce)
     this.height = 10;
     this.speedX = -(Math.floor (Math.random () * 6 + 1));
     this.speedY = -(Math.floor (Math.random () * 4 - 2));
+    this.gravity = gravity;
 
     this.update = function (idEnemy)
     {
@@ -1085,7 +1086,7 @@ function bolt (color, x, y, bounce)
             }
         }
         if (this.y > gameMap.height - this.height) gameEnemies.splice (idEnemy, 1);
-        this.speedY = Number ((this.speedY + gravity).toFixed (2));
+        this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
@@ -1133,7 +1134,13 @@ function player (type, name, x, y, heading, bounce)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
                 {
-                    if (this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y >= gameEnemies [enemy].y || this.y + this.height >= gameEnemies [enemy].y && this.y + this.height <= gameEnemies [enemy].y + gameEnemies [enemy].height) this.dead = 2;
+                    if (this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y >= gameEnemies [enemy].y || this.y + this.height >= gameEnemies [enemy].y && this.y + this.height <= gameEnemies [enemy].y + gameEnemies [enemy].height)
+                    {
+                        this.dead = 2;
+                        gameEnemies [enemy].speedX = 0;
+                        gameEnemies [enemy].speedY = 0;
+                        gameEnemies [enemy].gravity = 0;
+                    }
                 }
             }
             if (this.state != "chain")
