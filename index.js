@@ -624,6 +624,8 @@ function generateGameMap (map)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
+            gameFront.push (new elevator ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 280));
+            gameFront.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 229, 346));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
             gamePlayers.push (new player (0, "Mack", Math.round (gameMap.width / 2) + 160, 310, -1));
@@ -887,6 +889,76 @@ function chain (color, x, y, steps)
     }
 }
 
+function elevator (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = x;
+    this.y = y;
+    this.width = 54;
+    this.height = 66;
+
+    this.update = function ()
+    {
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (this.x, this.y);
+        ctx.fillStyle = this.color;
+        ctx.fillRect (0, 0, 54, 8);
+        ctx.fillRect (0, 8, 2, 48);
+        ctx.fillRect (50, 8, 4, 48);
+        ctx.fillRect (0, 56, 54, 10);
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (6, 2, 42, 4);
+        ctx.fillStyle = this.color3;
+        ctx.fillRect (2, 8, 2, 48);
+        ctx.fillRect (8, 58, 38, 4);
+        ctx.restore ();
+    }
+}
+
+function support (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = x;
+    this.y = y;
+    this.width = 12;
+    this.height = 32;
+
+    this.update = function ()
+    {
+        const patternCanvas = createCanvas (12, 16);
+        const patternContext = patternCanvas.getContext ("2d");
+        patternCanvas.width = 12;
+        patternCanvas.height = 16;
+        patternContext.fillStyle = this.color;
+        patternContext.fillRect (0, 0, 4, 6);
+        patternContext.fillRect (6, 0, 6, 2);
+        patternContext.fillRect (8, 2, 4, 2);
+        patternContext.fillRect (4, 2, 2, 2);
+        patternContext.fillRect (4, 4, 4, 4);
+        patternContext.fillRect (6, 6, 4, 4);
+        patternContext.fillRect (8, 8, 4, 4);
+        patternContext.fillRect (0, 8, 4, 8);
+        patternContext.fillRect (4, 10, 2, 2);
+        patternContext.fillRect (4, 12, 4, 4);
+        patternContext.fillRect (8, 14, 2, 2);
+        patternContext.fillStyle = this.color2;
+        patternContext.fillRect (0, 6, 2, 2);
+        patternContext.fillStyle = this.color3;
+        patternContext.fillRect (10, 4, 2, 2);
+        patternContext.fillRect (10, 12, 2, 2);
+        ctx = gameArea.ctx;
+        this.pattern = ctx.createPattern (patternCanvas);
+        ctx.fillStyle = this.pattern;
+        ctx.fillRect (this.x, this.y, this.width, this.height);
+    }
+}
+
 function bouncy (color, color2, color3, x, y)
 {
     this.color = color;
@@ -1145,7 +1217,7 @@ function player (type, name, x, y, heading, bounce)
             }
             if (this.state != "chain")
             {
-                if (this.dead == 0 && this.state == "ground") this.speedX = this.moveX;
+                if (this.dead == 0 && this.state == "ground" && this.bouncy == false) this.speedX = this.moveX;
                 this.state = "air";
                 for (let front = 0; front < gameFront.length; front++)
                 {
