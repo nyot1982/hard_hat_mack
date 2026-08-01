@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = sdl.video.displays [0].geometry.width,
-    windowHeight = sdl.video.displays [0].geometry.height,
+let windowWidth = 640, //sdl.video.displays [0].geometry.width,
+    windowHeight = 400, //sdl.video.displays [0].geometry.height,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -13,7 +13,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,
             title: "Hard Hat Mack",
             width: canvasWidth,
             height: canvasHeight,
-            fullscreen: true
+            fullscreen: false
         }
     ),
     highscore = 0,
@@ -625,7 +625,7 @@ function generateGameMap (map)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
             gameFront.push (new elevator ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 280));
-            gameFront.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 229, 346));
+            gameFront.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
             gamePlayers.push (new player (0, "Mack", Math.round (gameMap.width / 2) + 160, 310, -1));
@@ -770,15 +770,15 @@ function floor (color, x, y, width, height)
 
     this.update = function ()
     {
-        const patternCanvas = createCanvas (4, 6);
-        const patternContext = patternCanvas.getContext ("2d");
-        patternCanvas.width = 4;
-        patternCanvas.height = 6;
-        patternContext.fillStyle = this.color;
-        patternContext.fillRect (0, 0, 2, 2);
-        patternContext.fillRect (2, 2, 2, 4);
+        const canvasAux = createCanvas (4, 6);
+        canvasAux.width = 4;
+        canvasAux.height = 6;
+        const ctxAux = canvasAux.getContext ("2d");
+        ctxAux.fillStyle = this.color;
+        ctxAux.fillRect (0, 0, 2, 2);
+        ctxAux.fillRect (2, 2, 2, 4);
         ctx = gameArea.ctx;
-        this.pattern = ctx.createPattern (patternCanvas);
+        this.pattern = ctx.createPattern (canvasAux);
         ctx.fillStyle = this.pattern;
         ctx.fillRect (this.x, this.y, this.width, this.height);
     }
@@ -931,30 +931,31 @@ function support (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        const patternCanvas = createCanvas (12, 16);
-        const patternContext = patternCanvas.getContext ("2d");
-        patternCanvas.width = 12;
-        patternCanvas.height = 16;
-        patternContext.fillStyle = this.color;
-        patternContext.fillRect (0, 0, 4, 6);
-        patternContext.fillRect (6, 0, 6, 2);
-        patternContext.fillRect (8, 2, 4, 2);
-        patternContext.fillRect (4, 2, 2, 2);
-        patternContext.fillRect (4, 4, 4, 4);
-        patternContext.fillRect (6, 6, 4, 4);
-        patternContext.fillRect (8, 8, 4, 4);
-        patternContext.fillRect (0, 8, 4, 8);
-        patternContext.fillRect (4, 10, 2, 2);
-        patternContext.fillRect (4, 12, 4, 4);
-        patternContext.fillRect (8, 14, 2, 2);
-        patternContext.fillStyle = this.color2;
-        patternContext.fillRect (0, 6, 2, 2);
-        patternContext.fillStyle = this.color3;
-        patternContext.fillRect (10, 4, 2, 2);
-        patternContext.fillRect (10, 12, 2, 2);
+        const canvasAux = createCanvas (12, 16);
+        canvasAux.width = 12;
+        canvasAux.height = 16;
+        const ctxAux = canvasAux.getContext ("2d");
+
+        ctxAux.fillStyle = this.color;
+
+ctxAux.fillRect(0, 0, canvasAux.width, canvasAux.height);
+ctxAux.clearRect (10, 10, 2, 2);
+ctxAux.clearRect (0, 12, 2, 2);
+ctxAux.clearRect (2, 14, 2, 2);
+ctxAux.clearRect (4, 0, 2, 2);
+ctxAux.clearRect (8, 0, 2, 2);
+ctxAux.clearRect (10, 2, 2, 2);
+ctxAux.clearRect (0, 4, 2, 2);
+ctxAux.clearRect (2, 6, 2, 2);
+ctxAux.clearRect (4, 8, 2, 2);
+ctxAux.fillStyle = this.color2;
+ctxAux.fillRect (6, 0, 2, 2);
+ctxAux.fillStyle = this.color3;
+ctxAux.fillRect (4, 14, 2, 2);
+ctxAux.fillRect (4, 6, 2, 2);
         ctx = gameArea.ctx;
-        this.pattern = ctx.createPattern (patternCanvas);
-        ctx.fillStyle = this.pattern;
+        const pattern = ctx.createPattern (canvasAux);
+        ctx.fillStyle = pattern;
         ctx.fillRect (this.x, this.y, this.width, this.height);
     }
 }
