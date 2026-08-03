@@ -936,7 +936,7 @@ function support (color, color2, color3, x, y)
         canvasAux.height = 16;
         const ctxAux = canvasAux.getContext ("2d");
         ctxAux.fillStyle = this.color;
-        ctxAux.fillRect(0, 0, canvasAux.width, canvasAux.height);
+        ctxAux.fillRect (0, 0, canvasAux.width, canvasAux.height);
         ctxAux.clearRect (10, 10, 2, 2);
         ctxAux.clearRect (0, 12, 2, 2);
         ctxAux.clearRect (2, 14, 2, 2);
