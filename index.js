@@ -386,6 +386,21 @@ function JSONparse (input)
     }
 }
 
+function JSONstringify (input)
+{
+    if (typeof input !== "object") return undefined;
+    try
+    {
+        let json = JSON.stringify (input);
+        if (typeof json === 'string') return json;
+        else return undefined;
+    }
+    catch (err)
+    {
+        return undefined;
+    }
+}
+
 function startControl (id_control, control, bt_type, bt_code, bt_value)
 {
     if (!pressed [bt_type][id_control].includes (bt_code) || bt_type == "axes")
@@ -739,7 +754,7 @@ async function fileWrite (file)
     await fs.writeFile
     (
         './' + file,
-        encodeBase64Url (JSON.stringify ({ highscore: highscore, controls: controls })),
+        encodeBase64Url (JSONstringify ({ highscore: highscore, controls: controls })),
         'utf8',
         (err) =>
         {
