@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = sdl.video.displays [0].geometry.width, //640
-    windowHeight = sdl.video.displays [0].geometry.height, //400
+let windowWidth = 640, //sdl.video.displays [0].geometry.width,
+    windowHeight = 400, //sdl.video.displays [0].geometry.height,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -700,9 +700,9 @@ function updateGameArea ()
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
-        /*console.clear ();
+        console.clear ();
         console.log ("gamePlayers", gamePlayers);
-        console.log ("gameEnemies", gameEnemies);*/
+        //console.log ("gameEnemies", gameEnemies);
     }
     if (gameScreen != "game")
     {
@@ -1242,8 +1242,8 @@ function player (type, x, y, heading, bounce)
     {
         if (gameScreen == "game")
         {
-            this.x = Number ((this.x + this.speedX).toFixed (1));
-            this.y = Number ((this.y + this.speedY).toFixed (1));
+            this.x = Math.round (Number ((this.x + this.speedX).toFixed (1)));
+            this.y = Math.round (Number ((this.y + this.speedY).toFixed (1)));
             if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
