@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = 640, //sdl.video.displays [0].geometry.width,
-    windowHeight = 400, //sdl.video.displays [0].geometry.height,
+let windowWidth = sdl.video.displays [0].geometry.width,
+    windowHeight = sdl.video.displays [0].geometry.height,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow

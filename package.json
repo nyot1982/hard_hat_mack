@@ -1,13 +1,15 @@
 {
   "name": "Hard Hat Mack",
   "version": "1.0.0",
-  "description": "",
+  "description": "Hard Hat Mack",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "debug": "node --inspect index.js",
+    "inspect": "node --inspect-brk index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["hard", "hat", "mack"],
+  "author": "Marc Pinyot Gascón <marcpinyot@hotmail.com>",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
