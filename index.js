@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = sdl.video.displays [0].geometry.width,
-    windowHeight = sdl.video.displays [0].geometry.height,
+let windowWidth = sdl.video.displays [0].geometry.width, //640
+    windowHeight = sdl.video.displays [0].geometry.height, //400
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -407,7 +407,7 @@ function startControl (id_control, control, bt_type, bt_code, bt_value)
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
         let player = -1;
-        if (gameScreen == "game" && gamePlayers.length > 0) player = gamePlayers.findIndex (player => player.name == "Mack");
+        if (gameScreen == "game" && gamePlayers.length > 0) player = 0;
         if (control == "keyboard") bt_value = 1;
         userActionStart (control, bt_type, bt_code, bt_value, player);
     }
@@ -421,7 +421,7 @@ function stopControl (id_control, control, bt_type, bt_code)
         let player = -1;
         if (gameScreen == "game" && gamePlayers.length > 0)
         {
-            player = gamePlayers.findIndex (player => player.name == "Mack");
+            player = 0;
             userActionStop (id_control, control, bt_type, bt_code, player);
         }
     }
@@ -564,7 +564,7 @@ function userActionStop (id_control, control, bt_type, bt_code, player)
 
 function stopUserInteractions ()
 {
-    let player = gamePlayers.findIndex (player => player.name == "Mack");
+    let player = 0;
     pressed =
     {
         keys:
@@ -603,7 +603,7 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
         gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 173, gameText [4].y));
         gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 214, gameText [5].y + 23));
-        gameText.push (new player (0, "Mack", Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
+        gameText.push (new player (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
         gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 186, gameText [5].y + 23));
         gameText.push (new beam_h ("#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 256, gameText [5].y + 55, 512));
         gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
@@ -658,7 +658,7 @@ function generateGameMap (map)
             gameFront.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
-            gamePlayers.push (new player (0, "Mack", Math.round (gameMap.width / 2) + 160, 310, -1));
+            gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 310, -1));
         break;
         case "level2":
             gameMap =
@@ -700,6 +700,9 @@ function updateGameArea ()
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
+        /*console.clear ();
+        console.log ("gamePlayers", gamePlayers);
+        console.log ("gameEnemies", gameEnemies);*/
     }
     if (gameScreen != "game")
     {
@@ -1178,8 +1181,8 @@ function bolt (color, x, y, bounce)
 
     this.update = function (idEnemy)
     {
-        this.x = Number ((this.x + this.speedX).toFixed (2));
-        this.y = Number ((this.y + this.speedY).toFixed (2));
+        this.x = Number ((this.x + this.speedX).toFixed (1));
+        this.y = Number ((this.y + this.speedY).toFixed (1));
         for (let front = 0; front < gameFront.length; front++)
         {
             if (gameFront [front].constructor.name == "beam_h" && !this.bounced.includes (front)) 
@@ -1196,7 +1199,7 @@ function bolt (color, x, y, bounce)
             }
         }
         if (this.y > gameMap.height - this.height) gameEnemies.splice (idEnemy, 1);
-        this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
+        this.speedY = Number ((this.speedY + this.gravity).toFixed (1));
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
@@ -1208,10 +1211,9 @@ function bolt (color, x, y, bounce)
     }
 }
 
-function player (type, name, x, y, heading, bounce)
+function player (type, x, y, heading, bounce)
 {
     this.type = (type != null ? type : 0);
-    this.name = name || null;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.heading = (heading != null ? heading : 1);
@@ -1229,6 +1231,8 @@ function player (type, name, x, y, heading, bounce)
     this.deadFrame = 0;
     this.lives = 3;
     this.floor = 0;
+    this.enemyKill = null;
+
 
     this.drill = function (drilling)
     {
@@ -1238,8 +1242,8 @@ function player (type, name, x, y, heading, bounce)
     {
         if (gameScreen == "game")
         {
-            this.x = Number ((this.x + this.speedX).toFixed (2));
-            this.y = Number ((this.y + this.speedY).toFixed (2));
+            this.x = Number ((this.x + this.speedX).toFixed (1));
+            this.y = Number ((this.y + this.speedY).toFixed (1));
             if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
@@ -1250,6 +1254,7 @@ function player (type, name, x, y, heading, bounce)
                         gameEnemies [enemy].speedX = 0;
                         gameEnemies [enemy].speedY = 0;
                         gameEnemies [enemy].gravity = 0;
+                        this.enemyKill = enemy;
                     }
                 }
             }
@@ -1274,7 +1279,7 @@ function player (type, name, x, y, heading, bounce)
                             else if (this.speedY > 2.8) this.dead = 1;
                             else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
                         }
-                        if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = -(this.speedY * this.bounce);
+                        if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = (-(this.speedY * this.bounce) == -0 ? 0 : -(this.speedY * this.bounce));
                     }
                     if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                     {
@@ -1291,7 +1296,7 @@ function player (type, name, x, y, heading, bounce)
                     this.state = "ground";
                     if (this.speedY > 2.8) this.dead = 1;
                 }
-                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = -(this.speedY * this.bounce);
+                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = (-(this.speedY * this.bounce) == -0 ? 0 : -(this.speedY * this.bounce));
             }
             if (this.state == "air")
             {
@@ -1309,11 +1314,11 @@ function player (type, name, x, y, heading, bounce)
                     {
                         this.jumping = this.y;
                         this.bouncy = false;
-                        this.speedX = -1.2;
-                        this.speedY = -1.8;
+                        this.speedX = -1;
+                        this.speedY = -2;
                     }
                 }
-                else this.speedY = Number ((this.speedY + gravity).toFixed (2));
+                else this.speedY = Number ((this.speedY + gravity).toFixed (1));
                 if (this.dead == 0)
                 {
                     if (this.speedX == 0) this.type = 4;
@@ -1399,6 +1404,11 @@ function player (type, name, x, y, heading, bounce)
                         (
                             () =>
                             {
+                                if (gameEnemies [this.enemyKill].constructor.name == "bolt")
+                                {
+                                    gameEnemies.splice (this.enemyKill, 1);
+                                    this.enemyKill = null;
+                                }
                                 this.lives--;
                                 gameText [9].src = "" + this.lives + ""; 
                                 if (this.lives == 0)
