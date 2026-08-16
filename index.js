@@ -371,6 +371,21 @@ function decodeBase64Url (input)
     return Buffer.from (base64, 'base64').toString ();
 }
 
+function JSONparse (input)
+{
+    if (typeof input !== "string") return undefined;
+    try
+    {
+        let json = JSON.parse (input);
+        if (typeof json === 'object') return json;
+        else return undefined;
+    }
+    catch (err)
+    {
+        return undefined;
+    }
+}
+
 function startControl (id_control, control, bt_type, bt_code, bt_value)
 {
     if (!pressed [bt_type][id_control].includes (bt_code) || bt_type == "axes")
@@ -691,10 +706,21 @@ async function fileRead (file)
         {
             if (err)
             {
-                console.error ('Error reading file:', err.message);
+                console.error ('Error reading file:', err.message + '.');
                 return;
             }
-            let userData = JSON.parse (decodeBase64Url (data));
+            let userData = decodeBase64Url (data);
+            if (!userData)
+            {
+                console.error ('Error decoding base64Url data.');
+                return;
+            }
+            userData = JSONparse (userData);
+            if (userData == undefined)
+            {
+                console.error ('Error parsing JSON data.');
+                return;
+            }
             highscore = userData.highscore;
             controls = userData.controls;
             userActions [5].keyboard.keys = [controls [0].code];
@@ -703,7 +729,7 @@ async function fileRead (file)
             userActions [8].keyboard.keys = [controls [3].code];
             userActions [9].keyboard.keys = [controls [4].code];
             userActions [10].keyboard.keys = [controls [5].code];
-            userActions [11].keyboard.keys = [controls [6].code];
+            userActions [11].keyboard.keys = [controls [6].code];     
         }
     );
 }
@@ -719,10 +745,9 @@ async function fileWrite (file)
         {
             if (err)
             {
-                console.error ('Error writing file:', err.message);
+                console.error ('Error writing file:', err.message + '.');
                 return;
             }
-            //console.log ('File has been written successfully!');
         }
     );
 }
@@ -736,10 +761,9 @@ async function fileDelete (file)
         {
             if (err)
             {
-                console.error ('Error deletig file:', err.message);
+                console.error ('Error deleting file:', err.message + '.');
                 return;
             }
-            //console.log ('File has been deleted successfully!');
         }
     );
 }
