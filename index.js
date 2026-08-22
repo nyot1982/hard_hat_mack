@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = sdl.video.displays [0].geometry.width,//640,
-    windowHeight = sdl.video.displays [0].geometry.height,//400,
+let windowWidth = sdl.video.displays [0].geometry.width,/*640,*/
+    windowHeight = sdl.video.displays [0].geometry.height,/*400,*/
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -49,9 +49,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
             code: 19
         }
     ],
-    gravity = 0.1,
-    elevatorFloor = 0,
-    elevatorSpeed = 0,
+    gravity = 0.11,
     gameScreen = null,
     gameTitle = null,
     gameMap =
@@ -636,7 +634,9 @@ function generateGameMap (map)
             {
                 name: map,
                 width: canvasWidth,
-                height: canvasHeight
+                height: canvasHeight,
+                elevatorFloor: 0,
+                elevatorSpeed: 0
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 96, 240));
@@ -703,10 +703,14 @@ function updateGameArea ()
     for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
-        if (elevatorSpeed != 0)
+        if (gameMap.elevatorSpeed != 0)
         {
-            elevatorFloor -= elevatorSpeed;
-            if (elevatorSpeed < 0 && elevatorFloor == 192 ||elevatorSpeed > 0 && elevatorFloor == 0) elevatorSpeed = 0;
+            gameMap.elevatorFloor -= gameMap.elevatorSpeed;
+            if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0)
+            {
+                gameMap.elevatorSpeed = 0;
+                if (gamePlayers [0].elevator) gamePlayers [0].elevator = false;
+            }
         }
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
@@ -990,7 +994,7 @@ function elevator (color, color2, x, y, type)
 
     this.update = function ()
     {
-        this.y = this.startY - elevatorFloor;
+        this.y = this.startY - gameMap.elevatorFloor;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.fillStyle = this.color;
@@ -1024,8 +1028,8 @@ function support (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        this.y = this.startY - elevatorFloor;
-        this.height = this.startHeight + elevatorFloor;
+        this.y = this.startY - gameMap.elevatorFloor;
+        this.height = this.startHeight + gameMap.elevatorFloor;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         const canvasAux = createCanvas (12, 16);
@@ -1371,6 +1375,7 @@ function player (type, x, y, heading)
     this.jump = 0;
     this.jumping = false;
     this.bouncy = false;
+    this.elevator = false;
     this.dead = 0;
     this.deadFrame = 0;
     this.lives = 3;
@@ -1404,7 +1409,7 @@ function player (type, x, y, heading)
             }
             if (this.state != "chain")
             {
-                if (this.dead == 0 && this.state == "ground" && this.bouncy == false) this.speedX = this.moveX;
+                if (this.dead == 0 && this.state == "ground" && !this.bouncy && !this.elevator) this.speedX = this.moveX;
                 this.state = "air";
                 for (let front = 0; front < gameFront.length; front++)
                 {
@@ -1420,11 +1425,13 @@ function player (type, x, y, heading)
                                 this.bouncy = true;
                                 gameFront [front].type = 1;
                             }
-                            else if (this.speedX < 0 && gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && this.x == gameFront [front].x + (gameFront [front].width - this.width) / 2)
+                            else if (this.speedX < 0 && gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && this.x + this.width == gameFront [front].x + gameFront [front].width)
                             {
-                                if (elevatorFloor == 0) elevatorSpeed = -4;
-                                else if (elevatorFloor == 192) elevatorSpeed = 4;
-                                this.speedY = elevatorSpeed;
+                                this.elevator = true;
+                                this.x -= (this.x - gameFront [front].x) / 2 - 2;
+                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                this.speedY = gameMap.elevatorSpeed;
                             }
                             else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
                             else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
@@ -1435,8 +1442,8 @@ function player (type, x, y, heading)
                             if (gameFront [front].constructor.name == "bell")
                             {
                                 gameFront [front].rings = 1;
-                                if (elevatorFloor == 0) elevatorSpeed = -4;
-                                else if (elevatorFloor == 192) elevatorSpeed = 4;
+                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                             }
                             this.speedY = 0;
                         }
@@ -1448,8 +1455,8 @@ function player (type, x, y, heading)
                             if (gameFront [front].constructor.name == "bell")
                             {
                                 gameFront [front].rings = 1;
-                                if (elevatorFloor == 0) elevatorSpeed = -4;
-                                else if (elevatorFloor == 192) elevatorSpeed = 4;
+                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                             }
                             this.speedX = 0;
                         }
@@ -1530,7 +1537,7 @@ function player (type, x, y, heading)
                         this.speedY = this.moveY;
                         this.state = "chain";
                     }
-                    if (this.jump != 0)
+                    if (this.jump != 0 && !this.elevator)
                     {
                         this.speedY = this.jump;
                         this.jumping = this.y;
@@ -1541,6 +1548,10 @@ function player (type, x, y, heading)
                     {
                         if (this.type < 3) this.type++;
                         else this.type = 0;
+                    }
+                    if (this.elevator)
+                    {
+                        this.type = 4;
                     }
                 }
             }
@@ -1573,7 +1584,7 @@ function player (type, x, y, heading)
                         (
                             () =>
                             {
-                                if (this.enemyKill != null &&gameEnemies [this.enemyKill].constructor.name == "bolt")
+                                if (this.enemyKill != null && gameEnemies [this.enemyKill].constructor.name == "bolt")
                                 {
                                     gameEnemies.splice (this.enemyKill, 1);
                                     this.enemyKill = null;
@@ -1601,8 +1612,8 @@ function player (type, x, y, heading)
                                     this.heading = -1;
                                     this.type = 0;
                                     this.state = "ground";
-                                    elevatorFloor = 0;
-                                    elevatorSpeed = 0;
+                                    gameMap.elevatorFloor = 0;
+                                    gameMap.elevatorSpeed = 0;
                                     gameEnemies [0].name = Math.floor (Math.random () * 2);
                                     gameEnemies [0].direction = Math.floor (Math.random () * 2);
                                     gameEnemies [0].x = Math.round (gameMap.width / 2) - 194;
@@ -1615,7 +1626,6 @@ function player (type, x, y, heading)
                     else if (this.type == 4) this.type = 7;
                     else this.type = 4; 
                 }
-                
             }
             else if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
