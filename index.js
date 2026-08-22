@@ -50,6 +50,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         }
     ],
     gravity = 0.1,
+    elevatorSpeed = 0,
     gameScreen = null,
     gameTitle = null,
     gameMap =
@@ -982,6 +983,7 @@ function elevator (color, color2, x, y, type)
 
     this.update = function ()
     {
+        this.y = Number (this.y + elevatorSpeed);
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.fillStyle = this.color;
@@ -1013,6 +1015,7 @@ function support (color, color2, color3, x, y)
 
     this.update = function ()
     {
+        this.height = Number (this.height + elevatorSpeed);
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         const canvasAux = createCanvas (12, 16);
@@ -1413,7 +1416,11 @@ function player (type, x, y, heading)
                         }
                         else if (this.y == gameFront [front].y + gameFront [front].height)
                         {
-                            if (gameFront [front].constructor.name == "bell") gameFront [front].rings = 1;
+                            if (gameFront [front].constructor.name == "bell")
+                            {
+                                gameFront [front].rings = 1;
+                                elevatorSpeed = -1;
+                            }
                             this.speedY = 0;
                         }
                     }
@@ -1421,7 +1428,11 @@ function player (type, x, y, heading)
                     {
                         if (this.x == gameFront [front].x + gameFront [front].width  && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
                         {
-                            if (gameFront [front].constructor.name == "bell") gameFront [front].rings = 1;
+                            if (gameFront [front].constructor.name == "bell")
+                            {
+                                gameFront [front].rings = 1;
+                                elevatorSpeed = -1;
+                            }
                             this.speedX = 0;
                         }
                     }
