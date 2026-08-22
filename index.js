@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = 640, //sdl.video.displays [0].geometry.width,
-    windowHeight = 400, //sdl.video.displays [0].geometry.height,
+let windowWidth = sdl.video.displays [0].geometry.width,//640,
+    windowHeight = sdl.video.displays [0].geometry.height,//400,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -647,6 +647,7 @@ function generateGameMap (map)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
+            gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 286, 54));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 390));
@@ -700,8 +701,8 @@ function updateGameArea ()
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
-        console.clear ();
-        console.log ("gamePlayers", gamePlayers);
+        //console.clear ();
+        //console.log ("gamePlayers", gamePlayers);
         //console.log ("gameEnemies", gameEnemies);
     }
     if (gameScreen != "game")
@@ -797,6 +798,7 @@ function back (color, x, y, width, height)
     this.update = function ()
     {
         ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
         ctx.fillStyle = this.color;
         ctx.fillRect (this.x, this.y, this.width, this.height);
     }
@@ -812,23 +814,25 @@ function floor (color, x, y, width, height)
 
     this.update = function ()
     {
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
         const canvasAux = createCanvas (4, 6);
         canvasAux.width = 4;
         canvasAux.height = 6;
         const ctxAux = canvasAux.getContext ("2d");
+        ctxAux.lineWidth = 0;
         ctxAux.fillStyle = this.color;
         ctxAux.fillRect (0, 0, 2, 2);
         ctxAux.fillRect (2, 2, 2, 4);
-        ctx = gameArea.ctx;
         this.pattern = ctx.createPattern (canvasAux);
         ctx.fillStyle = this.pattern;
         ctx.fillRect (this.x, this.y, this.width, this.height);
     }
 }
 
-function beam_h (color1, color2, x, y, width)
+function beam_h (color, color2, x, y, width)
 {
-    this.color1 = color1;
+    this.color = color;
     this.color2 = color2;
     this.x = x;
     this.y = y;
@@ -840,24 +844,28 @@ function beam_h (color1, color2, x, y, width)
         if (this.width - 12 > 0)
         {
             ctx = gameArea.ctx;
-            ctx.fillStyle = this.color1;
-            ctx.fillRect (this.x, this.y, this.width, 4);
-            ctx.fillRect (this.x, this.y + 12, this.width, 4);
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (0, 0, this.width, 4);
+            ctx.fillRect (0, 12, this.width, 4);
             ctx.fillStyle = this.color2;
-            ctx.fillRect (this.x + 6, this.y + 4, this.width - 12, 8);
+            ctx.fillRect (6, 4, this.width - 12, 8);
             for (let x = 28; x + 7 < this.width; x += 104)
             {
                 ctx.fillStyle = "black";
-                ctx.fillRect (this.x + x, this.y + 6, 6, 4);
-                ctx.fillRect (this.x + x + 16, this.y + 6, 6, 4);
+                ctx.fillRect (x, 6, 6, 4);
+                ctx.fillRect (x + 16, 6, 6, 4);
             }
+            ctx.restore ();
         }
     }
 }
 
-function beam_v (color1, color2, x, y, height)
+function beam_v (color, color2, x, y, height)
 {
-    this.color1 = color1;
+    this.color = color;
     this.color2 = color2;
     this.x = x;
     this.y = y;
@@ -869,24 +877,28 @@ function beam_v (color1, color2, x, y, height)
         if (this.width - 11 > 0)
         {
             ctx = gameArea.ctx;
-            ctx.fillStyle = this.color1;
-            ctx.fillRect (this.x, this.y, 4, this.height);
-            ctx.fillRect (this.x + 18, this.y, 4, this.height);
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (0, 0, 4, this.height);
+            ctx.fillRect (18, 0, 4, this.height);
             ctx.fillStyle = this.color2;
-            ctx.fillRect (this.x + 4, this.y, 14, this.height);
+            ctx.fillRect (4, 0, 14, this.height);
             for (let y = 24; y + 5 < this.height; y += 64)
             {
                 ctx.fillStyle = "black";
-                ctx.fillRect (this.x + 8, this.y + y, 6, 4);
-                ctx.fillRect (this.x + 8, this.y + y + 14, 6, 4);
+                ctx.fillRect (8, y, 6, 4);
+                ctx.fillRect (8, y + 14, 6, 4);
             }
+            ctx.restore ();
         }
     }
 }
 
-function column (color1, color2, color3, x, y)
+function column (color, color2, color3, x, y)
 {
-    this.color1 = color1;
+    this.color = color;
     this.color2 = color2;
     this.color3 = color3;
     this.x = x;
@@ -897,15 +909,19 @@ function column (color1, color2, color3, x, y)
     this.update = function ()
     {
         ctx = gameArea.ctx;
-        ctx.fillStyle = this.color1;
-        ctx.fillRect (this.x + 2, this.y, 14, 4);
-        ctx.fillRect (this.x + 2, this.y + 16, 14, 4);
-        ctx.fillRect (this.x, this.y + 20, 18, 6);
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = this.color;
+        ctx.fillRect (2, 0, 14, 4);
+        ctx.fillRect (2, 16, 14, 4);
+        ctx.fillRect (0, 20, 18, 6);
         ctx.fillStyle = this.color2;
-        ctx.fillRect (this.x + 4, this.y + 4, 10, 4);
-        ctx.fillRect (this.x + 4, this.y + 12, 10, 4);
+        ctx.fillRect (4, 4, 10, 4);
+        ctx.fillRect (4, 12, 10, 4);
         ctx.fillStyle = this.color3;
-        ctx.fillRect (this.x + 6, this.y + 8, 6, 4);
+        ctx.fillRect (6, 8, 6, 4);
+        ctx.restore ();
     }
 }
 
@@ -921,13 +937,17 @@ function chain (color, x, y, steps)
     this.update = function ()
     {
         ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
         ctx.fillStyle = this.color;
         for (let y = 0; y < this.steps * 8; y += 8)
         {
-            ctx.fillRect (this.x, this.y + y, 2, 6);
-            ctx.fillRect (this.x + 6, this.y + y, 2, 6);
-            ctx.fillRect (this.x + 2, this.y + y + 6, 4, 2);
+            ctx.fillRect (0, y, 2, 6);
+            ctx.fillRect (6, y, 2, 6);
+            ctx.fillRect (2, y + 6, 4, 2);
         }
+        ctx.restore ();
     }
 }
 
@@ -946,7 +966,7 @@ function elevator (color, color2, color3, x, y)
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
-        ctx.translate (this.x, this.y);
+        ctx.translate (Math.round (this.x), Math.round (this.y));
         ctx.fillStyle = this.color;
         ctx.fillRect (0, 0, 54, 8);
         ctx.fillRect (0, 8, 2, 48);
@@ -973,10 +993,13 @@ function support (color, color2, color3, x, y)
 
     this.update = function ()
     {
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
         const canvasAux = createCanvas (12, 16);
         canvasAux.width = 12;
         canvasAux.height = 16;
         const ctxAux = canvasAux.getContext ("2d");
+        ctxAux.lineWidth = 0;
         ctxAux.fillStyle = this.color;
         ctxAux.fillRect (0, 0, canvasAux.width, canvasAux.height);
         ctxAux.clearRect (10, 10, 2, 2);
@@ -993,10 +1016,91 @@ function support (color, color2, color3, x, y)
         ctxAux.fillStyle = this.color3;
         ctxAux.fillRect (4, 14, 2, 2);
         ctxAux.fillRect (4, 6, 2, 2);
-        ctx = gameArea.ctx;
         const pattern = ctx.createPattern (canvasAux);
         ctx.fillStyle = pattern;
         ctx.fillRect (this.x, this.y, this.width, this.height);
+    }
+}
+
+function bell (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = x;
+    this.y = y;
+    this.width = 22;
+    this.height = 20;
+    this.type = 0;
+    this.rings = 0;
+
+    this.update = function ()
+    {
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = this.color;
+        if (gameArea.frame % 5 == 0 && this.rings > 0)
+        {
+            this.type++;
+            if (this.type == 4)
+            {
+                this.type = 0;
+                this.rings++;
+                if (this.rings == 6) this.rings = 0;
+            }
+        }
+        switch (this.type)
+        {
+            case 0:
+            case 2:
+                ctx.fillRect (8, 6, 6, 2);
+                ctx.fillRect (6, 8, 10, 4);
+                ctx.fillRect (4, 12, 14, 4);
+                ctx.fillRect (2, 16, 18, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (6, 0, 2, 6);
+                ctx.fillRect (14, 0, 2, 6);
+                ctx.fillRect (10, 18, 2, 2);
+            break;
+            case 1:
+                ctx.fillRect (8, 6, 8, 2);
+                ctx.fillRect (4, 8, 14, 2);
+                ctx.fillRect (0, 10, 18, 2);
+                ctx.fillRect (2, 12, 14, 2);
+                ctx.fillRect (6, 14, 10, 2);
+                ctx.fillRect (8, 16, 6, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (8, 2, 2, 2);
+                ctx.fillRect (16, 2, 2, 4);
+                ctx.fillRect (12, 18, 2, 2);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (6, 0, 2, 2);
+                ctx.fillRect (14, 0, 2, 2);
+                ctx.fillRect (10, 4, 2, 2);
+                ctx.fillRect (18, 6, 2, 2);
+                ctx.fillRect (6, 18, 2, 2);
+            break;
+            case 3:
+                ctx.fillRect (6, 6, 8, 2);
+                ctx.fillRect (4, 8, 14, 2);
+                ctx.fillRect (4, 10, 18, 2);
+                ctx.fillRect (6, 12, 14, 2);
+                ctx.fillRect (6, 14, 10, 2);
+                ctx.fillRect (8, 16, 6, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (6, 0, 2, 2);
+                ctx.fillRect (14, 0, 2, 2);
+                ctx.fillRect (10, 4, 2, 2);
+                ctx.fillRect (2, 6, 2, 2);
+                ctx.fillRect (14, 18, 2, 2);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (4, 2, 2, 4);
+                ctx.fillRect (12, 2, 2, 2);
+                ctx.fillRect (8, 18, 2, 2);
+        }
+        ctx.restore ();
     }
 }
 
@@ -1014,9 +1118,11 @@ function bouncy (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        if (gameArea.frame % 5 == 0 && this.type > 0 && this.type < 4) this.type++;
         ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
         ctx.fillStyle = this.color;
+        if (gameArea.frame % 5 == 0 && this.type > 0 && this.type < 4) this.type++;
         switch (this.type)
         {
             case 0:
@@ -1032,23 +1138,24 @@ function bouncy (color, color2, color3, x, y)
                         this.type = 0;
                     }
                 }
-                ctx.fillRect (this.x + 2, this.y, 22, 2);
+                ctx.translate (Math.round (this.x), Math.round (this.y));
+                ctx.fillRect (2, 0, 22, 2);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (this.x + 8, this.y + 6, 10, 14);
-                ctx.fillRect (this.x + 6, this.y + 10, 14, 6);
-                ctx.fillRect (this.x + 2, this.y + 20, 22, 4);
+                ctx.fillRect (8, 6, 10, 14);
+                ctx.fillRect (6, 10, 14, 6);
+                ctx.fillRect (2, 20, 22, 4);
                 ctx.fillStyle = this.color3;
-                ctx.fillRect (this.x, this.y + 2, 26, 4);
-                ctx.fillRect (this.x + 10, this.y + 6, 2, 4);
-                ctx.fillRect (this.x + 14, this.y + 6, 2, 4);
-                ctx.fillRect (this.x + 8, this.y + 10, 2, 4);
-                ctx.fillRect (this.x + 12, this.y + 10, 2, 4);
-                ctx.fillRect (this.x + 16, this.y + 10, 2, 4);
-                ctx.fillRect (this.x + 10, this.y + 14, 2, 4);
-                ctx.fillRect (this.x + 14, this.y + 14, 2, 4);
-                ctx.fillRect (this.x + 8, this.y + 18, 2, 2);
-                ctx.fillRect (this.x + 12, this.y + 18, 2, 2);
-                ctx.fillRect (this.x + 16, this.y + 18, 2, 2);
+                ctx.fillRect (0, 2, 26, 4);
+                ctx.fillRect (10, 6, 2, 4);
+                ctx.fillRect (14, 6, 2, 4);
+                ctx.fillRect (8, 10, 2, 4);
+                ctx.fillRect (12, 10, 2, 4);
+                ctx.fillRect (16, 10, 2, 4);
+                ctx.fillRect (10, 14, 2, 4);
+                ctx.fillRect (14, 14, 2, 4);
+                ctx.fillRect (8, 18, 2, 2);
+                ctx.fillRect (12, 18, 2, 2);
+                ctx.fillRect (16, 18, 2, 2);
             break;
             case 1:
             case 3:
@@ -1058,23 +1165,24 @@ function bouncy (color, color2, color3, x, y)
                     this.height = 20;
                     gamePlayers [0].y = this.y - 30;
                 }
-                ctx.fillRect (this.x + 2, this.y, 22, 2);
+                ctx.translate (Math.round (this.x), Math.round (this.y));
+                ctx.fillRect (2, 0, 22, 2);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (this.x + 6, this.y + 6, 14, 10);
-                ctx.fillRect (this.x + 2, this.y + 10, 22, 2);
-                ctx.fillRect (this.x + 2, this.y + 16, 22, 4);
+                ctx.fillRect (6, 6, 14, 10);
+                ctx.fillRect (2, 10, 22, 2);
+                ctx.fillRect (2, 16, 22, 4);
                 ctx.fillStyle = this.color3;
-                ctx.fillRect (this.x, this.y + 2, 26, 4);
-                ctx.fillRect (this.x + 8, this.y + 6, 2, 2);
-                ctx.fillRect (this.x + 12, this.y + 6, 2, 2);
-                ctx.fillRect (this.x + 16, this.y + 6, 2, 2);
-                ctx.fillRect (this.x + 4, this.y + 8, 4, 6);
-                ctx.fillRect (this.x + 10, this.y + 8, 2, 6);
-                ctx.fillRect (this.x + 14, this.y + 8, 2, 6);
-                ctx.fillRect (this.x + 18, this.y + 8, 4, 6);
-                ctx.fillRect (this.x + 8, this.y + 14, 2, 2);
-                ctx.fillRect (this.x + 12, this.y + 14, 2, 2);
-                ctx.fillRect (this.x + 16, this.y + 14, 2, 2);
+                ctx.fillRect (0, 2, 26, 4);
+                ctx.fillRect (8, 6, 2, 2);
+                ctx.fillRect (12, 6, 2, 2);
+                ctx.fillRect (16, 6, 2, 2);
+                ctx.fillRect (4, 8, 4, 6);
+                ctx.fillRect (10, 8, 2, 6);
+                ctx.fillRect (14, 8, 2, 6);
+                ctx.fillRect (18, 8, 4, 6);
+                ctx.fillRect (8, 14, 2, 2);
+                ctx.fillRect (12, 14, 2, 2);
+                ctx.fillRect (16, 14, 2, 2);
             break;
             case 2:
                 if (this.height != 10)
@@ -1083,12 +1191,14 @@ function bouncy (color, color2, color3, x, y)
                     this.height = 10;
                     gamePlayers [0].y = this.y - 30;
                 }
-                ctx.fillRect (this.x + 2, this.y, 22, 2);
+                ctx.translate (Math.round (this.x), Math.round (this.y));
+                ctx.fillRect (2, 0, 22, 2);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (this.x + 2, this.y + 6, 22, 4);
+                ctx.fillRect (2, 6, 22, 4);
                 ctx.fillStyle = this.color3;
-                ctx.fillRect (this.x, this.y + 2, 26, 4);
+                ctx.fillRect (0, 2, 26, 4);
         }
+        ctx.restore ();
     }
 }
 
@@ -1105,16 +1215,10 @@ function machine (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        if (gameArea.frame % 300 == 0 && this.type == 0)
-        {
-            this.type = 1;
-            gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
-        }
-        else if (gameArea.frame % 120 == 0 && this.type == 1) this.type = 0;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
-        ctx.translate (this.x, this.y);
+        ctx.translate (Math.round (this.x), Math.round (this.y));
         ctx.fillStyle = this.color;
         switch (this.type)
         {
@@ -1163,6 +1267,12 @@ function machine (color, color2, color3, x, y)
                 ctx.fillRect (16, 20, 6, 6);
         }
         ctx.restore ();
+        if (gameArea.frame % 300 == 0 && this.type == 0)
+        {
+            this.type = 1;
+            gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
+        }
+        else if (gameArea.frame % 120 == 0 && this.type == 1) this.type = 0;
     }
 }
 
@@ -1172,7 +1282,7 @@ function bolt (color, x, y, bounce)
     this.x = x;
     this.y = y;
     this.bounce = (bounce != null ? bounce : 0.6);
-    this.bounced = [5];
+    this.bounced = [0];
     this.width = 10;
     this.height = 10;
     this.speedX = -(Math.floor (Math.random () * 6 + 1));
@@ -1183,41 +1293,42 @@ function bolt (color, x, y, bounce)
     {
         this.x = Number ((this.x + this.speedX).toFixed (1));
         this.y = Number ((this.y + this.speedY).toFixed (1));
-        for (let front = 0; front < gameFront.length; front++)
+        let beams = gameFront.filter (front => front.constructor.name == "beam_h");
+        for (let beam = 1; beam < beams.length; beam++)
         {
-            if (gameFront [front].constructor.name == "beam_h" && !this.bounced.includes (front)) 
+            if (!this.bounced.includes (beam)) 
             {
-                if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
+                if (this.x < beams [beam].x + beams [beam].width && this.x >= beams [beam].x || this.x + this.width > beams [beam].x && this.x + this.width <= beams [beam].x + beams [beam].width)
                 {
-                    if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
-                    if (this.y == gameFront [front].y - this.height)
+                    if (this.y + this.height > beams [beam].y && this.y + this.height <= beams [beam].y + beams [beam].height && this.speedY > 0) this.y = beams [beam].y - this.height;
+                    if (this.y == beams [beam].y - this.height)
                     {
                         this.speedY = -(this.speedY * this.bounce);
-                        this.bounced.push (front);
+                        this.bounced.push (beam);
+                        if (!this.bounced.includes (beam - 1)) this.bounced.push (beam - 1);
                     }
                 }
             }
         }
-        if (this.y > gameMap.height - this.height) gameEnemies.splice (idEnemy, 1);
-        this.speedY = Number ((this.speedY + this.gravity).toFixed (1));
+        this.speedY = this.speedY + this.gravity;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
-        ctx.translate (this.x, this.y);
+        ctx.translate (Math.round (this.x), Math.round (this.y));
         ctx.fillStyle = this.color;
         ctx.fillRect (0, 0, 10, 4);
         ctx.fillRect (2, 4, 6, 6);
         ctx.restore ();
+        if (this.y > gameMap.height || this.x + this.width < 0) gameEnemies.splice (idEnemy, 1);
     }
 }
 
-function player (type, x, y, heading, bounce)
+function player (type, x, y, heading)
 {
     this.type = (type != null ? type : 0);
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.heading = (heading != null ? heading : 1);
-    this.bounce = (bounce != null ? bounce : 0);
     this.width = 26;
     this.height = 30;
     this.speedX = 0;
@@ -1242,8 +1353,8 @@ function player (type, x, y, heading, bounce)
     {
         if (gameScreen == "game")
         {
-            this.x = Math.round (Number ((this.x + this.speedX).toFixed (1)));
-            this.y = Math.round (Number ((this.y + this.speedY).toFixed (1)));
+            this.x = Number ((this.x + this.speedX).toFixed (1));
+            this.y = Number ((this.y + this.speedY).toFixed (1));
             if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
@@ -1278,12 +1389,21 @@ function player (type, x, y, heading, bounce)
                             }
                             else if (this.speedY > 2.8) this.dead = 1;
                             else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
+                            this.speedY = 0;
                         }
-                        if (this.y == gameFront [front].y - this.height || this.y == gameFront [front].y + gameFront [front].height) this.speedY = (-(this.speedY * this.bounce) == -0 ? 0 : -(this.speedY * this.bounce));
+                        else if (this.y == gameFront [front].y + gameFront [front].height)
+                        {
+                            if (gameFront [front].constructor.name == "bell") gameFront [front].rings = 1;
+                            this.speedY = 0;
+                        }
                     }
                     if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                     {
-                        if (this.x == gameFront [front].x + gameFront [front].width  && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0) this.speedX = 0;
+                        if (this.x == gameFront [front].x + gameFront [front].width  && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                        {
+                            if (gameFront [front].constructor.name == "bell") gameFront [front].rings = 1;
+                            this.speedX = 0;
+                        }
                     }
                 }
                 if (this.x < 0) this.x = 0;
@@ -1296,7 +1416,7 @@ function player (type, x, y, heading, bounce)
                     this.state = "ground";
                     if (this.speedY > 2.8) this.dead = 1;
                 }
-                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = (-(this.speedY * this.bounce) == -0 ? 0 : -(this.speedY * this.bounce));
+                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = 0;
             }
             if (this.state == "air")
             {
@@ -1318,7 +1438,7 @@ function player (type, x, y, heading, bounce)
                         this.speedY = -2;
                     }
                 }
-                else this.speedY = Number ((this.speedY + gravity).toFixed (1));
+                else this.speedY = this.speedY + gravity;
                 if (this.dead == 0)
                 {
                     if (this.speedX == 0) this.type = 4;
@@ -1404,7 +1524,7 @@ function player (type, x, y, heading, bounce)
                         (
                             () =>
                             {
-                                if (gameEnemies [this.enemyKill].constructor.name == "bolt")
+                                if (this.enemyKill != null &&gameEnemies [this.enemyKill].constructor.name == "bolt")
                                 {
                                     gameEnemies.splice (this.enemyKill, 1);
                                     this.enemyKill = null;
@@ -1453,7 +1573,7 @@ function player (type, x, y, heading, bounce)
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.scale (this.heading, 1);
-        ctx.translate (this.x * this.heading - (this.heading == -1 ? this.width : 0), this.y);
+        ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
         ctx.fillStyle = "#FFFFFF";
         switch (this.type)
         {
@@ -1784,7 +1904,7 @@ function enemy (name, type, x, y)
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
-        ctx.translate (this.x, this.y);
+        ctx.translate (Math.round (this.x), Math.round (this.y));
         switch (this.name)
         {
             case 0:
@@ -1925,7 +2045,7 @@ function component (type, src, color, x, y, width, height)
         }
         catch (err)
         {
-            console.error ('Error loading picture: ', err);
+            console.error ('Error loading picture:', err + '.');
         }
     }
 
