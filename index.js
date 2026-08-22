@@ -643,6 +643,7 @@ function generateGameMap (map)
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 160, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 178, 224, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 288, 4));
+            gameBack.push (new elevator ("#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 2));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 159, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
@@ -655,7 +656,9 @@ function generateGameMap (map)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
-            gameFront.push (new elevator ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 280));
+            gameFront.push (new elevator ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 0));
+            gameFront.push (new elevator ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 1));
+            gameFront.push (new elevator ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 3));
             gameFront.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
@@ -951,33 +954,50 @@ function chain (color, x, y, steps)
     }
 }
 
-function elevator (color, color2, color3, x, y)
+function elevator (color, color2, x, y, type)
 {
     this.color = color;
     this.color2 = color2;
-    this.color3 = color3;
     this.x = x;
     this.y = y;
-    this.width = 54;
-    this.height = 66;
+    this.type = (type != null ? type : 0);
+    switch (this.type)
+    {
+        case 0:
+            this.width = 54;
+            this.height = 8;
+        break;
+        case 1:
+            this.width = 4;
+            this.height = 48;
+        break;
+        case 2:
+            this.width = 4;
+            this.height = 48;
+        break;
+        case 3:
+            this.width = 54;
+            this.height = 10;
+    }
 
     this.update = function ()
     {
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
         ctx.fillStyle = this.color;
-        ctx.fillRect (0, 0, 54, 8);
-        ctx.fillRect (0, 8, 2, 48);
-        ctx.fillRect (50, 8, 4, 48);
-        ctx.fillRect (0, 56, 54, 10);
+        ctx.fillRect (this.x, this.y, this.width, this.height);
         ctx.fillStyle = this.color2;
-        ctx.fillRect (6, 2, 42, 4);
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (2, 8, 2, 48);
-        ctx.fillRect (8, 58, 38, 4);
-        ctx.restore ();
+        switch (this.type)
+        {
+            case 0:
+                ctx.fillRect (this.x + 6, this.y + 2, 42, 4);
+            break;
+            case 1:
+                ctx.fillRect (this.x + 2, this.y, 2, 48);
+            break;
+            case 3:
+                ctx.fillRect (this.x + 8, this.y + 2, 38, 4);
+        }
     }
 }
 
