@@ -1420,10 +1420,11 @@ function player (type, x, y, heading)
                                 this.bouncy = true;
                                 gameFront [front].type = 1;
                             }
-                            else if (this.speedX < 0 && gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && gameFront [front].x + 25 == this.x)
+                            else if (this.speedX < 0 && gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && this.x == gameFront [front].x + (gameFront [front].width - this.width) / 2)
                             {
                                 if (elevatorFloor == 0) elevatorSpeed = -4;
                                 else if (elevatorFloor == 192) elevatorSpeed = 4;
+                                this.speedY = elevatorSpeed;
                             }
                             else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
                             else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
