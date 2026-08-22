@@ -50,6 +50,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         }
     ],
     gravity = 0.1,
+    elevatorFloor = 0,
     elevatorSpeed = 0,
     gameScreen = null,
     gameTitle = null,
@@ -702,6 +703,11 @@ function updateGameArea ()
     for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
+        if (elevatorSpeed != 0)
+        {
+            elevatorFloor -= elevatorSpeed;
+            if (elevatorSpeed < 0 && elevatorFloor == 192 ||elevatorSpeed > 0 && elevatorFloor == 0) elevatorSpeed = 0;
+        }
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
@@ -961,6 +967,7 @@ function elevator (color, color2, x, y, type)
     this.color2 = color2;
     this.x = x;
     this.y = y;
+    this.startY = y;
     this.type = (type != null ? type : 0);
     switch (this.type)
     {
@@ -983,7 +990,7 @@ function elevator (color, color2, x, y, type)
 
     this.update = function ()
     {
-        this.y = Number (this.y + elevatorSpeed);
+        this.y = this.startY - elevatorFloor;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.fillStyle = this.color;
@@ -1010,12 +1017,15 @@ function support (color, color2, color3, x, y)
     this.color3 = color3;
     this.x = x;
     this.y = y;
+    this.startY = y;
     this.width = 12;
     this.height = 32;
+    this.startHeight = this.height;
 
     this.update = function ()
     {
-        this.height = Number (this.height + elevatorSpeed);
+        this.y = this.startY - elevatorFloor;
+        this.height = this.startHeight + elevatorFloor;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         const canvasAux = createCanvas (12, 16);
@@ -1410,7 +1420,12 @@ function player (type, x, y, heading)
                                 this.bouncy = true;
                                 gameFront [front].type = 1;
                             }
-                            else if (this.speedY > 2.8) this.dead = 1;
+                            else if (this.speedX < 0 && gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && gameFront [front].x + 25 == this.x)
+                            {
+                                if (elevatorFloor == 0) elevatorSpeed = -4;
+                                else if (elevatorFloor == 192) elevatorSpeed = 4;
+                            }
+                            else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
                             else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
                             this.speedY = 0;
                         }
@@ -1419,7 +1434,8 @@ function player (type, x, y, heading)
                             if (gameFront [front].constructor.name == "bell")
                             {
                                 gameFront [front].rings = 1;
-                                elevatorSpeed = -1;
+                                if (elevatorFloor == 0) elevatorSpeed = -4;
+                                else if (elevatorFloor == 192) elevatorSpeed = 4;
                             }
                             this.speedY = 0;
                         }
@@ -1431,7 +1447,8 @@ function player (type, x, y, heading)
                             if (gameFront [front].constructor.name == "bell")
                             {
                                 gameFront [front].rings = 1;
-                                elevatorSpeed = -1;
+                                if (elevatorFloor == 0) elevatorSpeed = -4;
+                                else if (elevatorFloor == 192) elevatorSpeed = 4;
                             }
                             this.speedX = 0;
                         }
@@ -1583,6 +1600,8 @@ function player (type, x, y, heading)
                                     this.heading = -1;
                                     this.type = 0;
                                     this.state = "ground";
+                                    elevatorFloor = 0;
+                                    elevatorSpeed = 0;
                                     gameEnemies [0].name = Math.floor (Math.random () * 2);
                                     gameEnemies [0].direction = Math.floor (Math.random () * 2);
                                     gameEnemies [0].x = Math.round (gameMap.width / 2) - 194;
