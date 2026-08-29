@@ -645,11 +645,12 @@ function generateGameMap (map)
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 160, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 178, 224, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 288, 4));
-            gameBack.push (new elevator ("#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 2));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 159, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
+            gameBack.push (new elevator ("#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 2));
+            gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 286, 54));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
@@ -661,7 +662,6 @@ function generateGameMap (map)
             gameFront.push (new elevator ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 0));
             gameFront.push (new elevator ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 1));
             gameFront.push (new elevator ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 3));
-            gameFront.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 310, -1));
@@ -706,18 +706,14 @@ function updateGameArea ()
         if (gameMap.elevatorSpeed != 0)
         {
             gameMap.elevatorFloor -= gameMap.elevatorSpeed;
-            if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0)
-            {
-                gameMap.elevatorSpeed = 0;
-                if (gamePlayers [0].elevator) gamePlayers [0].elevator = false;
-            }
+            if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
         }
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
-        //console.clear ();
-        //console.log ("gamePlayers", gamePlayers);
-        //console.log ("gameEnemies", gameEnemies);
+        console.clear ();
+        console.log ("gamePlayers", gamePlayers);
+        console.log ("gameEnemies", gameEnemies);
     }
     if (gameScreen != "game")
     {
@@ -1425,13 +1421,14 @@ function player (type, x, y, heading)
                                 this.bouncy = true;
                                 gameFront [front].type = 1;
                             }
-                            else if (this.speedX < 0 && gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && this.x + this.width == gameFront [front].x + gameFront [front].width)
+                            else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
                             {
                                 this.elevator = true;
+                                this.speedX = 0;
                                 this.x -= (this.x - gameFront [front].x) / 2 - 2;
+                                this.startY = this.y;
                                 if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                 else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                                this.speedY = gameMap.elevatorSpeed;
                             }
                             else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
                             else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
@@ -1551,7 +1548,17 @@ function player (type, x, y, heading)
                     }
                     if (this.elevator)
                     {
-                        this.type = 4;
+                        if (gameMap.elevatorSpeed == 0)
+                        {
+                            if (this.type == 4) this.type = 7;
+                            if (gameArea.frame % 5 == 0) this.type++;
+                            if (this.type == 14) this.elevator = false;
+                        }
+                        else
+                        {
+                            this.y = this.startY - gameMap.elevatorFloor;
+                            this.type = 4;
+                        }
                     }
                 }
             }
@@ -1577,6 +1584,7 @@ function player (type, x, y, heading)
                             this.type = 3;
                         }
                     }
+                    else if (this.type == 4) this.type = 7;
                     else if (this.type == 7)
                     {
                         this.type = 8;
@@ -1605,12 +1613,16 @@ function player (type, x, y, heading)
                                 }
                                 else
                                 {
-                                    this.dead = 0;
-                                    this.deadFrame = 0;
+                                    this.type = 0;
                                     this.x = Math.round (gameMap.width / 2) + 160;
                                     this.y = 310;
                                     this.heading = -1;
-                                    this.type = 0;
+                                    this.jump = 0;
+                                    this.jumping = false;
+                                    this.bouncy = false;
+                                    this.elevator = false;
+                                    this.dead = 0;
+                                    this.deadFrame = 0;
                                     this.state = "ground";
                                     gameMap.elevatorFloor = 0;
                                     gameMap.elevatorSpeed = 0;
@@ -1623,7 +1635,6 @@ function player (type, x, y, heading)
                             2000
                         );
                     }
-                    else if (this.type == 4) this.type = 7;
                     else this.type = 4; 
                 }
             }
@@ -1706,6 +1717,8 @@ function player (type, x, y, heading)
                 ctx.fillRect (22, 10, 2, 2);
             break;
             case 4:
+            case 10:
+            case 14:
                 ctx.fillRect (8, 0, 4, 2);
                 ctx.fillRect (14, 0, 4, 2);
                 ctx.fillRect (6, 2, 6, 2);
@@ -1779,6 +1792,9 @@ function player (type, x, y, heading)
                 ctx.fillRect (22, 14, 2, 2);
             break;
             case 7:
+            case 9:
+            case 11:
+            case 13:
                 ctx.fillRect (8, 10, 4, 2);
                 ctx.fillRect (14, 10, 4, 2);
                 ctx.fillRect (6, 12, 14, 2);
@@ -1798,6 +1814,7 @@ function player (type, x, y, heading)
                 ctx.fillRect (12, 22, 2, 2);
             break;
             case 8:
+            case 12:
                 ctx.fillRect (8, 16, 4, 2);
                 ctx.fillRect (14, 16, 4, 2);
                 ctx.fillRect (4, 18, 18, 2);
