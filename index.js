@@ -49,7 +49,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,/*640,*/
             code: 19
         }
     ],
-    gravity = 0.11,
+    gravity = 0.12,
     gameScreen = null,
     gameTitle = null,
     gameMap =
@@ -651,7 +651,7 @@ function generateGameMap (map)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
             gameBack.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 4, 48));
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
-            gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 18));
+            gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 286, 54));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 390));
@@ -664,7 +664,7 @@ function generateGameMap (map)
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
-            gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 310, -1));
+            gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
         break;
         case "level2":
             gameMap =
@@ -711,9 +711,8 @@ function updateGameArea ()
             gameMap.elevatorFloor -= gameMap.elevatorSpeed;
             if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
         }
-        /*console.clear ();
+        console.clear ();
         console.log ("gamePlayers", gamePlayers);
-        console.log ("gameEnemies", gameEnemies);*/
     }
     if (gameScreen != "game")
     {
@@ -1045,14 +1044,20 @@ function bell (color, color2, color3, x, y)
     this.color2 = color2;
     this.color3 = color3;
     this.x = x;
+    this.startX = x;
     this.y = y;
-    this.width = 22;
+    this.width = 18;
+    this.startWidth = this.width;
     this.height = 20;
     this.type = 0;
     this.rings = 0;
 
     this.update = function ()
     {
+        if (this.type == 1) this.x = this.startX - 2;
+        else this.x = this.startX;
+        if (this.type == 0 || this.type == 2) this.width = this.startWidth;
+        else this.width = this.startWidth + 2;
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
@@ -1072,14 +1077,14 @@ function bell (color, color2, color3, x, y)
         {
             case 0:
             case 2:
-                ctx.fillRect (8, 6, 6, 2);
-                ctx.fillRect (6, 8, 10, 4);
-                ctx.fillRect (4, 12, 14, 4);
-                ctx.fillRect (2, 16, 18, 2);
+                ctx.fillRect (6, 6, 6, 2);
+                ctx.fillRect (4, 8, 10, 4);
+                ctx.fillRect (2, 12, 14, 4);
+                ctx.fillRect (0, 16, 18, 2);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (6, 0, 2, 6);
-                ctx.fillRect (14, 0, 2, 6);
-                ctx.fillRect (10, 18, 2, 2);
+                ctx.fillRect (4, 0, 2, 6);
+                ctx.fillRect (12, 0, 2, 6);
+                ctx.fillRect (8, 18, 2, 2);
             break;
             case 1:
                 ctx.fillRect (8, 6, 8, 2);
@@ -1100,22 +1105,22 @@ function bell (color, color2, color3, x, y)
                 ctx.fillRect (6, 18, 2, 2);
             break;
             case 3:
-                ctx.fillRect (6, 6, 8, 2);
-                ctx.fillRect (4, 8, 14, 2);
-                ctx.fillRect (4, 10, 18, 2);
-                ctx.fillRect (6, 12, 14, 2);
-                ctx.fillRect (6, 14, 10, 2);
-                ctx.fillRect (8, 16, 6, 2);
+                ctx.fillRect (4, 6, 8, 2);
+                ctx.fillRect (2, 8, 14, 2);
+                ctx.fillRect (2, 10, 18, 2);
+                ctx.fillRect (4, 12, 14, 2);
+                ctx.fillRect (4, 14, 10, 2);
+                ctx.fillRect (6, 16, 6, 2);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (6, 0, 2, 2);
-                ctx.fillRect (14, 0, 2, 2);
-                ctx.fillRect (10, 4, 2, 2);
-                ctx.fillRect (2, 6, 2, 2);
-                ctx.fillRect (14, 18, 2, 2);
+                ctx.fillRect (4, 0, 2, 2);
+                ctx.fillRect (12, 0, 2, 2);
+                ctx.fillRect (8, 4, 2, 2);
+                ctx.fillRect (0, 6, 2, 2);
+                ctx.fillRect (12, 18, 2, 2);
                 ctx.fillStyle = this.color3;
-                ctx.fillRect (4, 2, 2, 4);
-                ctx.fillRect (12, 2, 2, 2);
-                ctx.fillRect (8, 18, 2, 2);
+                ctx.fillRect (2, 2, 2, 4);
+                ctx.fillRect (10, 2, 2, 2);
+                ctx.fillRect (6, 18, 2, 2);
         }
         ctx.restore ();
     }
@@ -1150,8 +1155,9 @@ function bouncy (color, color2, color3, x, y)
                     this.height = 24;
                     if (this.type == 4)
                     {
-                        gamePlayers [0].y = this.y - 30;
+                        gamePlayers [0].y = this.y - gamePlayers [0].height;
                         gamePlayers [0].speedY = -4;
+                        if (gamePlayers [0].dead > 0) gamePlayers [0].speedY = Number ((gamePlayers [0].speedY * 0.8).toFixed (2));
                         this.type = 0;
                     }
                 }
@@ -1180,7 +1186,7 @@ function bouncy (color, color2, color3, x, y)
                 {
                     this.y = this.startY + 4;
                     this.height = 20;
-                    gamePlayers [0].y = this.y - 30;
+                    gamePlayers [0].y = this.y - gamePlayers [0].height;
                 }
                 ctx.translate (Math.round (this.x), Math.round (this.y));
                 ctx.fillRect (2, 0, 22, 2);
@@ -1308,8 +1314,8 @@ function bolt (color, x, y, bounce)
 
     this.update = function (idEnemy)
     {
-        this.x = Number ((this.x + this.speedX).toFixed (1));
-        this.y = Number ((this.y + this.speedY).toFixed (1));
+        this.x = Number ((this.x + this.speedX).toFixed (2));
+        this.y = Number ((this.y + this.speedY).toFixed (2));
         let beams = gameFront.filter (front => front.constructor.name == "beam_h");
         for (let beam = 1; beam < beams.length; beam++)
         {
@@ -1356,12 +1362,12 @@ function player (type, x, y, heading)
     this.jumping = false;
     this.bouncy = false;
     this.elevator = false;
+    this.state = null;
     this.dead = 0;
     this.deadFrame = 0;
     this.lives = 3;
     this.floor = 0;
     this.enemyKill = null;
-
 
     this.drill = function (drilling)
     {
@@ -1371,8 +1377,8 @@ function player (type, x, y, heading)
     {
         if (gameScreen == "game")
         {
-            this.x = Number ((this.x + this.speedX).toFixed (1));
-            this.y = Number ((this.y + this.speedY).toFixed (1));
+            this.x = Number ((this.x + this.speedX).toFixed (2));
+            this.y = Number ((this.y + this.speedY).toFixed (2));
             if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
             {
                 if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
@@ -1412,10 +1418,10 @@ function player (type, x, y, heading)
                     this.state = "air";
                     for (let front = 0; front < gameFront.length; front++)
                     {
-                        if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
+                        if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
                         {
-                            if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
-                            else if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
+                            if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                            else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
                             if (this.y == gameFront [front].y - this.height)
                             {
                                 this.state = "ground";
@@ -1450,7 +1456,7 @@ function player (type, x, y, heading)
                         }
                         if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                         {
-                            if (this.x == gameFront [front].x + gameFront [front].width  && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                            if (this.x == gameFront [front].x + gameFront [front].width && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
                             {
                                 if (gameFront [front].constructor.name == "bell")
                                 {
@@ -1486,7 +1492,7 @@ function player (type, x, y, heading)
                     }
                     if (this.bouncy)
                     {
-                        if (this.floor > 80 - this.height && this.y <= this.floor - 60 || this.floor == 80 - this.height && this.y <= 354 - this.height)
+                        if (this.floor > 50 && this.y <= this.floor - 64 || this.floor == 50 && this.y <= 306)
                         {
                             this.jumping = this.y;
                             this.bouncy = false;
@@ -1494,7 +1500,7 @@ function player (type, x, y, heading)
                             this.speedY = -2;
                         }
                     }
-                    else this.speedY = this.speedY + gravity;
+                    if (!this.bouncy || this.bouncy && this.dead > 0) this.speedY = Number ((this.speedY + gravity).toFixed (2));
                     if (this.dead == 0)
                     {
                         if (this.speedX == 0) this.type = 4;
@@ -1603,19 +1609,19 @@ function player (type, x, y, heading)
                                 }
                                 else
                                 {
+                                    gameMap.elevatorFloor = 0;
+                                    gameMap.elevatorSpeed = 0;
                                     this.type = 0;
                                     this.x = Math.round (gameMap.width / 2) + 160;
-                                    this.y = 310;
+                                    this.y = 306;
                                     this.heading = -1;
                                     this.jump = 0;
                                     this.jumping = false;
                                     this.bouncy = false;
                                     this.elevator = false;
+                                    this.state = null;
                                     this.dead = 0;
                                     this.deadFrame = 0;
-                                    this.state = "ground";
-                                    gameMap.elevatorFloor = 0;
-                                    gameMap.elevatorSpeed = 0;
                                     gameEnemies [0].name = Math.floor (Math.random () * 2);
                                     gameEnemies [0].direction = Math.floor (Math.random () * 2);
                                     gameEnemies [0].x = Math.round (gameMap.width / 2) - 194;
