@@ -711,8 +711,11 @@ function updateGameArea ()
             gameMap.elevatorFloor -= gameMap.elevatorSpeed;
             if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
         }
-        console.clear ();
-        console.log ("gamePlayers", gamePlayers);
+        /*console.clear ();
+        console.log ("gamePlayers:", gamePlayers);
+        console.log ("gameEnemies:", gameEnemies);
+        console.log ("gameFront:", gameFront);
+        console.log ("gameBack:", gameBack);*/
     }
     if (gameScreen != "game")
     {
