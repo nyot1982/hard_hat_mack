@@ -649,7 +649,7 @@ function generateGameMap (map)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
-            gameBack.push (new elevator ("#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 2));
+            gameBack.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 4, 48));
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 286, 54));
@@ -659,9 +659,9 @@ function generateGameMap (map)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 390));
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
-            gameFront.push (new elevator ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 0));
-            gameFront.push (new elevator ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 1));
-            gameFront.push (new elevator ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 3));
+            gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 54, 8));
+            gameFront.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 4, 48));
+            gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 310, -1));
@@ -703,17 +703,17 @@ function updateGameArea ()
     for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
+        for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
+        for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
+        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
         if (gameMap.elevatorSpeed != 0)
         {
             gameMap.elevatorFloor -= gameMap.elevatorSpeed;
             if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
         }
-        for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
-        for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
-        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
-        console.clear ();
+        /*console.clear ();
         console.log ("gamePlayers", gamePlayers);
-        console.log ("gameEnemies", gameEnemies);
+        console.log ("gameEnemies", gameEnemies);*/
     }
     if (gameScreen != "game")
     {
@@ -961,32 +961,16 @@ function chain (color, x, y, steps)
     }
 }
 
-function elevator (color, color2, x, y, type)
+function elevator (type, color, color2, x, y, width, height)
 {
+    this.type = (type != null ? type : 0);
     this.color = color;
     this.color2 = color2;
     this.x = x;
     this.y = y;
     this.startY = y;
-    this.type = (type != null ? type : 0);
-    switch (this.type)
-    {
-        case 0:
-            this.width = 54;
-            this.height = 8;
-        break;
-        case 1:
-            this.width = 4;
-            this.height = 48;
-        break;
-        case 2:
-            this.width = 4;
-            this.height = 48;
-        break;
-        case 3:
-            this.width = 54;
-            this.height = 10;
-    }
+    this.width = width;
+    this.height = height;
 
     this.update = function ()
     {
@@ -1403,161 +1387,167 @@ function player (type, x, y, heading)
                     }
                 }
             }
-            if (this.state != "chain")
+            if (this.elevator)
             {
-                if (this.dead == 0 && this.state == "ground" && !this.bouncy && !this.elevator) this.speedX = this.moveX;
-                this.state = "air";
-                for (let front = 0; front < gameFront.length; front++)
+                if (gameMap.elevatorSpeed == 0)
                 {
-                    if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
+                    this.speedY = 0;
+                    if (this.dead == 0)
                     {
-                        if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
-                        else if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
-                        if (this.y == gameFront [front].y - this.height)
-                        {
-                            this.state = "ground";
-                            if (gameFront [front].constructor.name == "bouncy" && !this.bouncy)
-                            {
-                                this.bouncy = true;
-                                gameFront [front].type = 1;
-                            }
-                            else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
-                            {
-                                this.elevator = true;
-                                this.speedX = 0;
-                                this.x -= (this.x - gameFront [front].x) / 2 - 2;
-                                this.startY = this.y;
-                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                            }
-                            else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
-                            else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
-                            this.speedY = 0;
-                        }
-                        else if (this.y == gameFront [front].y + gameFront [front].height)
-                        {
-                            if (gameFront [front].constructor.name == "bell")
-                            {
-                                gameFront [front].rings = 1;
-                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                            }
-                            this.speedY = 0;
-                        }
-                    }
-                    if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
-                    {
-                        if (this.x == gameFront [front].x + gameFront [front].width  && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
-                        {
-                            if (gameFront [front].constructor.name == "bell")
-                            {
-                                gameFront [front].rings = 1;
-                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                            }
-                            this.speedX = 0;
-                        }
-                    }
-                }
-                if (this.x < 0) this.x = 0;
-                else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
-                if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0) this.speedX = 0;
-                if (this.y < 0) this.y = 0;
-                else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
-                if (this.y == gameMap.height - this.height)
-                {
-                    this.state = "ground";
-                    if (this.speedY > 2.8) this.dead = 1;
-                }
-                if (this.y == 0 || this.y == gameMap.height - this.height) this.speedY = 0;
-            }
-            if (this.state == "air")
-            {
-                if (this.speedX != 0)
-                {
-                    if (!this.jumping || this.y >= this.jumping)
-                    {
-                        this.speedX = 0;
-                        this.jumping = false;
-                    }
-                }
-                if (this.bouncy)
-                {
-                    if (this.floor > 80 - this.height && this.y <= this.floor - 60 || this.floor == 80 - this.height && this.y <= 354 - this.height)
-                    {
-                        this.jumping = this.y;
-                        this.bouncy = false;
-                        this.speedX = -1;
-                        this.speedY = -2;
-                    }
-                }
-                else this.speedY = this.speedY + gravity;
-                if (this.dead == 0)
-                {
-                    if (this.speedX == 0) this.type = 4;
-                    else this.type = 6;
-                }
-            }
-            else if (this.dead == 0)
-            {
-                this.chain_bottom = false;
-                this.chain_top = false;
-                for (let back = 0; back < gameBack.length; back++)
-                {
-                    if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
-                    {
-                        if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 > gameBack [back].y) this.state = "chain";
-                        else
-                        {
-                            this.speedY = 0;
-                            this.state = "ground";
-                            if (this.y - 18 == gameBack [back].y) this.chain_bottom = true;
-                            else if (this.y + this.height + 16 == gameBack [back].y) this.chain_top = true;
-                        }
-                    }
-                }
-                if (this.state == "chain")
-                {
-                    this.speedX = 0;
-                    this.speedY = this.moveY;
-                    if (this.speedY >= 0) this.type = 4;
-                    else if (gameArea.frame % 5 == 0)
-                    {
-                        if (this.type == 4) this.type = 5;
-                        else this.type = 4;
-                    }
-                }
-                else if (this.state == "ground")
-                {
-                    if (this.chain_bottom && this.moveY < 0 || this.chain_top && this.moveY > 0)
-                    {
-                        this.speedY = this.moveY;
-                        this.state = "chain";
-                    }
-                    if (this.jump != 0 && !this.elevator)
-                    {
-                        this.speedY = this.jump;
-                        this.jumping = this.y;
-                    }
-                    else this.jumping = false;
-                    if (this.type > 3 && !this.bouncy) this.type = 1;
-                    if (this.speedX != 0 && gameArea.frame % 3 == 0)
-                    {
-                        if (this.type < 3) this.type++;
-                        else this.type = 0;
-                    }
-                    if (this.elevator)
-                    {
-                        if (gameMap.elevatorSpeed == 0)
+                        if (this.type < 14)
                         {
                             if (this.type == 4) this.type = 7;
                             if (gameArea.frame % 5 == 0) this.type++;
-                            if (this.type == 14) this.elevator = false;
                         }
-                        else
+                        else this.elevator = false;
+                    }
+                }
+                else if (this.dead == 0) this.type = 4;
+            }
+            else
+            {
+                if (this.state != "chain")
+                {
+                    if (this.dead == 0 && this.state == "ground" && !this.bouncy && !this.elevator) this.speedX = this.moveX;
+                    this.state = "air";
+                    for (let front = 0; front < gameFront.length; front++)
+                    {
+                        if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                         {
-                            this.y = this.startY - gameMap.elevatorFloor;
-                            this.type = 4;
+                            if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                            else if (this.y < gameFront [front].y + gameFront [front].height && this.y >= gameFront [front].y && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
+                            if (this.y == gameFront [front].y - this.height)
+                            {
+                                this.state = "ground";
+                                if (gameFront [front].constructor.name == "bouncy" && !this.bouncy)
+                                {
+                                    this.bouncy = true;
+                                    gameFront [front].type = 1;
+                                }
+                                else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
+                                {
+                                    this.elevator = true;
+                                    this.speedX = 0;
+                                    this.x -= (this.x - gameFront [front].x) / 2;
+                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                    this.speedY = gameMap.elevatorSpeed;
+                                }
+                                else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
+                                else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
+                                if (!this.elevator) this.speedY = 0;
+                            }
+                            else if (this.y == gameFront [front].y + gameFront [front].height)
+                            {
+                                if (gameFront [front].constructor.name == "bell")
+                                {
+                                    gameFront [front].rings = 1;
+                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                }
+                                this.speedY = 0;
+                            }
+                        }
+                        if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
+                        {
+                            if (this.x == gameFront [front].x + gameFront [front].width  && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                            {
+                                if (gameFront [front].constructor.name == "bell")
+                                {
+                                    gameFront [front].rings = 1;
+                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                }
+                                this.speedX = 0;
+                            }
+                        }
+                    }
+                    if (this.x < 0) this.x = 0;
+                    else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
+                    if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0) this.speedX = 0;
+                    if (this.y < 0) this.y = 0;
+                    else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
+                    if (this.y == gameMap.height - this.height)
+                    {
+                        this.state = "ground";
+                        if (this.speedY > 2.8) this.dead = 1;
+                    }
+                    if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
+                }
+                if (this.state == "air")
+                {
+                    if (this.speedX != 0)
+                    {
+                        if (!this.jumping || this.y >= this.jumping)
+                        {
+                            this.speedX = 0;
+                            this.jumping = false;
+                        }
+                    }
+                    if (this.bouncy)
+                    {
+                        if (this.floor > 80 - this.height && this.y <= this.floor - 60 || this.floor == 80 - this.height && this.y <= 354 - this.height)
+                        {
+                            this.jumping = this.y;
+                            this.bouncy = false;
+                            this.speedX = -1;
+                            this.speedY = -2;
+                        }
+                    }
+                    else this.speedY = this.speedY + gravity;
+                    if (this.dead == 0)
+                    {
+                        if (this.speedX == 0) this.type = 4;
+                        else this.type = 6;
+                    }
+                }
+                else if (this.dead == 0)
+                {
+                    this.chain_bottom = false;
+                    this.chain_top = false;
+                    for (let back = 0; back < gameBack.length; back++)
+                    {
+                        if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
+                        {
+                            if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 > gameBack [back].y) this.state = "chain";
+                            else
+                            {
+                                this.speedY = 0;
+                                this.state = "ground";
+                                if (this.y - 18 == gameBack [back].y) this.chain_bottom = true;
+                                else if (this.y + this.height + 16 == gameBack [back].y) this.chain_top = true;
+                            }
+                        }
+                    }
+                    if (this.state == "chain")
+                    {
+                        this.speedX = 0;
+                        this.speedY = this.moveY;
+                        if (this.speedY >= 0) this.type = 4;
+                        else if (gameArea.frame % 5 == 0)
+                        {
+                            if (this.type == 4) this.type = 5;
+                            else this.type = 4;
+                        }
+                    }
+                    else if (this.state == "ground")
+                    {
+                        if (this.chain_bottom && this.moveY < 0 || this.chain_top && this.moveY > 0)
+                        {
+                            this.speedY = this.moveY;
+                            this.state = "chain";
+                        }
+                        if (this.jump != 0)
+                        {
+                            this.speedY = this.jump;
+                            this.jumping = this.y;
+                        }
+                        else this.jumping = false;
+                        if (this.type > 3 && this.type < 14 && !this.bouncy) this.type = 1;
+                        if (this.speedX != 0 && gameArea.frame % 3 == 0)
+                        {
+                            if (this.type < 3) this.type++;
+                            else this.type = 0;
                         }
                     }
                 }
@@ -1565,7 +1555,7 @@ function player (type, x, y, heading)
             if (this.dead > 0)
             {
                 this.speedX = 0;
-                if (this.state != "air") this.speedY = 0;
+                if (this.state != "air" && !this.elevator) this.speedY = 0;
                 if (this.type != 8 && gameArea.frame % 5 == 0)
                 {
                     if (this.dead == 2)
