@@ -69,6 +69,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,/*640,*/
     },
     gameBack = [],
     gameFront = [],
+    gameItems = [],
     gameEnemies = [],
     gamePlayers = [],
     gameText = [],
@@ -583,8 +584,9 @@ function gameLoadScreen (screen)
     gameTitle = null;
     gameBack = [];
     gameFront = [];
-    gamePlayers = [];
+    gameItems = [];
     gameEnemies = [];
+    gamePlayers = [];
     gameText = [];
 
     gameScreen = screen;
@@ -663,7 +665,8 @@ function generateGameMap (map)
             gameFront.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 4, 48));
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
-            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 194, 240));
+            gameItems.push (new drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
+            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 195, 240));
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
         break;
         case "level2":
@@ -703,6 +706,7 @@ function updateGameArea ()
     for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
+        for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
@@ -714,6 +718,7 @@ function updateGameArea ()
         /*console.clear ();
         console.log ("gamePlayers:", gamePlayers);
         console.log ("gameEnemies:", gameEnemies);
+        console.log ("gameItems:", gameItems);
         console.log ("gameFront:", gameFront);
         console.log ("gameBack:", gameBack);*/
     }
@@ -1349,6 +1354,148 @@ function bolt (color, x, y, bounce)
     }
 }
 
+function drill (color, color2, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.x = x;
+    this.y = y;
+    this.width = 28;
+    this.height = 30;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.type = 0;
+    this.direction = 0;
+
+    this.update = function (idEnemy)
+    {
+        if (gameScreen == "game")
+        {
+            if (this.direction == 0)
+            {
+                if (this.x == Math.round (gameMap.width / 2) - 100 && this.y == 306)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 306)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 242 && this.speedX == 0)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 167 && this.y == 242)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 170 && this.y == 242)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 170 && this.y == 178)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 110 && this.y == 178 && this.speedY == 0)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 110 && this.y == 114 && this.speedX == 0)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 50 && this.y == 114 && this.speedX > 0)
+                {
+                    this.speedX = 0;
+                    this.speedY = -1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 50 && this.y == 50)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                    this.direction = 1
+                }
+            }
+            else
+            {
+                if (this.x == Math.round (gameMap.width / 2) + 167 && this.y == 50)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 167 && this.y == 114)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 170 && this.y == 114)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 170 && this.y == 178)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 142 && this.y == 178)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 142 && this.y == 242)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 242)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 306)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                    this.direction = 0;
+                }
+            }
+            this.x += this.speedX; 
+            this.y += this.speedY;
+            if (this.speedX != 0 && gameArea.frame % 5 == 0)
+            {
+                if (this.type == 0) this.type = 1;
+                else this.type = 0;
+            }
+        }
+        ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y + (this.type == 1 ? 6 : 0)));
+        ctx.fillStyle = this.color;
+        ctx.fillRect (10, 0, 6, 2);
+        ctx.fillRect (0, 2, 28, 2);
+        ctx.fillRect (2, 4, 24, 2);
+        ctx.fillRect (8, 10, 10, 6);
+        ctx.fillRect (10, 20, 8, 2);
+        ctx.fillRect (12, 22, 4, (this.type == 0 ? 8 : 2));
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (8, 6, 10, 4);
+        ctx.fillRect (8, 12, 10, 2);
+        ctx.fillRect (8, 16, 10, 6);
+        ctx.restore ();
+    }
+}
+
 function player (type, x, y, heading)
 {
     this.type = (type != null ? type : 0);
@@ -1550,7 +1697,7 @@ function player (type, x, y, heading)
                         }
                         else this.jumping = false;
                         if (this.type > 3 && this.type < 14 && !this.bouncy) this.type = 1;
-                        if (this.speedX != 0 && gameArea.frame % 3 == 0)
+                        if (this.speedX != 0 && gameArea.frame % 5 == 0)
                         {
                             if (this.type < 3) this.type++;
                             else this.type = 0;
@@ -1622,9 +1769,12 @@ function player (type, x, y, heading)
                                     this.state = null;
                                     this.dead = 0;
                                     this.deadFrame = 0;
+                                    gameItems [0].direction = 0;
+                                    gameItems [0].x = Math.round (gameMap.width / 2) - 100;
+                                    gameItems [0].y = 306;
                                     gameEnemies [0].name = Math.floor (Math.random () * 2);
                                     gameEnemies [0].direction = Math.floor (Math.random () * 2);
-                                    gameEnemies [0].x = Math.round (gameMap.width / 2) - 194;
+                                    gameEnemies [0].x = Math.round (gameMap.width / 2) - 195;
                                     gameEnemies [0].y = 240;
                                 }
                             },
@@ -1848,128 +1998,120 @@ function enemy (name, type, x, y)
         {
             if (this.direction == 0)
             {
-                if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 304)
+                if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 304)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 304)
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 304)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 240)
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 240)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 240)
+                else if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 240)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 176)
+                else if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 176)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 176)
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 176)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 112)
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 112)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 112)
+                else if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 112)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 112 && this.speedX == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 112 && this.speedX == -1)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 48 && this.speedY == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 48 && this.speedY == -1)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 48)
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 48)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 48)
-                {
-                    this.speedX = 0;
                     this.direction = 1;
                 }
             }
             else
             {
-                if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 304)
+                if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 48)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 48 && this.speedX == -1)
                 {
                     this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 112 && this.speedY == 1)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 112)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 112)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 176)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 176)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) + 169 && this.y == 240)
+                {
+                    this.speedX = -1;
+                    this.speedY = 0;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 240)
+                {
+                    this.speedX = 0;
+                    this.speedY = 1;
+                }
+                else if (this.x == Math.round (gameMap.width / 2) - 195 && this.y == 304)
+                {
+                    this.speedX = 1;
+                    this.speedY = 0;
                     this.direction = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 304)
-                {
-                    this.speedX = 1;
-                    this.speedY = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 240)
-                {
-                    this.speedX = 0;
-                    this.speedY = 1;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 240)
-                {
-                    this.speedX = -1;
-                    this.speedY = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 176)
-                {
-                    this.speedX = 0;
-                    this.speedY = 1;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 176)
-                {
-                    this.speedX = 1;
-                    this.speedY = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) - 194 && this.y == 112)
-                {
-                    this.speedX = 0;
-                    this.speedY = 1;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 112)
-                {
-                    this.speedX = -1;
-                    this.speedY = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 112 && this.speedY == 1)
-                {
-                    this.speedX = 1;
-                    this.speedY = 0;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 52 && this.y == 48 && this.speedX == -1)
-                {
-                    this.speedX = 0;
-                    this.speedY = 1;
-                }
-                else if (this.x == Math.round (gameMap.width / 2) + 168 && this.y == 48)
-                {
-                    this.speedX = -1;
-                    this.speedY = 0;
                 }
             }
             this.x += this.speedX; 
             this.y += this.speedY;
-            if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 5 == 0)
+            if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 10 == 0)
             {
                 if (this.type == 0) this.type = 1;
                 else this.type = 0;
