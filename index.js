@@ -1157,7 +1157,7 @@ function bouncy (color, color2, color3, x, y)
                     {
                         gamePlayers [0].y = this.y - gamePlayers [0].height;
                         gamePlayers [0].speedY = -4;
-                        if (gamePlayers [0].dead > 0) gamePlayers [0].speedY = Number ((gamePlayers [0].speedY * 0.8).toFixed (2));
+                        //if (gamePlayers [0].dead > 0) gamePlayers [0].speedY = Number ((gamePlayers [0].speedY * 0.8).toFixed (2));
                         this.type = 0;
                     }
                 }
@@ -1212,7 +1212,7 @@ function bouncy (color, color2, color3, x, y)
                 {
                     this.y = this.startY + 14;
                     this.height = 10;
-                    gamePlayers [0].y = this.y - 30;
+                    gamePlayers [0].y = this.y - gamePlayers [0].height;
                 }
                 ctx.translate (Math.round (this.x), Math.round (this.y));
                 ctx.fillRect (2, 0, 22, 2);
@@ -1381,16 +1381,13 @@ function player (type, x, y, heading)
             this.y = Number ((this.y + this.speedY).toFixed (2));
             if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
             {
-                if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x >= gameEnemies [enemy].x || this.x + this.width >= gameEnemies [enemy].x && this.x + this.width <= gameEnemies [enemy].x + gameEnemies [enemy].width)
+                if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width >= gameEnemies [enemy].x && this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height >= gameEnemies [enemy].y)
                 {
-                    if (this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y >= gameEnemies [enemy].y || this.y + this.height >= gameEnemies [enemy].y && this.y + this.height <= gameEnemies [enemy].y + gameEnemies [enemy].height)
-                    {
-                        this.dead = 2;
-                        gameEnemies [enemy].speedX = 0;
-                        gameEnemies [enemy].speedY = 0;
-                        gameEnemies [enemy].gravity = 0;
-                        this.enemyKill = enemy;
-                    }
+                    this.dead = 2;
+                    gameEnemies [enemy].speedX = 0;
+                    gameEnemies [enemy].speedY = 0;
+                    gameEnemies [enemy].gravity = 0;
+                    this.enemyKill = enemy;
                 }
             }
             if (this.elevator)
