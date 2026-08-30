@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = sdl.video.displays [0].geometry.width,/*640,*/
-    windowHeight = sdl.video.displays [0].geometry.height,/*400,*/
+let windowWidth = /*sdl.video.displays [0].geometry.width,*/640,
+    windowHeight = /*sdl.video.displays [0].geometry.height,*/400,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -653,6 +653,7 @@ function generateGameMap (level)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
+            gameBack.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 250, 288, 3, 48));
             gameBack.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 4, 48));
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
@@ -664,7 +665,7 @@ function generateGameMap (level)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
             gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 54, 8));
-            gameFront.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 4, 48));
+            gameFront.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 251, 288, 1, 48));
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameItems.push (new hammer_drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
@@ -995,7 +996,7 @@ function elevator (type, color, color2, x, y, width, height)
                 ctx.fillRect (this.x + 6, this.y + 2, 42, 4);
             break;
             case 1:
-                ctx.fillRect (this.x + 2, this.y, 2, 48);
+                ctx.fillRect (this.x + 1, this.y, 2, 48);
             break;
             case 3:
                 ctx.fillRect (this.x + 8, this.y + 2, 38, 4);
@@ -2290,7 +2291,6 @@ function component (type, src, color, x, y, width, height)
             console.error ('Error loading picture:', err + '.');
         }
     }
-
     this.type = type;
     if (src == "lives") this.src = "" + gamePlayers [0].lives + "";
     else this.src = src;
