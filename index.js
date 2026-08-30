@@ -667,7 +667,7 @@ function generateGameMap (level)
             gameFront.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 4, 48));
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
-            gameItems.push (new demolisher ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
+            gameItems.push (new hammer_drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 195, 240));
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
         break;
@@ -1356,7 +1356,7 @@ function bolt (color, x, y, bounce)
     }
 }
 
-function demolisher (color, color2, x, y)
+function hammer_drill (color, color2, x, y)
 {
     this.color = color;
     this.color2 = color2;
@@ -1529,7 +1529,7 @@ function player (type, x, y, heading)
 
     this.dropItem = function ()
     {
-        if (gameItems [this.item].constructor.name == "demolisher")
+        if (gameItems [this.item].constructor.name == "hammer_drill")
         {
             gameItems [this.item].direction = 0;
             gameItems [this.item].x = Math.round (gameMap.width / 2) - 100;
