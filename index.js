@@ -16,6 +16,8 @@ let windowWidth = sdl.video.displays [0].geometry.width,/*640,*/
             fullscreen: false
         }
     ),
+    bonus = 5000,
+    score = 0,
     highscore = 0,
     editKey = 0,
     controls =
@@ -257,7 +259,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,/*640,*/
         },
         {
             screen: ["game"],
-            action: "drop_drill",
+            action: "drop",
             keyboard:
             {
                 keys: [40] // Enter
@@ -506,8 +508,8 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
                 case 'jump':
                     if (player > -1) gamePlayers [player].jump = -2;
                 break;
-                case 'drop_drill':
-                    if (player > -1) gamePlayers [player].drill (false);
+                case 'drop':
+                    if (player > -1) gamePlayers [player].dropItem ();
             }
         }
     }
@@ -623,18 +625,18 @@ function gameLoadScreen (screen)
         canvasWidth = Math.round (canvasHeight * windowWidth / windowHeight);
         gameArea.canvas.width = canvasWidth;
         gameArea.canvas.height = canvasHeight;
-        generateGameMap ("level1");
+        generateGameMap (1);
     }
 }
 
-function generateGameMap (map)
+function generateGameMap (level)
 {
-    switch (map)
+    switch (level)
     {
-        case "level1":
+        case 1:
             gameMap =
             {
-                name: map,
+                level: level,
                 width: canvasWidth,
                 height: canvasHeight,
                 elevatorFloor: 0,
@@ -665,38 +667,38 @@ function generateGameMap (map)
             gameFront.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 4, 48));
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
-            gameItems.push (new drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
+            gameItems.push (new demolisher ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 195, 240));
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
         break;
-        case "level2":
+        case 2:
             gameMap =
             {
-                name: map,
+                level: level,
                 width: canvasWidth,
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
         break;
-        case "level3":
+        case 3:
             gameMap =
             {
-                name: map,
+                level: level,
                 width: canvasWidth,
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
     }
     gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 300, 0));
-    gameText.push (new component ("text", "04700", "white", Math.round (gameMap.width / 2) - 210, 0));
+    gameText.push (new component ("text", (bonus < 10 ? "0000" : bonus < 100 ? "000" : bonus < 1000 ? "00" : bonus < 10000 ? "0" : "") + bonus + "", "white", Math.round (gameMap.width / 2) - 210, 0));
     gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 90, 0));
-    gameText.push (new component ("text", "00000", "white", Math.round (gameMap.width / 2), 0));
+    gameText.push (new component ("text", (score < 10 ? "0000" : score < 100 ? "000" : score < 1000 ? "00" : score < 10000 ? "0" : "") + score + "", "white", Math.round (gameMap.width / 2), 0));
     gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 113, 0));
     gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", Math.round (gameMap.width / 2) + 245, 0));
     gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 300, 128, "vertical"));
-    gameText.push (new component ("text", "01", "white", Math.round (gameMap.width / 2) + 286, 224));
+    gameText.push (new component ("text", (gameMap.level < 10 ? "0" : "") + gameMap.level + "", "white", Math.round (gameMap.width / 2) + 286, 224));
     gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 300, 288, "vertical"));
-    gameText.push (new component ("text", "3", "white", Math.round (gameMap.width / 2) + 300, 368));
+    gameText.push (new component ("text", "lives", "white", Math.round (gameMap.width / 2) + 300, 368));
 }
 
 function updateGameArea ()
@@ -1354,7 +1356,7 @@ function bolt (color, x, y, bounce)
     }
 }
 
-function drill (color, color2, x, y)
+function demolisher (color, color2, x, y)
 {
     this.color = color;
     this.color2 = color2;
@@ -1367,9 +1369,14 @@ function drill (color, color2, x, y)
     this.type = 0;
     this.direction = 0;
 
-    this.update = function (idEnemy)
+    this.update = function (idItem)
     {
-        if (gameScreen == "game")
+        if (idItem == gamePlayers [0].item)
+        {
+            this.speedX = gamePlayers [0].speedX;
+            this.speedY = gamePlayers [0].speedY;
+        }
+        else
         {
             if (this.direction == 0)
             {
@@ -1471,11 +1478,11 @@ function drill (color, color2, x, y)
             }
             this.x += this.speedX; 
             this.y += this.speedY;
-            if (this.speedX != 0 && gameArea.frame % 5 == 0)
-            {
-                if (this.type == 0) this.type = 1;
-                else this.type = 0;
-            }
+        }
+        if (this.speedX != 0 && this.speedY == 0 && gameArea.frame % 5 == 0)
+        {
+            if (this.type == 0) this.type = 1;
+            else this.type = 0;
         }
         ctx = gameArea.ctx;
         ctx.lineWidth = 0;
@@ -1518,9 +1525,17 @@ function player (type, x, y, heading)
     this.lives = 3;
     this.floor = 0;
     this.enemyKill = null;
+    this.item = null;
 
-    this.drill = function (drilling)
+    this.dropItem = function ()
     {
+        if (gameItems [this.item].constructor.name == "demolisher")
+        {
+            gameItems [this.item].direction = 0;
+            gameItems [this.item].x = Math.round (gameMap.width / 2) - 100;
+            gameItems [this.item].y = 306;
+        }
+        this.item = null;
     }
 
     this.update = function (idPlayer)
@@ -1529,15 +1544,25 @@ function player (type, x, y, heading)
         {
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
-            if (this.dead == 0) for (let enemy = 0; enemy < gameEnemies.length; enemy++)
+            if (this.dead == 0)
             {
-                if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width >= gameEnemies [enemy].x && this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height >= gameEnemies [enemy].y)
+                for (let enemy = 0; enemy < gameEnemies.length; enemy++)
                 {
-                    this.dead = 2;
-                    gameEnemies [enemy].speedX = 0;
-                    gameEnemies [enemy].speedY = 0;
-                    gameEnemies [enemy].gravity = 0;
-                    this.enemyKill = enemy;
+                    if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width >= gameEnemies [enemy].x && this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height >= gameEnemies [enemy].y)
+                    {
+                        this.dead = 2;
+                        gameEnemies [enemy].speedX = 0;
+                        gameEnemies [enemy].speedY = 0;
+                        gameEnemies [enemy].gravity = 0;
+                        this.enemyKill = enemy;
+                    }
+                }
+                if (this.item == null) for (let item = 0; item < gameItems.length; item++) if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y) this.item = item;
+                if (this.item != null)
+                {
+                    gameItems [this.item].y = this.y;
+                    if (this.heading == 1) gameItems [this.item].x = this.x + this.width;
+                    else gameItems [this.item].x = this.x - gameItems [this.item].width;
                 }
             }
             if (this.elevator)
@@ -1769,6 +1794,7 @@ function player (type, x, y, heading)
                                     this.state = null;
                                     this.dead = 0;
                                     this.deadFrame = 0;
+                                    this.item = null;
                                     gameItems [0].direction = 0;
                                     gameItems [0].x = Math.round (gameMap.width / 2) - 100;
                                     gameItems [0].y = 306;
@@ -2266,7 +2292,8 @@ function component (type, src, color, x, y, width, height)
     }
 
     this.type = type;
-    this.src = src;
+    if (src == "lives") this.src = "" + gamePlayers [0].lives + "";
+    else this.src = src;
     this.color = color;
     if (this.type == "image") this.loadFile ("./img/" + this.src);
     this.x = x;
