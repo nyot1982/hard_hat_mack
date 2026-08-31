@@ -1530,13 +1530,13 @@ function player (type, x, y, heading)
 
     this.dropItem = function ()
     {
-        if (gameItems [this.item].constructor.name == "hammer_drill")
+        if (this.item != null && gameItems [this.item].constructor.name == "hammer_drill")
         {
             gameItems [this.item].direction = 0;
             gameItems [this.item].x = Math.round (gameMap.width / 2) - 100;
             gameItems [this.item].y = 306;
+            this.item = null;
         }
-        this.item = null;
     }
 
     this.update = function (idPlayer)
