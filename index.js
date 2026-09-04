@@ -883,7 +883,7 @@ function beam_h (type, color, color2, x, y, width)
                     ctx.fillRect (6, 4, this.width - 12, 8);
                     for (let x = 28; x + 28 < this.width; x += 104)
                     {
-                        ctx.fillStyle = "red";
+                        ctx.fillStyle = "black";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                     }
@@ -892,7 +892,7 @@ function beam_h (type, color, color2, x, y, width)
                     ctx.fillRect (6, 4, this.width - 6, 8);
                     for (let x = 28; x + 22 < this.width; x += 104)
                     {
-                        ctx.fillStyle = "red";
+                        ctx.fillStyle = "black";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                     }
@@ -901,7 +901,7 @@ function beam_h (type, color, color2, x, y, width)
                     ctx.fillRect (0, 4, this.width - 6, 8);
                     for (let x = 50; this.width - x > 0; x += 104)
                     {
-                        ctx.fillStyle = "red";
+                        ctx.fillStyle = "black";
                         ctx.fillRect (this.width - x, 6, 6, 4);
                         ctx.fillRect (this.width - x + 16, 6, 6, 4);
                     }
