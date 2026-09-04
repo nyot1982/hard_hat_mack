@@ -653,7 +653,7 @@ function generateGameMap (level)
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 59, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 41, 352));
             gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 352));
-            gameBack.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 250, 288, 3, 48));
+            gameBack.push (new elevator (1, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 288, 4, 48));
             gameBack.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 4, 48));
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
@@ -665,7 +665,7 @@ function generateGameMap (level)
             gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
             gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 54, 8));
-            gameFront.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 251, 288, 1, 48));
+            gameFront.push (new elevator (2, null, null, Math.round (gameMap.width / 2) - 251, 288, 0, 48));
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
             gameItems.push (new hammer_drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
@@ -996,7 +996,7 @@ function elevator (type, color, color2, x, y, width, height)
                 ctx.fillRect (this.x + 6, this.y + 2, 42, 4);
             break;
             case 1:
-                ctx.fillRect (this.x + 1, this.y, 2, 48);
+                ctx.fillRect (this.x + 2, this.y, 2, 48);
             break;
             case 3:
                 ctx.fillRect (this.x + 8, this.y + 2, 38, 4);
@@ -1247,6 +1247,20 @@ function machine (color, color2, color3, x, y)
     this.height = 32;
     this.type = 0;
 
+    this.shot = function ()
+    {
+        this.type = 1;
+        gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
+        setTimeout
+        (
+            () =>
+            {
+                this.type = 0;
+            },
+            120
+        );
+    }
+
     this.update = function ()
     {
         ctx = gameArea.ctx;
@@ -1301,13 +1315,10 @@ function machine (color, color2, color3, x, y)
                 ctx.fillRect (16, 20, 6, 6);
         }
         ctx.restore ();
-        if (gameArea.frame % 300 == 0 && this.type == 0)
-        {
-            this.type = 1;
-            gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
-        }
-        else if (gameArea.frame % 120 == 0 && this.type == 1) this.type = 0;
+        if (gameArea.frame % 500 == 0) this.shot ();
     }
+
+    this.shot ();
 }
 
 function bolt (color, x, y, bounce)
@@ -1562,7 +1573,7 @@ function player (type, x, y, heading)
                 if (this.item != null)
                 {
                     gameItems [this.item].y = this.y;
-                    if (this.heading == 1) gameItems [this.item].x = this.x + this.width;
+                    if (this.heading == 1 || this.x < Math.round (gameMap.width / 2) - 251 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
                     else gameItems [this.item].x = this.x - gameItems [this.item].width;
                 }
             }
@@ -1607,12 +1618,13 @@ function player (type, x, y, heading)
                                 {
                                     this.elevator = true;
                                     this.speedX = 0;
-                                    this.x -= (this.x - gameFront [front].x) / 2;
+                                    if (this.item == null) this.x -= (this.x - gameFront [front].x) / 2;
+                                    else this.x = gameFront [front].x;
                                     if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                     else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                                     this.speedY = gameMap.elevatorSpeed;
                                 }
-                                else if (this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) this.dead = 1;
+                                else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
                                 else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
                                 if (!this.elevator) this.speedY = 0;
                             }
@@ -1649,7 +1661,7 @@ function player (type, x, y, heading)
                     if (this.y == gameMap.height - this.height)
                     {
                         this.state = "ground";
-                        if (this.speedY > 2.8) this.dead = 1;
+                        if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
                     }
                     if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
                 }
