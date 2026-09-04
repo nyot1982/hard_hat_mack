@@ -3,8 +3,8 @@ const fs = require ('fs');
 const { PNG } = require ('pngjs');
 const { createCanvas, loadImage } = require ('canvas');
 
-let windowWidth = /*sdl.video.displays [0].geometry.width,*/640,
-    windowHeight = /*sdl.video.displays [0].geometry.height,*/400,
+let windowWidth = sdl.video.displays [0].geometry.width,//640,
+    windowHeight = sdl.video.displays [0].geometry.height,//400,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
@@ -609,7 +609,7 @@ function gameLoadScreen (screen)
         gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 214, gameText [5].y + 23));
         gameText.push (new player (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
         gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 186, gameText [5].y + 23));
-        gameText.push (new beam_h ("#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 256, gameText [5].y + 55, 512));
+        gameText.push (new beam_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 256, gameText [5].y + 55, 512));
         gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", Math.round (canvasWidth / 2) + 325, canvasHeight - 150));
     }
@@ -657,17 +657,22 @@ function generateGameMap (level)
             gameBack.push (new elevator (2, "#FFFFFF", null, Math.round (gameMap.width / 2) - 201, 288, 4, 48));
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
-            gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 286, 54));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 208, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 390));
-            gameFront.push (new beam_h ("#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 390));
-            gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 256, 378, 512, 6));
+            gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 262, 54));
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 93));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 68, 80, 263));
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 127));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 34, 144, 229));
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 208, 161));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2), 208, 195));
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 195));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) + 34, 272, 161));
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 229));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) + 68, 336, 127));
+            gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 252, 378, 506, 6));
             gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 54, 8));
             gameFront.push (new elevator (2, null, null, Math.round (gameMap.width / 2) - 251, 288, 0, 48));
             gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 336, 54, 10));
-            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 232, 354));
+            gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 229, 354));
             gameItems.push (new hammer_drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 195, 240));
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
@@ -690,16 +695,16 @@ function generateGameMap (level)
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
     }
-    gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 300, 0));
-    gameText.push (new component ("text", (bonus < 10 ? "0000" : bonus < 100 ? "000" : bonus < 1000 ? "00" : bonus < 10000 ? "0" : "") + bonus + "", "white", Math.round (gameMap.width / 2) - 210, 0));
-    gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 90, 0));
-    gameText.push (new component ("text", (score < 10 ? "0000" : score < 100 ? "000" : score < 1000 ? "00" : score < 10000 ? "0" : "") + score + "", "white", Math.round (gameMap.width / 2), 0));
-    gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 113, 0));
-    gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", Math.round (gameMap.width / 2) + 245, 0));
-    gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 300, 128, "vertical"));
-    gameText.push (new component ("text", (gameMap.level < 10 ? "0" : "") + gameMap.level + "", "white", Math.round (gameMap.width / 2) + 286, 224));
-    gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 300, 288, "vertical"));
-    gameText.push (new component ("text", "lives", "white", Math.round (gameMap.width / 2) + 300, 368));
+    gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 288, 0));
+    gameText.push (new component ("text", (bonus < 10 ? "0000" : bonus < 100 ? "000" : bonus < 1000 ? "00" : bonus < 10000 ? "0" : "") + bonus + "", "white", Math.round (gameMap.width / 2) - 198, 0));
+    gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 100, 0));
+    gameText.push (new component ("text", (score < 10 ? "0000" : score < 100 ? "000" : score < 1000 ? "00" : score < 10000 ? "0" : "") + score + "", "white", Math.round (gameMap.width / 2) - 10, 0));
+    gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 88, 0));
+    gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", Math.round (gameMap.width / 2) + 220, 0));
+    gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 276, 128, "vertical"));
+    gameText.push (new component ("text", (gameMap.level < 10 ? "0" : "") + gameMap.level + "", "white", Math.round (gameMap.width / 2) + 262, 224));
+    gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 276, 288, "vertical"));
+    gameText.push (new component ("text", "lives", "white", Math.round (gameMap.width / 2) + 276, 368));
 }
 
 function updateGameArea ()
@@ -850,8 +855,9 @@ function floor (color, x, y, width, height)
     }
 }
 
-function beam_h (color, color2, x, y, width)
+function beam_h (type, color, color2, x, y, width)
 {
+    this.type = (type != null ? type : 0);
     this.color = color;
     this.color2 = color2;
     this.x = x;
@@ -871,12 +877,34 @@ function beam_h (color, color2, x, y, width)
             ctx.fillRect (0, 0, this.width, 4);
             ctx.fillRect (0, 12, this.width, 4);
             ctx.fillStyle = this.color2;
-            ctx.fillRect (6, 4, this.width - 12, 8);
-            for (let x = 28; x + 7 < this.width; x += 104)
+            switch (this.type)
             {
-                ctx.fillStyle = "black";
-                ctx.fillRect (x, 6, 6, 4);
-                ctx.fillRect (x + 16, 6, 6, 4);
+                case 0:
+                    ctx.fillRect (6, 4, this.width - 12, 8);
+                    for (let x = 28; x + 28 < this.width; x += 104)
+                    {
+                        ctx.fillStyle = "red";
+                        ctx.fillRect (x, 6, 6, 4);
+                        ctx.fillRect (x + 16, 6, 6, 4);
+                    }
+                break;
+                case 1:
+                    ctx.fillRect (6, 4, this.width - 6, 8);
+                    for (let x = 28; x + 22 < this.width; x += 104)
+                    {
+                        ctx.fillStyle = "red";
+                        ctx.fillRect (x, 6, 6, 4);
+                        ctx.fillRect (x + 16, 6, 6, 4);
+                    }
+                break;
+                case 2:
+                    ctx.fillRect (0, 4, this.width - 6, 8);
+                    for (let x = 50; this.width - x > 0; x += 104)
+                    {
+                        ctx.fillStyle = "red";
+                        ctx.fillRect (this.width - x, 6, 6, 4);
+                        ctx.fillRect (this.width - x + 16, 6, 6, 4);
+                    }
             }
             ctx.restore ();
         }
@@ -1246,20 +1274,7 @@ function machine (color, color2, color3, x, y)
     this.width = 26;
     this.height = 32;
     this.type = 0;
-
-    this.shot = function ()
-    {
-        this.type = 1;
-        gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
-        setTimeout
-        (
-            () =>
-            {
-                this.type = 0;
-            },
-            120
-        );
-    }
+    this.shotFrame = gameArea.frame;
 
     this.update = function ()
     {
@@ -1315,10 +1330,17 @@ function machine (color, color2, color3, x, y)
                 ctx.fillRect (16, 20, 6, 6);
         }
         ctx.restore ();
-        if (gameArea.frame % 500 == 0) this.shot ();
+        if (this.type == 0 && gameArea.frame == this.shotFrame)
+        {
+            this.type = 1;
+            gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
+        }
+        else if (this.type == 1 && gameArea.frame - this.shotFrame == 120)
+        {
+            this.type = 0;
+            this.shotFrame += 500;
+        }
     }
-
-    this.shot ();
 }
 
 function bolt (color, x, y, bounce)
@@ -1560,7 +1582,7 @@ function player (type, x, y, heading)
             {
                 for (let enemy = 0; enemy < gameEnemies.length; enemy++)
                 {
-                    if (this.x <= gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width >= gameEnemies [enemy].x && this.y <= gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height >= gameEnemies [enemy].y)
+                    if (this.x < gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width > gameEnemies [enemy].x && this.y < gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height > gameEnemies [enemy].y)
                     {
                         this.dead = 2;
                         gameEnemies [enemy].speedX = 0;
@@ -1573,7 +1595,7 @@ function player (type, x, y, heading)
                 if (this.item != null)
                 {
                     gameItems [this.item].y = this.y;
-                    if (this.heading == 1 || this.x < Math.round (gameMap.width / 2) - 251 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
+                    if (this.heading == 1 && this.x < Math.round (gameMap.width / 2) + 236 - this.width || this.x < Math.round (gameMap.width / 2) - 251 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
                     else gameItems [this.item].x = this.x - gameItems [this.item].width;
                 }
             }
