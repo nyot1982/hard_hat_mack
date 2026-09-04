@@ -606,10 +606,10 @@ function gameLoadScreen (screen)
         gameText.push (new component ("text", "Vandal", "white", Math.round (canvasWidth / 2) - 241, gameText [2].y + 100));
         gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
         gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 173, gameText [4].y));
-        gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 214, gameText [5].y + 23));
+        gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 213, gameText [5].y + 23));
         gameText.push (new player (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
-        gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 186, gameText [5].y + 23));
-        gameText.push (new beam_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 256, gameText [5].y + 55, 512));
+        gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 187, gameText [5].y + 23));
+        gameText.push (new beam_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 247, gameText [5].y + 55, 494));
         gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
         gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", Math.round (canvasWidth / 2) + 325, canvasHeight - 150));
     }
@@ -634,6 +634,7 @@ function generateGameMap (level)
     switch (level)
     {
         case 1:
+            let beamBreak = 0;
             gameMap =
             {
                 level: level,
@@ -658,16 +659,19 @@ function generateGameMap (level)
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 262, 54));
-            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 93));
-            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 68, 80, 263));
-            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 127));
-            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 34, 144, 229));
-            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 208, 161));
-            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2), 208, 195));
-            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 195));
-            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) + 34, 272, 161));
-            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 229));
-            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) + 68, 336, 127));
+            gameFront.push (new beam_h (0, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
+            beamBreak = Math.floor (Math.random () * 6);
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144, 93 + beamBreak * 34));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 68 + beamBreak * 34, 144, 263 - beamBreak * 34));
+            beamBreak = Math.floor (Math.random () * 6);
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 208, 93 + beamBreak * 34));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 68 + beamBreak * 34, 208, 263 - beamBreak * 34));
+            beamBreak = Math.floor (Math.random () * 6);
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 272, 93 + beamBreak * 34));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 68 + beamBreak * 34, 272, 263 - beamBreak * 34));
+            beamBreak = Math.floor (Math.random () * 6);
+            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 336, 93 + beamBreak * 34));
+            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 68 + beamBreak * 34, 336, 263 - beamBreak * 34));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 252, 378, 506, 6));
             gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 54, 8));
             gameFront.push (new elevator (2, null, null, Math.round (gameMap.width / 2) - 251, 288, 0, 48));
