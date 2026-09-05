@@ -8,7 +8,11 @@
     "debug": "node --inspect index.js",
     "inspect": "node --inspect-brk index.js"
   },
-  "keywords": ["hard", "hat", "mack"],
+  "keywords": [
+    "hard",
+    "hat",
+    "mack"
+  ],
   "author": "Marc Pinyot Gascón <marcpinyot@hotmail.com>",
   "license": "ISC",
   "type": "commonjs",
