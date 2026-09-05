@@ -16,7 +16,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
             fullscreen: false
         }
     ),
-    bonus = 5000,
+    bonus = 0,
     score = 0,
     highscore = 0,
     editKey = 0,
@@ -51,15 +51,6 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
             code: 19
         }
     ],
-    gravity = 0.12,
-    gameScreen = null,
-    gameTitle = null,
-    gameMap =
-    {
-        name: null,
-        width: canvasWidth,
-        height: canvasHeight
-    },
     pressed =
     {
         keys:
@@ -69,6 +60,10 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         buttons: [],
         axes: []
     },
+    gravity = 0.12,
+    gameScreen = null,
+    gameTitle = null,
+    gameMap = {},
     gameBack = [],
     gameFront = [],
     gameItems = [],
@@ -631,18 +626,20 @@ function gameLoadScreen (screen)
 
 function generateGameMap (level)
 {
+    bonus = 5100;
+    gameMap =
+    {
+        level: level,
+        startFrame: gameArea.frame,
+        width: canvasWidth,
+        height: canvasHeight,
+        elevatorFloor: 0,
+        elevatorSpeed: 0
+    };
     switch (level)
     {
         case 1:
             let beamBreak = 0;
-            gameMap =
-            {
-                level: level,
-                width: canvasWidth,
-                height: canvasHeight,
-                elevatorFloor: 0,
-                elevatorSpeed: 0
-            };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 139, 96, 240));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) + 117, 96, 240));
@@ -682,33 +679,21 @@ function generateGameMap (level)
             gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
         break;
         case 2:
-            gameMap =
-            {
-                level: level,
-                width: canvasWidth,
-                height: canvasHeight
-            };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
         break;
         case 3:
-            gameMap =
-            {
-                level: level,
-                width: canvasWidth,
-                height: canvasHeight
-            };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
     }
     gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 288, 0));
-    gameText.push (new component ("text", (bonus < 10 ? "0000" : bonus < 100 ? "000" : bonus < 1000 ? "00" : bonus < 10000 ? "0" : "") + bonus + "", "white", Math.round (gameMap.width / 2) - 198, 0));
+    gameText.push (new component ("value", "bonus", "white", Math.round (gameMap.width / 2) - 198, 0, "left", 5));
     gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 100, 0));
-    gameText.push (new component ("text", (score < 10 ? "0000" : score < 100 ? "000" : score < 1000 ? "00" : score < 10000 ? "0" : "") + score + "", "white", Math.round (gameMap.width / 2) - 10, 0));
+    gameText.push (new component ("value", "score", "white", Math.round (gameMap.width / 2) - 10, 0, "left", 5));
     gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 88, 0));
-    gameText.push (new component ("text", (highscore < 10 ? "0000" : highscore < 100 ? "000" : highscore < 1000 ? "00" : highscore < 10000 ? "0" : "") + highscore + "", "white", Math.round (gameMap.width / 2) + 220, 0));
+    gameText.push (new component ("value", "highscore", "white", Math.round (gameMap.width / 2) + 220, 0, "left", 5));
     gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 276, 128, "vertical"));
-    gameText.push (new component ("text", (gameMap.level < 10 ? "0" : "") + gameMap.level + "", "white", Math.round (gameMap.width / 2) + 262, 224));
+    gameText.push (new component ("value", "gameMap.level", "white", Math.round (gameMap.width / 2) + 262, 224, "left", 2));
     gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 276, 288, "vertical"));
-    gameText.push (new component ("text", "lives", "white", Math.round (gameMap.width / 2) + 276, 368));
+    gameText.push (new component ("value", "gamePlayers [0].lives", "white", Math.round (gameMap.width / 2) + 276, 368, "left", 1));
 }
 
 function updateGameArea ()
@@ -718,6 +703,11 @@ function updateGameArea ()
     for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     if (gameScreen == "game")
     {
+        if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0)
+        {
+            bonus -= 100;
+            if (bonus == 0) gamePlayers [0].dead = 3;
+        }
         for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
         for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
@@ -1773,7 +1763,7 @@ function player (type, x, y, heading)
             {
                 this.speedX = 0;
                 if (this.state != "air" && !this.elevator) this.speedY = 0;
-                if (this.type != 8 && gameArea.frame % 5 == 0)
+                if (this.type != 8 && this.dead < 4 &&gameArea.frame % 5 == 0)
                 {
                     if (this.dead == 2)
                     {
@@ -1791,10 +1781,11 @@ function player (type, x, y, heading)
                             this.type = 3;
                         }
                     }
-                    else if (this.type == 4) this.type = 7;
-                    else if (this.type == 7)
+                    else if (this.dead == 1 && this.type == 4) this.type = 7;
+                    else if (this.type == 7 || this.dead == 3)
                     {
-                        this.type = 8;
+                        if (this.dead == 1) this.type = 8;
+                        else this.dead = 4;
                         setTimeout
                         (
                             () =>
@@ -1805,7 +1796,6 @@ function player (type, x, y, heading)
                                     this.enemyKill = null;
                                 }
                                 this.lives--;
-                                gameText [9].src = "" + this.lives + ""; 
                                 if (this.lives == 0)
                                 {
                                     gameText.push (new component ("text", "Game over", "white", Math.round (gameMap.width / 2) - 60, 178));
@@ -1820,6 +1810,8 @@ function player (type, x, y, heading)
                                 }
                                 else
                                 {
+                                    bonus = 5100;
+                                    gameMap.startFrame = gameArea.frame;
                                     gameMap.elevatorFloor = 0;
                                     gameMap.elevatorSpeed = 0;
                                     this.type = 0;
@@ -2330,16 +2322,16 @@ function component (type, src, color, x, y, width, height)
         }
     }
     this.type = type;
-    if (src == "lives") this.src = "" + gamePlayers [0].lives + "";
-    else this.src = src;
+    this.src = src;
     this.color = color;
     if (this.type == "image") this.loadFile ("./img/" + this.src);
     this.x = x;
     this.y = y;
-    if (this.type == "text")
+    if (this.type == "text" || this.type == "value")
     {
         this.startX = this.x;
         this.direction = (width ? width : "left");
+        if (this.type == "value") this.chars = (height != null ? height : 0);
     }
     else
     {
@@ -2365,15 +2357,22 @@ function component (type, src, color, x, y, width, height)
             ctx.fillStyle = this.color;
             ctx.fill ();
         }
-        else if (this.type == "text")
+        else if (this.type == "text" || this.type == "value")
         {
+            if (this.type == "text") this.text = this.src;
+            else if (this.type == "value")
+            {
+                eval ('this.text = ' + this.src + ';');
+                this.text = (this.text < 10 ? "0000" : this.text < 100 ? "000" : this.text < 1000 ? "00" : this.text < 10000 ? "0" : "") + this.text + "";
+                this.text = this.text.substr (5 - this.chars, this.chars);
+            }
             if (this.width) ctx.fillStyle = this.color;
             else ctx.fillStyle = "transparent";
             this.width = 0;
             this.height = 0;
-            for (let i = 0, x = this.x, y = this.y; i < this.src.length; i++)
+            for (let i = 0, x = this.x, y = this.y; i < this.text.length; i++)
             {
-                let char = this.src.substr (i, 1).toUpperCase (),
+                let char = this.text.substr (i, 1).toUpperCase (),
                     width = 14,
                     height = 16;
 
