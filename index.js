@@ -1,7 +1,8 @@
-const sdl = require ('@kmamal/sdl');
-const fs = require ('fs');
-const { PNG } = require ('pngjs');
-const { createCanvas, loadImage } = require ('canvas');
+import sdl from '@kmamal/sdl';
+import fs from 'fs';
+import { PNG } from 'pngjs';
+import { createCanvas, loadImage } from 'canvas';
+import audio from 'audio';
 
 let windowWidth = sdl.video.displays [0].geometry.width,//640,
     windowHeight = sdl.video.displays [0].geometry.height,//400,
@@ -816,7 +817,7 @@ function back (color, x, y, width, height)
 
     this.update = function ()
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.fillStyle = this.color;
         ctx.fillRect (this.x, this.y, this.width, this.height);
@@ -833,7 +834,7 @@ function floor (color, x, y, width, height)
 
     this.update = function ()
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         const canvasAux = createCanvas (4, 6);
         canvasAux.width = 4;
@@ -863,7 +864,7 @@ function beam_h (type, color, color2, x, y, width)
     {
         if (this.width - 12 > 0)
         {
-            ctx = gameArea.ctx;
+            let ctx = gameArea.ctx;
             ctx.lineWidth = 0;
             ctx.save ();
             ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -918,7 +919,7 @@ function beam_v (color, color2, x, y, height)
     {
         if (this.width - 11 > 0)
         {
-            ctx = gameArea.ctx;
+            let ctx = gameArea.ctx;
             ctx.lineWidth = 0;
             ctx.save ();
             ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -950,7 +951,7 @@ function column (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -978,7 +979,7 @@ function chain (color, x, y, steps)
 
     this.update = function ()
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -1007,7 +1008,7 @@ function elevator (type, color, color2, x, y, width, height)
     this.update = function ()
     {
         this.y = this.startY - gameMap.elevatorFloor;
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.fillStyle = this.color;
         ctx.fillRect (this.x, this.y, this.width, this.height);
@@ -1042,7 +1043,7 @@ function support (color, color2, color3, x, y)
     {
         this.y = this.startY - gameMap.elevatorFloor;
         this.height = this.startHeight + gameMap.elevatorFloor;
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         const canvasAux = createCanvas (12, 16);
         canvasAux.width = 12;
@@ -1091,7 +1092,7 @@ function bell (color, color2, color3, x, y)
         else this.x = this.startX;
         if (this.type == 0 || this.type == 2) this.width = this.startWidth;
         else this.width = this.startWidth + 2;
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -1173,7 +1174,7 @@ function bouncy (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.fillStyle = this.color;
@@ -1272,7 +1273,7 @@ function machine (color, color2, color3, x, y)
 
     this.update = function ()
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -1372,7 +1373,7 @@ function bolt (color, x, y, bounce)
             }
         }
         this.speedY = this.speedY + this.gravity;
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -1512,7 +1513,7 @@ function hammer_drill (color, color2, x, y)
             if (this.type == 0) this.type = 1;
             else this.type = 0;
         }
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y + (this.type == 1 ? 6 : 0)));
@@ -1844,7 +1845,7 @@ function player (type, x, y, heading)
             else if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
         }
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.scale (this.heading, 1);
@@ -2174,7 +2175,7 @@ function enemy (name, type, x, y)
                 else this.type = 0;
             }
         }
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
@@ -2341,7 +2342,7 @@ function component (type, src, color, x, y, width, height)
 
     this.update = function (idComponent)
     {
-        ctx = gameArea.ctx;
+        let ctx = gameArea.ctx;
         if (this.type == "image") ctx.drawImage (this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         else if (this.type == "rect")
         {

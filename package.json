@@ -15,9 +15,10 @@
   ],
   "author": "Marc Pinyot Gascón <marcpinyot@hotmail.com>",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@kmamal/sdl": "^0.11.13",
+    "audio": "^2.6.9",
     "canvas": "^3.2.3",
     "pngjs": "^7.0.0"
   }
