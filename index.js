@@ -71,6 +71,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
     gameEnemies = [],
     gamePlayers = [],
     gameText = [],
+    gameAudios = [],
     userActions =
     [
         {
@@ -313,7 +314,8 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         canvas: createCanvas (canvasWidth, canvasHeight),
         start: function ()
         {
-            const pngBuffer = fs.readFileSync ('./img/icon.png');
+            loadAudios ('audio');
+            const pngBuffer = fs.readFileSync ('img/icon.png');
             const png = PNG.sync.read (pngBuffer);
             const { width, height, data } = png;
             window.setIcon (width, height, width * 4, 'rgba32', data);
@@ -735,11 +737,21 @@ function updateGameArea ()
     gameArea.frame++;
 }
 
+async function loadAudios (dir)
+{
+    gameAudios = fs.readdirSync (dir);
+    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
+    {
+        gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
+        gameAudios [gameAudio].play ();
+    }
+}
+
 async function fileRead (file)
 {
     await fs.readFile
     (
-        './' + file,
+        file,
         'utf8',
         (err, data) =>
         {
@@ -777,7 +789,7 @@ async function fileWrite (file)
 {
     await fs.writeFile
     (
-        './' + file,
+        file,
         encodeBase64Url (JSONstringify ({ highscore: highscore, controls: controls })),
         'utf8',
         (err) =>
@@ -795,7 +807,7 @@ async function fileDelete (file)
 {
     await fs.unlink
     (
-        './' + file,
+        file,
         (err) =>
         {
             if (err)
@@ -2325,7 +2337,7 @@ function component (type, src, color, x, y, width, height)
     this.type = type;
     this.src = src;
     this.color = color;
-    if (this.type == "image") this.loadFile ("./img/" + this.src);
+    if (this.type == "image") this.loadFile ("img/" + this.src);
     this.x = x;
     this.y = y;
     if (this.type == "text" || this.type == "value")
