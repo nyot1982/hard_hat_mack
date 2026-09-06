@@ -71,7 +71,9 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
     gameEnemies = [],
     gamePlayers = [],
     gameText = [],
-    gameAudios = [],
+    gameImages = fs.readdirSync ("img"),
+    gameAudios = fs.readdirSync ("audio"),
+    loading = 2 + gameImages.length + gameAudios.length,
     userActions =
     [
         {
@@ -314,12 +316,12 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         canvas: createCanvas (canvasWidth, canvasHeight),
         start: function ()
         {
-            loadAudios ('audio');
-            const pngBuffer = fs.readFileSync ('img/icon.png');
-            const png = PNG.sync.read (pngBuffer);
-            const { width, height, data } = png;
-            window.setIcon (width, height, width * 4, 'rgba32', data);
+            gameText.push (new component ("text", "loading...", "red", Math.round (canvasWidth / 2), 20, "center"));
+            gameText.push (new component ("text", "", null, Math.round (canvasWidth / 2), 30, "center"));
             fileRead ('user.bin');
+            setIcon ('icon.png');
+            loadImages ('img');
+            loadAudio ('audio');
             this.canvas.id = "hardHatMack";
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
@@ -381,7 +383,7 @@ function JSONparse (input)
         if (typeof json === 'object') return json;
         else return undefined;
     }
-    catch (err)
+    catch (error)
     {
         return undefined;
     }
@@ -396,7 +398,7 @@ function JSONstringify (input)
         if (typeof json === 'string') return json;
         else return undefined;
     }
-    catch (err)
+    catch (error)
     {
         return undefined;
     }
@@ -590,40 +592,39 @@ function gameLoadScreen (screen)
     gameText = [];
 
     gameScreen = screen;
-    if (gameScreen == "menu")
+    switch (gameScreen)
     {
-        canvasWidth = windowWidth;;
-        canvasHeight = windowHeight;
-        gameArea.canvas.width = canvasWidth;
-        gameArea.canvas.height = canvasHeight;
-        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("image", "title.png", "", Math.round (canvasWidth / 2), 150, 362, 40);
-        gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", Math.round (canvasWidth / 2), gameTitle.y + 250, "center"));
-        gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", Math.round (canvasWidth / 2), gameText [0].y + 50, "center"));
-        gameText.push (new component ("text", "This remake was developed by Marc Pinyot Gascón using Node.js.", "white", Math.round (canvasWidth / 2), gameText [1].y + 50, "center"));
-        gameText.push (new component ("text", "Vandal", "white", Math.round (canvasWidth / 2) - 241, gameText [2].y + 100));
-        gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
-        gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 173, gameText [4].y));
-        gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 213, gameText [5].y + 23));
-        gameText.push (new player (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
-        gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 187, gameText [5].y + 23));
-        gameText.push (new beam_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 247, gameText [5].y + 55, 494));
-        gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
-        gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", Math.round (canvasWidth / 2) + 325, canvasHeight - 150));
-    }
-    else if (gameScreen == "config")
-    {
-        gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-        gameTitle = new component ("text", "Configuration menu", "white", Math.round (canvasWidth / 2), 100, "center");
-        gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", Math.round (canvasWidth / 2) - 500, gameTitle.y + 105));
-    }
-    else if (gameScreen == "game")
-    {
-        canvasHeight = 400;
-        canvasWidth = Math.round (canvasHeight * windowWidth / windowHeight);
-        gameArea.canvas.width = canvasWidth;
-        gameArea.canvas.height = canvasHeight;
-        generateGameMap (1);
+        case 'menu':
+            canvasWidth = windowWidth;;
+            canvasHeight = windowHeight;
+            gameArea.canvas.width = canvasWidth;
+            gameArea.canvas.height = canvasHeight;
+            gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+            gameTitle = new component ("image", "title.png", "", Math.round (canvasWidth / 2), 150, 362, 40);
+            gameText.push (new component ("text", "IBM version by Dana How & Kevin Gilmore, through TMQ Software, inc.", "white", Math.round (canvasWidth / 2), gameTitle.y + 250, "center"));
+            gameText.push (new component ("text", "An original game design by Michael Abbot & Matthew Alexander.", "white", Math.round (canvasWidth / 2), gameText [0].y + 50, "center"));
+            gameText.push (new component ("text", "This remake was developed by Marc Pinyot Gascón using Node.js.", "white", Math.round (canvasWidth / 2), gameText [1].y + 50, "center"));
+            gameText.push (new component ("text", "Vandal", "white", Math.round (canvasWidth / 2) - 241, gameText [2].y + 100));
+            gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
+            gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 173, gameText [4].y));
+            gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 213, gameText [5].y + 23));
+            gameText.push (new player (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
+            gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 187, gameText [5].y + 23));
+            gameText.push (new beam_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 247, gameText [5].y + 55, 494));
+            gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
+            gameText.push (new component ("text", "(C)1984 The Duplicators - 2026 nYoT", "white", Math.round (canvasWidth / 2) + 325, canvasHeight - 150));
+        break;
+        case 'config':
+            gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+            gameTitle = new component ("text", "Configuration menu", "white", Math.round (canvasWidth / 2), 100, "center");
+            gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", Math.round (canvasWidth / 2) - 500, gameTitle.y + 105));
+        break;
+        case 'game':
+            canvasHeight = 400;
+            canvasWidth = Math.round (canvasHeight * windowWidth / windowHeight);
+            gameArea.canvas.width = canvasWidth;
+            gameArea.canvas.height = canvasHeight;
+            generateGameMap (1);
     }
 }
 
@@ -702,8 +703,23 @@ function generateGameMap (level)
 function updateGameArea ()
 {
     gameArea.clear ();
-    for (let back = 0; back < gameBack.length; back++) gameBack [back].update ();
-    for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
+    if (gameScreen == null && loading == 0 && gameText [gameText.length - 1].src != "loading complete")
+    {
+        gameText.push (new component ("text", "loading complete", "#00FF00", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
+        setTimeout
+        (
+            () =>
+            {
+                gameLoadScreen ("menu");
+            },
+            1000
+        );
+    }
+    else
+    {
+        for (let back = 0; back < gameBack.length; back++) gameBack [back].update ();
+        for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
+    }
     if (gameScreen == "game")
     {
         if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0)
@@ -737,14 +753,14 @@ function updateGameArea ()
     gameArea.frame++;
 }
 
-async function loadAudios (dir)
+async function setIcon (file)
 {
-    gameAudios = fs.readdirSync (dir);
-    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
-    {
-        gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
-        gameAudios [gameAudio].play ();
-    }
+    const pngBuffer = await fs.readFileSync (file);
+    const png = await PNG.sync.read (pngBuffer);
+    const { width, height, data } = png;
+    await window.setIcon (width, height, width * 4, 'rgba32', data);
+    gameText.push (new component ("text", file, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+    loading--;
 }
 
 async function fileRead (file)
@@ -753,11 +769,11 @@ async function fileRead (file)
     (
         file,
         'utf8',
-        (err, data) =>
+        (error, data) =>
         {
-            if (err)
+            if (error)
             {
-                console.error ('Error reading file:', err.message + '.');
+                console.error ('Error reading file:', error.message + '.');
                 return;
             }
             let userData = decodeBase64Url (data);
@@ -780,7 +796,9 @@ async function fileRead (file)
             userActions [8].keyboard.keys = [controls [3].code];
             userActions [9].keyboard.keys = [controls [4].code];
             userActions [10].keyboard.keys = [controls [5].code];
-            userActions [11].keyboard.keys = [controls [6].code];     
+            userActions [11].keyboard.keys = [controls [6].code];
+            gameText.push (new component ("text", file, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+            loading--;
         }
     );
 }
@@ -792,11 +810,11 @@ async function fileWrite (file)
         file,
         encodeBase64Url (JSONstringify ({ highscore: highscore, controls: controls })),
         'utf8',
-        (err) =>
+        (error) =>
         {
-            if (err)
+            if (error)
             {
-                console.error ('Error writing file:', err.message + '.');
+                console.error ('Error writing file:', error.message + '.');
                 return;
             }
         }
@@ -808,15 +826,42 @@ async function fileDelete (file)
     await fs.unlink
     (
         file,
-        (err) =>
+        (error) =>
         {
-            if (err)
+            if (error)
             {
-                console.error ('Error deleting file:', err.message + '.');
+                console.error ('error deleting file:', error.message + '.');
                 return;
             }
         }
     );
+}
+
+async function loadAudio (dir)
+{
+    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
+    {
+        gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
+        gameText.push (new component ("text", gameAudios [gameAudio].source, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+        loading--;
+    }
+}
+
+async function loadImages (dir)
+{
+    for (let gameImage = 0; gameImage < gameImages.length; gameImage++)
+    {
+        try
+        {
+            gameImages [gameImage] = await loadImage (dir + "/" + gameImages [gameImage]);
+        }
+        catch (error)
+        {
+            console.error ('Error loading picture:', error + '.');
+        }
+        gameText.push (new component ("text", gameImages [gameImage].src, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+        loading--;
+    }
 }
 
 function back (color, x, y, width, height)
@@ -1591,6 +1636,7 @@ function player (type, x, y, heading)
                 {
                     if (this.x < gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width > gameEnemies [enemy].x && this.y < gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height > gameEnemies [enemy].y)
                     {
+                        gameAudios [0].play ();
                         this.dead = 2;
                         gameEnemies [enemy].speedX = 0;
                         gameEnemies [enemy].speedY = 0;
@@ -2323,21 +2369,14 @@ function enemy (name, type, x, y)
 
 function component (type, src, color, x, y, width, height)
 {
-    this.loadFile = async function (src)
-    {
-        try
-        {
-            this.image = await loadImage (src);
-        }
-        catch (err)
-        {
-            console.error ('Error loading picture:', err + '.');
-        }
-    }
     this.type = type;
     this.src = src;
     this.color = color;
-    if (this.type == "image") this.loadFile ("img/" + this.src);
+    if (this.type == "image")
+    {
+        this.src = "img/" + this.src;
+        this.image = gameImages.findIndex (image => image.src == this.src);
+    }
     this.x = x;
     this.y = y;
     if (this.type == "text" || this.type == "value")
@@ -2355,7 +2394,7 @@ function component (type, src, color, x, y, width, height)
     this.update = function (idComponent)
     {
         let ctx = gameArea.ctx;
-        if (this.type == "image") ctx.drawImage (this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        if (this.type == "image") ctx.drawImage (gameImages [this.image], this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         else if (this.type == "rect")
         {
             ctx.beginPath ();
@@ -2683,32 +2722,41 @@ function component (type, src, color, x, y, width, height)
                         ctx.fillRect (x + 2, y + 12, 6, 2);
                         ctx.fillRect (x + 10, y + 12, 2, 2);
                     break;
+                    case "=":
+                        ctx.fillRect (x, y + 2, 12, 4);
+                        ctx.fillRect (x, y + 8, 12, 4);
+                    break;
                     case "-":
                         ctx.fillRect (x, y + 5, 12, 4);
-                        height = 6;
+                    break;
+                    case "_":
+                        ctx.fillRect (x, y + 12, 12, 4);
+                        height = 18;
                     break;
                     case "+":
                         ctx.fillRect (x + 4, y + 1, 4, 12);
                         ctx.fillRect (x, y + 5, 12, 4);
                         height = 14;
                     break;
+                    case "·":
+                        ctx.fillRect (x, y + 5, 4, 4);
+                        width = 6;
+                    break;
                     case ".":
                         ctx.fillRect (x, y + 10, 4, 4);
                         width = 6;
-                        height = 6;
                     break;
                     case ",":
                         ctx.fillRect (x, y + 10, 4, 4);
                         ctx.fillRect (x + 2, y + 14, 2, 2);
                         ctx.fillRect (x, y + 16, 2, 2);
                         width = 6;
-                        height = 8;
+                        height = 20;
                     break;
                     case ":":
                         ctx.fillRect (x, y + 2, 4, 4);
                         ctx.fillRect (x, y + 8, 4, 4);
                         width = 6;
-                        height = 14;
                     break;
                     case ";":
                         ctx.fillRect (x, y + 4, 4, 4);
@@ -2716,6 +2764,7 @@ function component (type, src, color, x, y, width, height)
                         ctx.fillRect (x + 2, y + 14, 2, 2);
                         ctx.fillRect (x, y + 16, 2, 2);
                         width = 6;
+                        height = 20;
                     break;
                     case "(":
                         ctx.fillRect (x + 4, y, 6, 2);
@@ -2740,7 +2789,6 @@ function component (type, src, color, x, y, width, height)
                         ctx.fillRect (x + 6, y + 4, 2, 4);
                         ctx.fillRect (x + 8, y + 2, 2, 4);
                         ctx.fillRect (x + 10, y, 2, 4);
-                        width = 12;
                     break;
                     case "\\":
                         ctx.fillRect (x, y, 2, 4);
@@ -2749,7 +2797,6 @@ function component (type, src, color, x, y, width, height)
                         ctx.fillRect (x + 6, y + 6, 2, 4);
                         ctx.fillRect (x + 8, y + 8, 2, 4);
                         ctx.fillRect (x + 10, y + 10, 2, 4);
-                        width = 12;
                 }
                 if (this.direction == "vertical")
                 {
@@ -2797,4 +2844,3 @@ window.on
 );
 
 gameArea.start ();
-gameLoadScreen ("menu");
