@@ -703,9 +703,9 @@ function generateGameMap (level)
 function updateGameArea ()
 {
     gameArea.clear ();
-    if (gameScreen == null && loading == 0 && gameText [gameText.length - 1].src != "loading complete")
+    if (gameScreen == null && loading == 0 && gameText [gameText.length - 1].src != "loading completed...")
     {
-        gameText.push (new component ("text", "loading complete", "#00FF00", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
+        gameText.push (new component ("text", "loading completed...", "#00FF00", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
         setTimeout
         (
             () =>
