@@ -4,8 +4,8 @@ import { PNG } from 'pngjs';
 import { createCanvas, loadImage } from 'canvas';
 import audio from 'audio';
 
-let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
-    windowHeight = 400,//sdl.video.displays [0].geometry.height,//400,
+let windowWidth = sdl.video.displays [0].geometry.width,//640,
+    windowHeight = sdl.video.displays [0].geometry.height,//400,
     canvasWidth = windowWidth,
     canvasHeight = windowHeight,
     window = sdl.video.createWindow
