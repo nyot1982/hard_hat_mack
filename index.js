@@ -638,16 +638,17 @@ function generateGameMap (level)
         width: canvasWidth,
         height: canvasHeight,
         elevatorFloor: 0,
-        elevatorSpeed: 0
+        elevatorSpeed: 0,
+        beamBreaks: []
     };
     switch (level)
     {
         case 1:
-            let beamBreak = 0, brickX = 0, brickY = 0, brickTurn = 0;
+            let beamBreak = 0, beamX = 0, beamY = 0, beamTurn = 0;
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 135, 96, 240));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) + 113, 96, 240));
-            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 60, 96, 4));
+            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 66, 96, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 160, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 178, 224, 4));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) - 186, 288, 4));
@@ -660,44 +661,44 @@ function generateGameMap (level)
             gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 230, 346));
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 262, 54));
-            gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 195));
-            gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2), 80, 195));
+            gameFront.push (new beam_h (0, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
             for (let i = 0; i < 4; i++)
             {
                 beamBreak = Math.floor (Math.random () * 6);
+                gameMap.beamBreaks [144 + i * 64] = beamBreak;
                 gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144 + i * 64, 111 + beamBreak * 28));
                 gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 56 + beamBreak * 28, 144 + i * 64, 251 - beamBreak * 28));
                 beamBreak = Math.floor (Math.random () * 2);
                 if (beamBreak == 0)
                 {
-                    brickY = 132 + i * 64;
-                    brickTurn = -45;
+                    beamY = 132 + i * 64;
+                    beamTurn = -45;
                 }
                 else
                 {
-                    brickY = 112 + i * 64;
-                    brickTurn = 45;
+                    beamY = 112 + i * 64;
+                    beamTurn = 45;
                 }
                 beamBreak = Math.floor (Math.random () * (i < 3 ? 4 : 3));
                 switch (beamBreak)
                 {
                     case 0:
-                        if (brickTurn == -45) brickX = -167;
-                        else brickX = -156;
+                        if (beamTurn == -45) beamX = -167;
+                        else beamX = -156;
                     break;
                     case 1:
-                        if (brickTurn == -45) brickX = -112;
-                        else brickX = -101;
+                        if (beamTurn == -45) beamX = -112;
+                        else beamX = -101;
                     break;
                     case 2:
-                        if (brickTurn == -45) brickX = 81;
-                        else brickX = 92;
+                        if (beamTurn == -45) beamX = 81;
+                        else beamX = 92;
                     break;
                     case 3:
-                        if (brickTurn == -45) brickX = 136;
-                        else brickX = 147;
+                        if (beamTurn == -45) beamX = 136;
+                        else beamX = 147;
                 }
-                gameItems.push (new brick ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + brickX, brickY, brickTurn));
+                gameItems.push (new beam ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + beamX, beamY, beamTurn));
             }
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 252, 378, 506, 6));
             gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 251, 280, 54, 8));
@@ -964,6 +965,7 @@ function beam_h (type, color, color2, x, y, width)
                         ctx.fillStyle = "black";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
+                        if (x == 142) x -= 28;
                     }
                 break;
                 case 1:
@@ -973,6 +975,7 @@ function beam_h (type, color, color2, x, y, width)
                         ctx.fillStyle = "black";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
+                        if (x == 142) x -= 28;
                     }
                 break;
                 case 2:
@@ -982,6 +985,7 @@ function beam_h (type, color, color2, x, y, width)
                         ctx.fillStyle = "black";
                         ctx.fillRect (this.width - x, 6, 6, 4);
                         ctx.fillRect (this.width - x + 16, 6, 6, 4);
+                        if (x == 164) x -= 28;
                     }
             }
             ctx.restore ();
@@ -1022,20 +1026,29 @@ function beam_v (color, color2, x, y, height)
     }
 }
 
-function brick (color, color2, color3, x, y, turn)
+function beam (color, color2, color3, x, y, turn)
 {
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
     this.x = x;
+    this.startX = this.x;
     this.y = y;
+    this.startY = this.y;
+    this.turn = (turn != null ? turn : 0);
+    this.startTurn = this.turn;
     this.width = 28;
     this.height = 16;
     this.type = 0;
-    this.turn = (turn != null ? turn : 0);
 
     this.update = function (idItem)
     {
+        if (this.type == 0)
+        {
+            this.x = this.startX;
+            this.y = this.startY;
+            this.turn = this.startTurn;
+        }
         this.radians = this.turn * Math.PI / 180;
         let ctx = gameArea.ctx;
         ctx.lineWidth = 0;
@@ -1063,6 +1076,18 @@ function brick (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, 0, this.width, this.height);
                 ctx.fillStyle = this.color2;
                 ctx.fillRect (0, 4, this.width, this.height - 8);
+            break;
+            case 3:
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (0, 0, this.width, this.height);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (0, 4, this.width, this.height - 8);
+                if (gameMap.beamBreaks [this.y] == 1 || gameMap.beamBreaks [this.y] == 4)
+                {
+                    ctx.fillStyle = "black";
+                    ctx.fillRect (3, 6, 6, 4);
+                    ctx.fillRect (19, 6, 6, 4);
+                }
         }
         ctx.restore ();
     }
@@ -1130,7 +1155,7 @@ function elevator (type, color, color2, x, y, width, height)
     this.color2 = color2;
     this.x = x;
     this.y = y;
-    this.startY = y;
+    this.startY = this.y;
     this.width = width;
     this.height = height;
 
@@ -1163,7 +1188,7 @@ function support (color, color2, color3, x, y)
     this.color3 = color3;
     this.x = x;
     this.y = y;
-    this.startY = y;
+    this.startY = this.y;
     this.width = 12;
     this.height = 32;
     this.startHeight = this.height;
@@ -1207,7 +1232,7 @@ function bell (color, color2, color3, x, y)
     this.color2 = color2;
     this.color3 = color3;
     this.x = x;
-    this.startX = x;
+    this.startX = this.x;
     this.y = y;
     this.width = 18;
     this.startWidth = this.width;
@@ -1296,7 +1321,7 @@ function bouncy (color, color2, color3, x, y)
     this.color3 = color3;
     this.x = x;
     this.y = y;
-    this.startY = y;
+    this.startY = this.y;
     this.width = 26;
     this.height = 24;
     this.type = 0;
@@ -1473,7 +1498,7 @@ function bolt (color, x, y, bounce)
     this.x = x;
     this.y = y;
     this.bounce = (bounce != null ? bounce : 0.6);
-    this.bounced = [0];
+    this.bounced = 0;
     this.width = 10;
     this.height = 10;
     this.speedX = -(Math.floor (Math.random () * 6 + 1));
@@ -1484,19 +1509,17 @@ function bolt (color, x, y, bounce)
     {
         this.x = Number ((this.x + this.speedX).toFixed (2));
         this.y = Number ((this.y + this.speedY).toFixed (2));
-        let beams = gameFront.filter (front => front.constructor.name == "beam_h");
-        for (let beam = 1; beam < beams.length; beam++)
+        for (let front = 0; front < gameFront.length; front++)
         {
-            if (!this.bounced.includes (beam)) 
+            if ((gameFront [front].constructor.name == "beam" || gameFront [front].constructor.name == "beam_h") && gameFront [front].y > this.bounced)
             {
-                if (this.x < beams [beam].x + beams [beam].width && this.x >= beams [beam].x || this.x + this.width > beams [beam].x && this.x + this.width <= beams [beam].x + beams [beam].width)
+                if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                 {
-                    if (this.y + this.height > beams [beam].y && this.y + this.height <= beams [beam].y + beams [beam].height && this.speedY > 0) this.y = beams [beam].y - this.height;
-                    if (this.y == beams [beam].y - this.height)
+                    if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                    if (this.y == gameFront [front].y - this.height)
                     {
                         this.speedY = -(this.speedY * this.bounce);
-                        this.bounced.push (beam);
-                        if (!this.bounced.includes (beam - 1)) this.bounced.push (beam - 1);
+                        this.bounced = gameFront [front].y;
                     }
                 }
             }
@@ -1719,7 +1742,7 @@ function player (type, x, y, heading)
                 if (this.item == null) for (let item = 0; item < gameItems.length; item++) if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y)
                 {
                     this.item = item;
-                    if (gameItems [this.item].constructor.name == "brick")
+                    if (gameItems [this.item].constructor.name == "beam")
                     {
                         gameItems [this.item].type = 1;
                         gameItems [this.item].turn = 0;
@@ -1727,13 +1750,21 @@ function player (type, x, y, heading)
                 }
                 if (this.item != null)
                 {
-                    if (gameItems [this.item].constructor.name == "brick") gameItems [this.item].y = this.y + 4;
-                    else gameItems [this.item].y = this.y;
                     if (this.heading == 1 && this.x < Math.round (gameMap.width / 2) + 236 - this.width || this.x < Math.round (gameMap.width / 2) - 251 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
                     else gameItems [this.item].x = this.x - gameItems [this.item].width;
-                    /*gameItems [this.item].type = 2;
-                    gameItems [this.item].y += 50;
-                    this.item = null;*/
+                    gameItems [this.item].y = this.y;
+                    if (gameItems [this.item].constructor.name == "beam")
+                    {
+                        gameItems [this.item].y += 4;
+                        if (gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor + this.height] * 28)
+                        {
+                            gameItems [this.item].type = 2;
+                            gameItems [this.item].y += 26;
+                            gameFront.push (gameItems [this.item]);
+                            gameItems.splice (this.item, 1);
+                            this.item = null;
+                        }
+                    }
                 }
             }
             if (this.elevator)
@@ -1969,14 +2000,27 @@ function player (type, x, y, heading)
                                     this.dead = 0;
                                     this.deadFrame = 0;
                                     this.item = null;
-                                    let gameItem = gameItems.findIndex (item => item.constructor.name == "hammer_drill");
-                                    gameItems [gameItem].direction = 0;
-                                    gameItems [gameItem].x = Math.round (gameMap.width / 2) - 100;
-                                    gameItems [gameItem].y = 306;
-                                    gameEnemies [0].name = Math.floor (Math.random () * 2);
-                                    gameEnemies [0].direction = Math.floor (Math.random () * 2);
-                                    gameEnemies [0].x = Math.round (gameMap.width / 2) - 195;
-                                    gameEnemies [0].y = 240;
+                                    for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
+                                    {
+                                        gameItems.push (gameFront [front]);
+                                        gameFront.splice (front, 1);
+                                        front--;
+                                    }
+                                    for (let item = 0; item < gameItems.length; item++)
+                                    {
+                                        if (gameItems [item].constructor.name == "hammer_drill")
+                                        {
+                                            gameItems [item].direction = 0;
+                                            gameItems [item].x = Math.round (gameMap.width / 2) - 100;
+                                            gameItems [item].y = 306;
+                                        }
+                                        else if (gameItems [item].constructor.name == "beam" && gameItems [item].type > 0) gameItems [item].type = 0;
+                                    }
+                                    let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
+                                    gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
+                                    gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
+                                    gameEnemies [gameEnemy].x = Math.round (gameMap.width / 2) - 195;
+                                    gameEnemies [gameEnemy].y = 240;
                                 }
                             },
                             2000
@@ -2239,12 +2283,12 @@ function enemy (name, type, x, y)
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 112 && this.speedX == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 57 && this.y == 112 && this.speedX == -1)
                 {
                     this.speedX = 0;
                     this.speedY = -1;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 48 && this.speedY == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 57 && this.y == 48 && this.speedY == -1)
                 {
                     this.speedX = -1;
                     this.speedY = 0;
@@ -2263,12 +2307,12 @@ function enemy (name, type, x, y)
                     this.speedX = -1;
                     this.speedY = 0;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 48 && this.speedX == -1)
+                else if (this.x == Math.round (gameMap.width / 2) + 57 && this.y == 48 && this.speedX == -1)
                 {
                     this.speedX = 0;
                     this.speedY = 1;
                 }
-                else if (this.x == Math.round (gameMap.width / 2) + 51 && this.y == 112 && this.speedY == 1)
+                else if (this.x == Math.round (gameMap.width / 2) + 57 && this.y == 112 && this.speedY == 1)
                 {
                     this.speedX = 1;
                     this.speedY = 0;
