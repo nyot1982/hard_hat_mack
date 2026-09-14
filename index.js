@@ -665,7 +665,11 @@ function generateGameMap (level)
             for (let i = 0; i < 4; i++)
             {
                 beamBreak = Math.floor (Math.random () * 6);
-                gameMap.beamBreaks [144 + i * 64] = beamBreak;
+                gameMap.beamBreaks [144 + i * 64] =
+                {
+                    beamBreak: beamBreak,
+                    beam: null
+                }
                 gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144 + i * 64, 111 + beamBreak * 28));
                 gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 56 + beamBreak * 28, 144 + i * 64, 251 - beamBreak * 28));
                 beamBreak = Math.floor (Math.random () * 2);
@@ -1082,7 +1086,7 @@ function beam (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, 0, this.width, this.height);
                 ctx.fillStyle = this.color2;
                 ctx.fillRect (0, 4, this.width, this.height - 8);
-                if (gameMap.beamBreaks [this.y] == 1 || gameMap.beamBreaks [this.y] == 4)
+                if (gameMap.beamBreaks [this.y].beamBreak == 1 || gameMap.beamBreaks [this.y].beamBreak == 4)
                 {
                     ctx.fillStyle = "black";
                     ctx.fillRect (3, 6, 6, 4);
@@ -1744,6 +1748,7 @@ function player (type, x, y, heading)
                     this.item = item;
                     if (gameItems [this.item].constructor.name == "beam")
                     {
+                        score += 10;
                         gameItems [this.item].type = 1;
                         gameItems [this.item].turn = 0;
                     }
@@ -1756,14 +1761,21 @@ function player (type, x, y, heading)
                     if (gameItems [this.item].constructor.name == "beam")
                     {
                         gameItems [this.item].y += 4;
-                        if (gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor + this.height] * 28)
+                        if (gameMap.beamBreaks [this.floor + this.height].beam == null && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor + this.height].beamBreak * 28)
                         {
+                            score += 25;
                             gameItems [this.item].type = 2;
                             gameItems [this.item].y += 26;
+                            gameMap.beamBreaks [this.floor + this.height].beam = gameFront.length;
                             gameFront.push (gameItems [this.item]);
                             gameItems.splice (this.item, 1);
                             this.item = null;
                         }
+                    }
+                    else if (gameItems [this.item].constructor.name == "hammer_drill" && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor + this.height].beamBreak * 28 && gameMap.beamBreaks [this.floor + this.height].beam != null && gameFront [gameMap.beamBreaks [this.floor + this.height].beam].type < 3)
+                    {
+                        score += 50;
+                        gameFront [gameMap.beamBreaks [this.floor + this.height].beam].type = 3;
                     }
                 }
             }
@@ -1822,6 +1834,7 @@ function player (type, x, y, heading)
                             {
                                 if (gameFront [front].constructor.name == "bell")
                                 {
+                                    score += 10;
                                     gameFront [front].rings = 1;
                                     if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                     else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
@@ -1835,6 +1848,7 @@ function player (type, x, y, heading)
                             {
                                 if (gameFront [front].constructor.name == "bell")
                                 {
+                                    score += 10;
                                     gameFront [front].rings = 1;
                                     if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                     else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
@@ -1972,11 +1986,17 @@ function player (type, x, y, heading)
                                 this.lives--;
                                 if (this.lives == 0)
                                 {
+                                    if (score > highscore)
+                                    {
+                                        highscore = score;
+                                        fileWrite ('user.bin');
+                                    }
                                     gameText.push (new component ("text", "Game over", "white", Math.round (gameMap.width / 2) - 60, 178));
                                     setTimeout
                                     (
                                         () =>
                                         {
+                                            score = 0;
                                             gameLoadScreen ("menu");
                                         },
                                         3000
@@ -2002,6 +2022,7 @@ function player (type, x, y, heading)
                                     this.item = null;
                                     for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
                                     {
+                                        gameMap.beamBreaks [gameFront [front].y].beam = null;
                                         gameItems.push (gameFront [front]);
                                         gameFront.splice (front, 1);
                                         front--;
