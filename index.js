@@ -639,6 +639,7 @@ function generateGameMap (level)
         height: canvasHeight,
         elevatorFloor: 0,
         elevatorSpeed: 0,
+        beamsBroken: 4,
         beamBreaks: []
     };
     switch (level)
@@ -662,14 +663,17 @@ function generateGameMap (level)
             gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 137, 18));
             gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 262, 54));
             gameFront.push (new beam_h (0, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 80, 390));
+            gameItems.push (new tool ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 84, 52));
             for (let i = 0; i < 4; i++)
             {
                 beamBreak = Math.floor (Math.random () * 6);
-                gameMap.beamBreaks [144 + i * 64] =
-                {
-                    beamBreak: beamBreak,
-                    beam: null
-                }
+                gameMap.beamBreaks.push
+                (
+                    {
+                        beamBreak: beamBreak,
+                        beam: null
+                    }
+                );
                 gameFront.push (new beam_h (1, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 195, 144 + i * 64, 111 + beamBreak * 28));
                 gameFront.push (new beam_h (2, "#55FFFF", "#FF55FF", Math.round (gameMap.width / 2) - 56 + beamBreak * 28, 144 + i * 64, 251 - beamBreak * 28));
                 beamBreak = Math.floor (Math.random () * 2);
@@ -751,12 +755,35 @@ function updateGameArea ()
         for (let back = 0; back < gameBack.length; back++) gameBack [back].update ();
         for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
     }
-    if (gameScreen == "game")
+    if (gameScreen != "game")
     {
-        if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0)
+        if (gameTitle) gameTitle.update ();
+        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
+    }
+    else
+    {
+        if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0) bonus -= 100;
+        if (bonus == 0) gamePlayers [0].dead = 3;
+        else if (gameMap.beamsBroken == 0)
         {
-            bonus -= 100;
-            if (bonus == 0) gamePlayers [0].dead = 3;
+            gameText.push (new component ("text", "Succeded", "white", Math.round (gameMap.width / 2) - 60, 178));
+            score += bonus;
+            if (score > highscore)
+            {
+                highscore = score;
+                fileWrite ('user.bin');
+            }
+            gameArea.pause ();
+            setTimeout
+            (
+                () =>
+                {
+                    gameArea.play ();
+                    score = 0;
+                    gameLoadScreen ("menu");
+                },
+                3000
+            );
         }
         for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
@@ -768,16 +795,12 @@ function updateGameArea ()
             if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
         }
         /*console.clear ();
+        console.log ("gameMap:", gameMap);
         console.log ("gamePlayers:", gamePlayers);
         console.log ("gameEnemies:", gameEnemies);
         console.log ("gameItems:", gameItems);
         console.log ("gameFront:", gameFront);
         console.log ("gameBack:", gameBack);*/
-    }
-    if (gameScreen != "game")
-    {
-        if (gameTitle) gameTitle.update ();
-        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
     }
     const buffer = gameArea.canvas.toBuffer ('raw');
     window.render (canvasWidth, canvasHeight, canvasWidth * 4, 'argb8888', buffer);
@@ -1086,7 +1109,7 @@ function beam (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, 0, this.width, this.height);
                 ctx.fillStyle = this.color2;
                 ctx.fillRect (0, 4, this.width, this.height - 8);
-                if (gameMap.beamBreaks [this.y].beamBreak == 1 || gameMap.beamBreaks [this.y].beamBreak == 4)
+                if (gameMap.beamBreaks [(this.y - 144) / 64].beamBreak == 1 || gameMap.beamBreaks [(this.y - 144) / 64].beamBreak == 4)
                 {
                     ctx.fillStyle = "black";
                     ctx.fillRect (3, 6, 6, 4);
@@ -1688,6 +1711,114 @@ function hammer_drill (color, color2, x, y)
     }
 }
 
+function tool (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.type = Math.floor (Math.random () * 4);
+    if (this.type == 0) this.width = 28;
+    else if (this.type == 1)
+    {
+        this.x += 4;
+        this.width = 20;
+    }
+    else this.width = 26;
+    if (this.type == 1)
+    {
+        this.y -= 4;
+        this.height = 32;
+    }
+    else this.height = 28;
+    this.width = 26;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        switch (this.type)
+        {
+            case 0:
+                ctx.fillStyle = this.color;
+                ctx.fillRect (16, 0, 6, 4);
+                ctx.fillRect (14, 2, 4, 8);
+                ctx.fillRect (24, 4, 4, 6);
+                ctx.fillRect (18, 8, 8, 4);
+                ctx.fillRect (12, 10, 8, 4);
+                ctx.fillRect (10, 12, 8, 4);
+                ctx.fillRect (8, 14, 8, 4);
+                ctx.fillRect (2, 16, 8, 4);
+                ctx.fillRect (0, 18, 4, 4);
+                ctx.fillRect (10, 18, 4, 8);
+                ctx.fillRect (4, 24, 8, 4);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (18, 2, 2, 2);
+                ctx.fillRect (24, 4, 2, 2);
+                ctx.fillRect (2, 20, 2, 2);
+                ctx.fillRect (10, 22, 2, 2);
+            break;
+            case 1:
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (0, 2, 10, 14);
+                ctx.fillRect (4, 22, 2, 2);
+                ctx.fillRect (4, 28, 2, 2);
+                ctx.fillStyle = this.color;
+                ctx.fillRect (0, 0, 10, 2);
+                ctx.fillRect (8, 2, 4, 6);
+                ctx.fillRect (0, 6, 6, 2);
+                ctx.fillRect (0, 10, 6, 2);
+                ctx.fillRect (2, 16, 6, 2);
+                ctx.fillRect (2, 20, 4, 2);
+                ctx.fillRect (2, 26, 4, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (12, 2, 4, 6);
+                ctx.fillRect (16, 6, 2, 2);
+                ctx.fillRect (18, 2, 2, 6);
+                ctx.fillRect (2, 18, 2, 2);
+                ctx.fillRect (2, 24, 2, 2);
+                ctx.fillRect (2, 30, 2, 2);
+            break;
+            case 2:
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (12, 6, 6, 22);
+                ctx.fillStyle = this.color;
+                ctx.fillRect (20, 0, 6, 8);
+                ctx.fillRect (6, 2, 14, 4);
+                ctx.fillRect (4, 4, 4, 4);
+                ctx.fillRect (2, 6, 2, 2);
+                ctx.fillRect (0, 8, 2, 2);
+                ctx.fillRect (12, 20, 6, 6);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (2, 8, 2, 2);
+            break;
+            case 3:
+                ctx.fillStyle = this.color;
+                ctx.fillRect (16, 0, 6, 2);
+                ctx.fillRect (12, 2, 6, 2);
+                ctx.fillRect (8, 4, 18, 6);
+                ctx.fillRect (6, 6, 18, 6);
+                ctx.fillRect (4, 8, 18, 6);
+                ctx.fillRect (6, 14, 14, 2);
+                ctx.fillRect (8, 16, 10, 2);
+                ctx.fillRect (6, 20, 14, 2);
+                ctx.fillRect (0, 26, 26, 2);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (18, 2, 6, 6);
+                ctx.fillRect (10, 12, 6, 2);
+                ctx.fillRect (12, 14, 2, 8);
+                ctx.fillRect (10, 18, 6, 2);
+                ctx.fillRect (6, 22, 14, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (0, 24, 26, 2);
+        }
+        ctx.restore ();
+    }
+}
+
 function player (type, x, y, heading)
 {
     this.type = (type != null ? type : 0);
@@ -1723,7 +1854,7 @@ function player (type, x, y, heading)
         }
     }
 
-    this.update = function (idPlayer)
+    this.update = function ()
     {
         if (gameScreen == "game")
         {
@@ -1743,14 +1874,26 @@ function player (type, x, y, heading)
                         this.enemyKill = enemy;
                     }
                 }
-                if (this.item == null) for (let item = 0; item < gameItems.length; item++) if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y)
+                for (let item = 0; item < gameItems.length; item++)
                 {
-                    this.item = item;
-                    if (gameItems [this.item].constructor.name == "beam")
+                    if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y)
                     {
-                        score += 10;
-                        gameItems [this.item].type = 1;
-                        gameItems [this.item].turn = 0;
+                        if (gameItems [item].constructor.name == "tool")
+                        {
+                            score += 200;
+                            gameItems.splice (item, 1);
+                            item--;
+                        }
+                        else if (this.item == null)
+                        {
+                            if (gameItems [item].constructor.name == "beam")
+                            {
+                                score += 10;
+                                gameItems [item].type = 1;
+                                gameItems [item].turn = 0;
+                            }
+                            this.item = item;
+                        }
                     }
                 }
                 if (this.item != null)
@@ -1761,21 +1904,22 @@ function player (type, x, y, heading)
                     if (gameItems [this.item].constructor.name == "beam")
                     {
                         gameItems [this.item].y += 4;
-                        if (gameMap.beamBreaks [this.floor + this.height].beam == null && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor + this.height].beamBreak * 28)
+                        if (this.floor > 0 && gameMap.beamBreaks [this.floor - 1].beam == null && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor - 1].beamBreak * 28 && gameItems [this.item].type > 0)
                         {
                             score += 25;
                             gameItems [this.item].type = 2;
                             gameItems [this.item].y += 26;
-                            gameMap.beamBreaks [this.floor + this.height].beam = gameFront.length;
+                            gameMap.beamBreaks [this.floor - 1].beam = gameFront.length;
                             gameFront.push (gameItems [this.item]);
                             gameItems.splice (this.item, 1);
                             this.item = null;
                         }
                     }
-                    else if (gameItems [this.item].constructor.name == "hammer_drill" && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor + this.height].beamBreak * 28 && gameMap.beamBreaks [this.floor + this.height].beam != null && gameFront [gameMap.beamBreaks [this.floor + this.height].beam].type < 3)
+                    else if (this.floor > 0 && gameItems [this.item].constructor.name == "hammer_drill" && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor - 1].beamBreak * 28 && gameMap.beamBreaks [this.floor - 1].beam != null && gameFront [gameMap.beamBreaks [this.floor - 1].beam].type < 3)
                     {
                         score += 50;
-                        gameFront [gameMap.beamBreaks [this.floor + this.height].beam].type = 3;
+                        gameFront [gameMap.beamBreaks [this.floor - 1].beam].type = 3;
+                        gameMap.beamsBroken--;
                     }
                 }
             }
@@ -1827,7 +1971,7 @@ function player (type, x, y, heading)
                                     this.speedY = gameMap.elevatorSpeed;
                                 }
                                 else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
-                                else if (gameFront [front].constructor.name == "beam_h") this.floor = this.y;
+                                else if (gameFront [front].constructor.name == "beam_h") this.floor = (gameFront [front].y - 80) / 64;
                                 if (!this.elevator) this.speedY = 0;
                             }
                             else if (this.y == gameFront [front].y + gameFront [front].height)
@@ -1881,7 +2025,7 @@ function player (type, x, y, heading)
                     }
                     if (this.bouncy)
                     {
-                        if (this.floor > 50 && this.y <= this.floor - 64 || this.floor == 50 && this.y <= 306)
+                        if (this.floor > 0 && this.y <= 50 + this.floor * 64 - 64 || this.floor == 0 && this.y <= 306)
                         {
                             this.jumping = this.y;
                             this.bouncy = false;
@@ -2022,7 +2166,7 @@ function player (type, x, y, heading)
                                     this.item = null;
                                     for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
                                     {
-                                        gameMap.beamBreaks [gameFront [front].y].beam = null;
+                                        gameMap.beamBreaks [(gameFront [front].y - 144) / 64].beam = null;
                                         gameItems.push (gameFront [front]);
                                         gameFront.splice (front, 1);
                                         front--;
@@ -2258,7 +2402,7 @@ function enemy (name, type, x, y)
     this.speedY = 0;
     this.direction = Math.floor (Math.random () * 2);
 
-    this.update = function (idEnemy)
+    this.update = function ()
     {
         if (gameScreen == "game")
         {
@@ -2541,7 +2685,7 @@ function component (type, src, color, x, y, width, height)
         this.height = height;
     }
 
-    this.update = function (idComponent)
+    this.update = function ()
     {
         let ctx = gameArea.ctx;
         if (this.type == "image") ctx.drawImage (gameImages [this.image], this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
