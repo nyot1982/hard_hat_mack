@@ -17,6 +17,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
             fullscreen: false
         }
     ),
+    level = 1,
     bonus = 0,
     score = 0,
     highscore = 0,
@@ -62,6 +63,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         axes: []
     },
     gravity = 0.12,
+    player = null,
     gameScreen = null,
     gameTitle = null,
     gameMap = {},
@@ -69,7 +71,6 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
     gameFront = [],
     gameItems = [],
     gameEnemies = [],
-    gamePlayers = [],
     gameText = [],
     gameImages = fs.readdirSync ("img"),
     gameAudios = fs.readdirSync ("audio"),
@@ -409,10 +410,8 @@ function startControl (id_control, control, bt_type, bt_code, bt_value)
     if (!pressed [bt_type][id_control].includes (bt_code) || bt_type == "axes")
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
-        let player = -1;
-        if (gameScreen == "game" && gamePlayers.length > 0) player = 0;
         if (control == "keyboard") bt_value = 1;
-        userActionStart (control, bt_type, bt_code, bt_value, player);
+        userActionStart (control, bt_type, bt_code, bt_value);
     }
 }
 
@@ -421,16 +420,11 @@ function stopControl (id_control, control, bt_type, bt_code)
     if (pressed [bt_type][id_control].includes (bt_code))
     {
         pressed [bt_type][id_control].splice (pressed [bt_type][id_control].indexOf (bt_code), 1);
-        let player = -1;
-        if (gameScreen == "game" && gamePlayers.length > 0)
-        {
-            player = 0;
-            userActionStop (id_control, control, bt_type, bt_code, player);
-        }
+        if (gameScreen == "game" && player != null) userActionStop (id_control, control, bt_type, bt_code);
     }
 }
 
-function userActionStart (control, bt_type, bt_code, bt_value, player)
+function userActionStart (control, bt_type, bt_code, bt_value)
 {
     let userAction = null;
     if (bt_type == null) userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
@@ -484,90 +478,76 @@ function userActionStart (control, bt_type, bt_code, bt_value, player)
             switch (userActions [userAction].action)
             {
                 case 'pause':
-                    if (player > -1)
-                    {
-                        if (gameArea.animation == null) gameArea.play ();
-                        else  gameArea.pause ();
-                    }
+                    if (gameArea.animation == null) gameArea.play ();
+                    else  gameArea.pause ();
                 break;
                 case 'exit':
-                    if (player > -1) gameLoadScreen ("menu");
+                    gameLoadScreen ("menu");
                 break;
                 case 'move_up':
-                    if (player > -1) gamePlayers [player].moveY = -bt_value;
+                    player.moveY = -bt_value;
                 break;
                 case 'move_down':
-                    if (player > -1) gamePlayers [player].moveY = bt_value;
+                    player.moveY = bt_value;
                 break;
                  case 'move_left':
-                    if (player > -1) gamePlayers [player].moveX = -bt_value;
+                    player.moveX = -bt_value;
                 break;
                 case 'move_right':
-                    if (player > -1) gamePlayers [player].moveX = bt_value;
+                    player.moveX = bt_value;
                 break;
                 case 'jump':
-                    if (player > -1) gamePlayers [player].jump = -2;
+                    player.jump = -2;
                 break;
                 case 'drop':
-                    if (player > -1) gamePlayers [player].dropItem ();
+                    player.dropItem ();
             }
         }
     }
 }
 
-function userActionStop (id_control, control, bt_type, bt_code, player)
+function userActionStop (id_control, control, bt_type, bt_code)
 {
-    let userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
+    let userActionPrev = 0,
+        bt_code_prev = 0,
+        userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
     if (userAction > -1)
     {
         switch (userActions [userAction].action)
         {
             case 'move_down':
-                if (player > -1)
-                {
-                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
-                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveY = -1;
-                    else gamePlayers [player].moveY = 0;
-                }
+                userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_up');
+                bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                if (pressed [bt_type][id_control].includes (bt_code_prev)) player.moveY = -1;
+                else player.moveY = 0;
             break;
             case 'move_up':
-                if (player > -1)
-                {
-                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
-                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveY = 1;
-                    else gamePlayers [player].moveY = 0;
-                }
+                userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_down');
+                bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                if (pressed [bt_type][id_control].includes (bt_code_prev)) player.moveY = 1;
+                else player.moveY = 0;
             break;
             case 'move_left':
-                if (player > -1)
-                {
-                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
-                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = 1;
-                    else gamePlayers [player].moveX = 0;
-                }
+                userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_right');
+                bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                if (pressed [bt_type][id_control].includes (bt_code_prev)) player.moveX = 1;
+                else player.moveX = 0;
             break;
             case 'move_right':
-                if (player > -1)
-                {
-                    let userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
-                    let bt_code_prev = userActions [userActionPrev][control][bt_type][0];
-                    if (pressed [bt_type][id_control].includes (bt_code_prev)) gamePlayers [player].moveX = -1;
-                    else gamePlayers [player].moveX = 0;
-                }
+                userActionPrev = userActions.findIndex (action => action.screen.includes (gameScreen) && action.action == 'move_left');
+                bt_code_prev = userActions [userActionPrev][control][bt_type][0];
+                if (pressed [bt_type][id_control].includes (bt_code_prev)) player.moveX = -1;
+                else player.moveX = 0;
             break;
             case 'jump':
-                if (player > -1) gamePlayers [player].jump = 0;
+                player.jump = 0;
         }
     }
 }
 
 function stopUserInteractions ()
 {
-    let player = 0;
     pressed =
     {
         keys:
@@ -577,18 +557,18 @@ function stopUserInteractions ()
         buttons: [],
         axes: []
     };
-    gamePlayers [player].speedX = 0;
-    gamePlayers [player].speedY = 0;
+    player.speedX = 0;
+    player.speedY = 0;
 }
 
 function gameLoadScreen (screen)
 {
+    if (gameScreen != "game" || screen != "game") player = null;
     gameTitle = null;
     gameBack = [];
     gameFront = [];
     gameItems = [];
     gameEnemies = [];
-    gamePlayers = [];
     gameText = [];
 
     gameScreen = screen;
@@ -608,7 +588,7 @@ function gameLoadScreen (screen)
             gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
             gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 173, gameText [4].y));
             gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 213, gameText [5].y + 23));
-            gameText.push (new player (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
+            gameText.push (new mack (0, Math.round (canvasWidth / 2) - 13, gameText [5].y + 25));
             gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 187, gameText [5].y + 23));
             gameText.push (new beam_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 247, gameText [5].y + 55, 494));
             gameText.push (new component ("image", "electronic_arts.png", "", 246, canvasHeight - 150, 192, 66));
@@ -624,28 +604,27 @@ function gameLoadScreen (screen)
             canvasWidth = Math.round (canvasHeight * windowWidth / windowHeight);
             gameArea.canvas.width = canvasWidth;
             gameArea.canvas.height = canvasHeight;
-            generateGameMap (1);
+            generateGameMap ();
     }
 }
 
-function generateGameMap (level)
+function generateGameMap ()
 {
     bonus = 5100;
-    gameMap =
-    {
-        level: level,
-        startFrame: gameArea.frame,
-        width: canvasWidth,
-        height: canvasHeight,
-        elevatorFloor: 0,
-        elevatorSpeed: 0,
-        beamsBroken: 4,
-        beamBreaks: []
-    };
     switch (level)
     {
         case 1:
             let beamBreak = 0, beamX = 0, beamY = 0, beamTurn = 0;
+            gameMap =
+            {
+                startFrame: gameArea.frame,
+                width: canvasWidth,
+                height: canvasHeight,
+                elevatorFloor: 0,
+                elevatorSpeed: 0,
+                beamsBroken: 4,
+                beamBreaks: []
+            };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 135, 96, 240));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) + 113, 96, 240));
@@ -715,13 +694,27 @@ function generateGameMap (level)
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 229, 354));
             gameItems.push (new hammer_drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 195, 240));
-            gamePlayers.push (new player (0, Math.round (gameMap.width / 2) + 160, 306, -1));
+            player = new mack (0, Math.round (gameMap.width / 2) + 160, 306, -1);
         break;
         case 2:
-            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
+            gameMap =
+            {
+                startFrame: gameArea.frame,
+                width: canvasWidth,
+                height: canvasHeight,
+                elevatorFloor: 0,
+                elevatorSpeed: 0
+            };
+            gameBack.push (new back ("blue", 0, 0, gameMap.width, gameMap.height));
         break;
         case 3:
-            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
+            gameMap =
+            {
+                startFrame: gameArea.frame,
+                width: canvasWidth,
+                height: canvasHeight
+            };
+            gameBack.push (new back ("red", 0, 0, gameMap.width, gameMap.height));
     }
     gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 288, 0));
     gameText.push (new component ("value", "bonus", "white", Math.round (gameMap.width / 2) - 198, 0, "left", 5));
@@ -730,9 +723,9 @@ function generateGameMap (level)
     gameText.push (new component ("text", "Hi-score:", "white", Math.round (gameMap.width / 2) + 88, 0));
     gameText.push (new component ("value", "highscore", "white", Math.round (gameMap.width / 2) + 220, 0, "left", 5));
     gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 276, 128, "vertical"));
-    gameText.push (new component ("value", "gameMap.level", "white", Math.round (gameMap.width / 2) + 262, 224, "left", 2));
+    gameText.push (new component ("value", "level", "white", Math.round (gameMap.width / 2) + 262, 224, "left", 2));
     gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 276, 288, "vertical"));
-    gameText.push (new component ("value", "gamePlayers [0].lives", "white", Math.round (gameMap.width / 2) + 276, 368, "left", 1));
+    gameText.push (new component ("value", "player.lives", "white", Math.round (gameMap.width / 2) + 276, 368, "left", 1));
 }
 
 function updateGameArea ()
@@ -763,10 +756,9 @@ function updateGameArea ()
     else
     {
         if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0) bonus -= 100;
-        if (bonus == 0) gamePlayers [0].dead = 3;
+        if (bonus == 0) player.dead = 3;
         else if (gameMap.beamsBroken == 0)
         {
-            gameText.push (new component ("text", "Succeded", "white", Math.round (gameMap.width / 2) - 60, 178));
             score += bonus;
             if (score > highscore)
             {
@@ -779,15 +771,16 @@ function updateGameArea ()
                 () =>
                 {
                     gameArea.play ();
-                    score = 0;
-                    gameLoadScreen ("menu");
+                    level++;
+                    player.item = null;
+                    gameLoadScreen ("game");
                 },
                 3000
             );
         }
         for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
         for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
-        for (let player = 0; player < gamePlayers.length; player++) gamePlayers [player].update (player);
+        if (player != null) player.update ();
         for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
         if (gameMap.elevatorSpeed != 0)
         {
@@ -795,8 +788,8 @@ function updateGameArea ()
             if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
         }
         /*console.clear ();
+        console.log ("player:", player);
         console.log ("gameMap:", gameMap);
-        console.log ("gamePlayers:", gamePlayers);
         console.log ("gameEnemies:", gameEnemies);
         console.log ("gameItems:", gameItems);
         console.log ("gameFront:", gameFront);
@@ -1370,9 +1363,9 @@ function bouncy (color, color2, color3, x, y)
                     this.height = 24;
                     if (this.type == 4)
                     {
-                        gamePlayers [0].y = this.y - gamePlayers [0].height;
-                        gamePlayers [0].speedY = -4;
-                        //if (gamePlayers [0].dead > 0) gamePlayers [0].speedY = Number ((gamePlayers [0].speedY * 0.8).toFixed (2));
+                        player.y = this.y - player.height;
+                        player.speedY = -4;
+                        //if (player.dead > 0) player.speedY = Number ((player.speedY * 0.8).toFixed (2));
                         this.type = 0;
                     }
                 }
@@ -1401,7 +1394,7 @@ function bouncy (color, color2, color3, x, y)
                 {
                     this.y = this.startY + 4;
                     this.height = 20;
-                    gamePlayers [0].y = this.y - gamePlayers [0].height;
+                    player.y = this.y - player.height;
                 }
                 ctx.translate (Math.round (this.x), Math.round (this.y));
                 ctx.fillRect (2, 0, 22, 2);
@@ -1427,7 +1420,7 @@ function bouncy (color, color2, color3, x, y)
                 {
                     this.y = this.startY + 14;
                     this.height = 10;
-                    gamePlayers [0].y = this.y - gamePlayers [0].height;
+                    player.y = this.y - player.height;
                 }
                 ctx.translate (Math.round (this.x), Math.round (this.y));
                 ctx.fillRect (2, 0, 22, 2);
@@ -1579,10 +1572,10 @@ function hammer_drill (color, color2, x, y)
 
     this.update = function (idItem)
     {
-        if (idItem == gamePlayers [0].item)
+        if (idItem == player.item)
         {
-            this.speedX = gamePlayers [0].speedX;
-            this.speedY = gamePlayers [0].speedY;
+            this.speedX = player.speedX;
+            this.speedY = player.speedY;
         }
         else
         {
@@ -1819,7 +1812,7 @@ function tool (color, color2, color3, x, y)
     }
 }
 
-function player (type, x, y, heading)
+function mack (type, x, y, heading)
 {
     this.type = (type != null ? type : 0);
     this.x = (x != null ? x : 0);
