@@ -615,7 +615,6 @@ function generateGameMap ()
 {
     bonus = 5100;
     levelCompleted = false;
-    player.item = null;
     switch (level)
     {
         case 1:
