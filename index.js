@@ -705,7 +705,7 @@ function generateGameMap ()
                 elevatorFloor: 0,
                 elevatorSpeed: 0
             };
-            gameBack.push (new back ("blue", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
         break;
         case 3:
             gameMap =
@@ -2141,44 +2141,47 @@ function mack (type, x, y, heading)
                                 }
                                 else
                                 {
-                                    bonus = 5100;
-                                    gameMap.startFrame = gameArea.frame;
-                                    gameMap.elevatorFloor = 0;
-                                    gameMap.elevatorSpeed = 0;
-                                    this.type = 0;
-                                    this.x = Math.round (gameMap.width / 2) + 160;
-                                    this.y = 306;
-                                    this.heading = -1;
-                                    this.jump = 0;
-                                    this.jumping = false;
-                                    this.bouncy = false;
-                                    this.elevator = false;
-                                    this.state = null;
-                                    this.dead = 0;
-                                    this.deadFrame = 0;
-                                    this.item = null;
-                                    for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
+                                    if (level == 1)
                                     {
-                                        gameMap.beamBreaks [(gameFront [front].y - 144) / 64].beam = null;
-                                        gameItems.push (gameFront [front]);
-                                        gameFront.splice (front, 1);
-                                        front--;
-                                    }
-                                    for (let item = 0; item < gameItems.length; item++)
-                                    {
-                                        if (gameItems [item].constructor.name == "hammer_drill")
+                                        bonus = 5100;
+                                        gameMap.startFrame = gameArea.frame;
+                                        gameMap.elevatorFloor = 0;
+                                        gameMap.elevatorSpeed = 0;
+                                        this.type = 0;
+                                        this.x = Math.round (gameMap.width / 2) + 160;
+                                        this.y = 306;
+                                        this.heading = -1;
+                                        this.jump = 0;
+                                        this.jumping = false;
+                                        this.bouncy = false;
+                                        this.elevator = false;
+                                        this.state = null;
+                                        this.dead = 0;
+                                        this.deadFrame = 0;
+                                        this.item = null;
+                                        for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
                                         {
-                                            gameItems [item].direction = 0;
-                                            gameItems [item].x = Math.round (gameMap.width / 2) - 100;
-                                            gameItems [item].y = 306;
+                                            gameMap.beamBreaks [(gameFront [front].y - 144) / 64].beam = null;
+                                            gameItems.push (gameFront [front]);
+                                            gameFront.splice (front, 1);
+                                            front--;
                                         }
-                                        else if (gameItems [item].constructor.name == "beam" && gameItems [item].type > 0) gameItems [item].type = 0;
+                                        for (let item = 0; item < gameItems.length; item++)
+                                        {
+                                            if (gameItems [item].constructor.name == "hammer_drill")
+                                            {
+                                                gameItems [item].direction = 0;
+                                                gameItems [item].x = Math.round (gameMap.width / 2) - 100;
+                                                gameItems [item].y = 306;
+                                            }
+                                            else if (gameItems [item].constructor.name == "beam" && gameItems [item].type > 0) gameItems [item].type = 0;
+                                        }
+                                        let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
+                                        gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
+                                        gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
+                                        gameEnemies [gameEnemy].x = Math.round (gameMap.width / 2) - 195;
+                                        gameEnemies [gameEnemy].y = 240;
                                     }
-                                    let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
-                                    gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
-                                    gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
-                                    gameEnemies [gameEnemy].x = Math.round (gameMap.width / 2) - 195;
-                                    gameEnemies [gameEnemy].y = 240;
                                 }
                             },
                             2000
