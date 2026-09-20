@@ -792,7 +792,11 @@ function updateGameArea ()
                 score += 100;
                 bonus -= 100;
                 gameAudios [2].play ();
-                if (bonus == 0) gameMap.startFrame = gameArea.frame;
+                if (bonus == 0)
+                {
+                    gameMap.startFrame = gameArea.frame;
+                    gameAudios [7].play ();
+                }
             }
             if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
             {
