@@ -352,7 +352,6 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         },
         stop: function ()
         {
-            stopUserInteractions ();
             clearInterval (this.animation);
             this.animation = null;
             this.frame = null;
@@ -547,21 +546,6 @@ function userActionStop (id_control, control, bt_type, bt_code)
     }
 }
 
-function stopUserInteractions ()
-{
-    pressed =
-    {
-        keys:
-        {
-            99: []
-        },
-        buttons: [],
-        axes: []
-    };
-    player.speedX = 0;
-    player.speedY = 0;
-}
-
 function gameLoadScreen (screen)
 {
     if (gameScreen != screen)
@@ -626,8 +610,15 @@ function generateGameMap ()
                 height: canvasHeight,
                 elevatorFloor: 0,
                 elevatorSpeed: 0,
-                beamsBroken: 4,
-                beamBreaks: []
+                items: 4,
+                beamBreaks: [],
+                player:
+                {
+                    type: 0,
+                    x: Math.round (canvasWidth / 2) + 160,
+                    y: 306,
+                    heading: -1
+                }
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new beam_v ("#FFFFFF", "#55FFFF", Math.round (gameMap.width / 2) - 135, 96, 240));
@@ -698,7 +689,7 @@ function generateGameMap ()
             gameFront.push (new bouncy ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 229, 354));
             gameItems.push (new hammer_drill ("#FFFFFF", "#FF55FF", Math.round (gameMap.width / 2) - 100, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, Math.round (gameMap.width / 2) - 195, 240));
-            player = new mack (0, Math.round (gameMap.width / 2) + 160, 306, -1);
+            player = new mack (gameMap.player.type, gameMap.player.x, gameMap.player.y, gameMap.player.heading);
             gameText.push (new component ("text", "Bonus:", "white", Math.round (gameMap.width / 2) - 288, 0));
             gameText.push (new component ("value", "bonus", "white", Math.round (gameMap.width / 2) - 198, 0, "left", 5));
             gameText.push (new component ("text", "Score:", "white", Math.round (gameMap.width / 2) - 100, 0));
@@ -708,7 +699,7 @@ function generateGameMap ()
             gameText.push (new component ("text", "Level", "white", Math.round (gameMap.width / 2) + 276, 128, "vertical"));
             gameText.push (new component ("value", "level", "white", Math.round (gameMap.width / 2) + 262, 224, "left", 2));
             gameText.push (new component ("text", "Mack", "white", Math.round (gameMap.width / 2) + 276, 288, "vertical"));
-            gameText.push (new component ("value", "player.lives", "white", Math.round (gameMap.width / 2) + 276, 368, "left", 1));
+            gameText.push (new component ("value", "player.ups", "white", Math.round (gameMap.width / 2) + 276, 368, "left", 1));
         break;
         case 2:
             gameMap =
@@ -716,12 +707,31 @@ function generateGameMap ()
                 startFrame: gameArea.frame,
                 width: canvasWidth,
                 height: canvasHeight,
-                elevatorFloor: 0,
-                elevatorSpeed: 0
+                items: 4,
+                player:
+                {
+                    type: 1,
+                    x: Math.round (canvasWidth / 2) - 252,
+                    y: 352,
+                    heading: -1
+                }
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            player.x = 0;
-            player.y = gameMap.height - player.height;
+            gameFront.push (new beam_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 112, 80, 70));
+            gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 18, 80, 70));
+            gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 252, 378, 506, 6));
+            player.type = gameMap.player.type;
+            player.x = gameMap.player.x;
+            player.y = gameMap.player.y;
+            player.heading = gameMap.player.heading;
+            player.jump = 0;
+            player.jumping = false;
+            player.bouncy = false;
+            player.elevator = false;
+            player.state = null;
+            player.dead = 0;
+            player.deadFrame = 0;
+            player.item = null;
         break;
         case 3:
             gameMap =
@@ -731,9 +741,21 @@ function generateGameMap ()
                 height: canvasHeight
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            player.x = 0;
-            player.y = gameMap.height - player.height;
+            gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 252, 378, 506, 6));
+            player.type = gameMap.player.type;
+            player.x = gameMap.player.x;
+            player.y = gameMap.player.y;
+            player.heading = gameMap.player.heading;
+            player.jump = 0;
+            player.jumping = false;
+            player.bouncy = false;
+            player.elevator = false;
+            player.state = null;
+            player.dead = 0;
+            player.deadFrame = 0;
+            player.item = null;
     }
+    gameAudios [8].play ();
 }
 
 function updateGameArea ()
@@ -763,14 +785,16 @@ function updateGameArea ()
     }
     else
     {
-        if (levelCompleted && (gameArea.frame - gameMap.startFrame) % 10 == 0)
+        if (levelCompleted)
         {
-            if (bonus > 0)
+            if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 10 == 0)
             {
                 score += 100;
                 bonus -= 100;
+                gameAudios [2].play ();
+                if (bonus == 0) gameMap.startFrame = gameArea.frame;
             }
-            else if (bonus == 0)
+            if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
             {
                 if (score > highscore)
                 {
@@ -1550,6 +1574,7 @@ function bolt (color, x, y, bounce)
                         {
                             this.speedY = -(this.speedY * this.bounce);
                             this.bounced = gameFront [front].y;
+                            gameAudios [1].play ();
                         }
                     }
                 }
@@ -1845,7 +1870,7 @@ function mack (type, x, y, heading)
     this.state = null;
     this.dead = 0;
     this.deadFrame = 0;
-    this.lives = 3;
+    this.ups = 3;
     this.floor = 0;
     this.enemyKill = null;
     this.item = null;
@@ -1873,7 +1898,6 @@ function mack (type, x, y, heading)
                 {
                     if (this.x < gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width > gameEnemies [enemy].x && this.y < gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height > gameEnemies [enemy].y)
                     {
-                        gameAudios [0].play ();
                         this.dead = 2;
                         gameEnemies [enemy].speedX = 0;
                         gameEnemies [enemy].speedY = 0;
@@ -1915,19 +1939,21 @@ function mack (type, x, y, heading)
                         {
                             score += 25;
                             gameItems [this.item].type = 2;
-                            gameItems [this.item].y += 26;
+                            gameItems [this.item].y = this.floor * 64 + 80;
                             gameMap.beamBreaks [this.floor - 1].beam = gameFront.length;
                             gameFront.push (gameItems [this.item]);
                             gameItems.splice (this.item, 1);
                             this.item = null;
+                            gameAudios [0].play ();
                         }
                     }
                     else if (this.floor > 0 && gameItems [this.item].constructor.name == "hammer_drill" && gameItems [this.item].x == Math.round (gameMap.width / 2) - 84 + gameMap.beamBreaks [this.floor - 1].beamBreak * 28 && gameMap.beamBreaks [this.floor - 1].beam != null && gameFront [gameMap.beamBreaks [this.floor - 1].beam].type < 3)
                     {
                         score += 50;
                         gameFront [gameMap.beamBreaks [this.floor - 1].beam].type = 3;
-                        gameMap.beamsBroken--;
-                        if (gameMap.beamsBroken == 0) levelCompleted = true;
+                        gameMap.items--;
+                        gameAudios [3].play ();
+                        if (gameMap.items == 0) levelCompleted = true;
                     }
                 }
             }
@@ -2086,6 +2112,7 @@ function mack (type, x, y, heading)
                         }
                         if (this.jump != 0)
                         {
+                            gameAudios [6].play ();
                             this.speedY = this.jump;
                             this.jumping = this.y;
                         }
@@ -2103,7 +2130,7 @@ function mack (type, x, y, heading)
             {
                 this.speedX = 0;
                 if (this.state != "air" && !this.elevator) this.speedY = 0;
-                if (this.type != 8 && this.dead < 4 &&gameArea.frame % 5 == 0)
+                if (this.type != 8 && this.dead < 4 && gameArea.frame % 5 == 0)
                 {
                     if (this.dead == 2)
                     {
@@ -2126,6 +2153,7 @@ function mack (type, x, y, heading)
                     {
                         if (this.dead == 1) this.type = 8;
                         else this.dead = 4;
+                        gameAudios [9].play ();
                         setTimeout
                         (
                             () =>
@@ -2135,8 +2163,8 @@ function mack (type, x, y, heading)
                                     gameEnemies.splice (this.enemyKill, 1);
                                     this.enemyKill = null;
                                 }
-                                this.lives--;
-                                if (this.lives == 0)
+                                this.ups--;
+                                if (this.ups == 0)
                                 {
                                     if (score > highscore)
                                     {
@@ -2156,24 +2184,24 @@ function mack (type, x, y, heading)
                                 }
                                 else
                                 {
+                                    bonus = 5100;
+                                    gameMap.startFrame = gameArea.frame;
+                                    this.type = gameMap.player.type;
+                                    this.x = gameMap.player.x;
+                                    this.y = gameMap.player.y;
+                                    this.heading = gameMap.player.heading;
+                                    this.jump = 0;
+                                    this.jumping = false;
+                                    this.bouncy = false;
+                                    this.elevator = false;
+                                    this.state = null;
+                                    this.dead = 0;
+                                    this.deadFrame = 0;
+                                    this.item = null;
                                     if (level == 1)
                                     {
-                                        bonus = 5100;
-                                        gameMap.startFrame = gameArea.frame;
                                         gameMap.elevatorFloor = 0;
                                         gameMap.elevatorSpeed = 0;
-                                        this.type = 0;
-                                        this.x = Math.round (gameMap.width / 2) + 160;
-                                        this.y = 306;
-                                        this.heading = -1;
-                                        this.jump = 0;
-                                        this.jumping = false;
-                                        this.bouncy = false;
-                                        this.elevator = false;
-                                        this.state = null;
-                                        this.dead = 0;
-                                        this.deadFrame = 0;
-                                        this.item = null;
                                         for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
                                         {
                                             gameMap.beamBreaks [(gameFront [front].y - 144) / 64].beam = null;
@@ -3144,6 +3172,7 @@ window.on
     'close',
     () =>
     {
+        gameArea.stop ();
         process.exit (0);
     }
 );
