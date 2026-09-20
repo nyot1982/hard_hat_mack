@@ -707,7 +707,7 @@ function generateGameMap ()
                 startFrame: gameArea.frame,
                 width: canvasWidth,
                 height: canvasHeight,
-                items: 4,
+                items: 6,
                 player:
                 {
                     type: 1,
@@ -717,8 +717,15 @@ function generateGameMap ()
                 }
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 204, 288, 8));
             gameFront.push (new beam_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 112, 80, 70));
             gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 18, 80, 70));
+            gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 280, 144, 166));
+            gameFront.push (new beam_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 56, 144, 166));
+            gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 280, 208, 166));
+            gameFront.push (new beam_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 56, 208, 166));
+            gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 280, 272, 166));
+            gameFront.push (new beam_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 56, 272, 166));
             gameFront.push (new floor ("white", Math.round (gameMap.width / 2) - 252, 378, 506, 6));
             player.type = gameMap.player.type;
             player.x = gameMap.player.x;
@@ -2181,6 +2188,7 @@ function mack (type, x, y, heading)
                                         () =>
                                         {
                                             score = 0;
+                                            level = 1;
                                             gameLoadScreen ("menu");
                                         },
                                         3000
