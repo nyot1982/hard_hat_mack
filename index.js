@@ -6,17 +6,17 @@ import audio from 'audio';
 
 let windowWidth = sdl.video.displays [0].geometry.width,//640,
     windowHeight = sdl.video.displays [0].geometry.height,//400,
-    canvasWidth = windowWidth,
-    canvasHeight = windowHeight,
     window = sdl.video.createWindow
     (
         {
             title: "Hard Hat Mack",
-            width: canvasWidth,
-            height: canvasHeight,
+            width: windowWidth,
+            height: windowHeight,
             fullscreen: false
         }
     ),
+    canvasWidth = windowWidth,
+    canvasHeight = windowHeight,
     level = 0,
     levelCompleted = false,
     bonus = 0,
