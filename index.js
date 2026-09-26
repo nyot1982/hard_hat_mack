@@ -559,7 +559,7 @@ function gameLoadScreen (screen)
         gameTitle = null;
         gameText = [];
         score = 0;
-        level = 2;
+        level = 1;
     }
     gameBack = [];
     gameFront = [];
@@ -2091,80 +2091,77 @@ function mack (type, x, y, heading)
             }
             else
             {
-                
+                if (this.dead == 0 && this.state == "ground" && !this.bouncy && !this.elevator) this.speedX = this.moveX;
+                if (this.state != "chain") this.state = "air";
+                for (let front = 0; front < gameFront.length; front++)
                 {
-                    if (this.dead == 0 && this.state == "ground" && !this.bouncy && !this.elevator) this.speedX = this.moveX;
-                    if (this.state != "chain") this.state = "air";
-                    for (let front = 0; front < gameFront.length; front++)
+                    if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
                     {
-                        if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
+                        if (this.state != "chain")
                         {
-                            if (this.state != "chain")
-                            {
-                                if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0) this.y = gameFront [front].y - this.height;
-                                else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
-                            }
-                            if (this.y == gameFront [front].y - this.height)
-                            {
-                                this.state = "ground";
-                                if (gameFront [front].constructor.name == "bouncy" && !this.bouncy)
-                                {
-                                    this.bouncy = true;
-                                    gameFront [front].type = 1;
-                                }
-                                else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
-                                {
-                                    this.elevator = true;
-                                    this.speedX = 0;
-                                    if (this.item == null) this.x -= (this.x - gameFront [front].x) / 2;
-                                    else this.x = gameFront [front].x;
-                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                                    this.speedY = gameMap.elevatorSpeed;
-                                }
-                                else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
-                                else if (gameFront [front].constructor.name == "beam_h") this.floor = (gameFront [front].y - 80) / 64;
-                                if (!this.elevator) this.speedY = 0;
-                            }
-                            else if (this.state != "chain" && this.y == gameFront [front].y + gameFront [front].height)
-                            {
-                                if (gameFront [front].constructor.name == "bell")
-                                {
-                                    score += 10;
-                                    gameFront [front].rings = 1;
-                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                                }
-                                this.speedY = 0;
-                            }
+                            if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                            else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
                         }
-                        if (this.state != "chain" && this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
+                        if (this.y == gameFront [front].y - this.height)
                         {
-                            if (this.x == gameFront [front].x + gameFront [front].width && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                            this.state = "ground";
+                            if (gameFront [front].constructor.name == "bouncy" && !this.bouncy)
                             {
-                                if (gameFront [front].constructor.name == "bell")
-                                {
-                                    score += 10;
-                                    gameFront [front].rings = 1;
-                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                                }
+                                this.bouncy = true;
+                                gameFront [front].type = 1;
+                            }
+                            else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
+                            {
+                                this.elevator = true;
                                 this.speedX = 0;
+                                if (this.item == null) this.x -= (this.x - gameFront [front].x) / 2;
+                                else this.x = gameFront [front].x;
+                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                this.speedY = gameMap.elevatorSpeed;
                             }
+                            else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
+                            else if (gameFront [front].constructor.name == "beam_h") this.floor = (gameFront [front].y - 80) / 64;
+                            if (!this.elevator) this.speedY = 0;
+                        }
+                        else if (this.state != "chain" && this.y == gameFront [front].y + gameFront [front].height)
+                        {
+                            if (gameFront [front].constructor.name == "bell")
+                            {
+                                score += 10;
+                                gameFront [front].rings = 1;
+                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                            }
+                            this.speedY = 0;
                         }
                     }
-                    if (this.x < 0) this.x = 0;
-                    else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
-                    if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0) this.speedX = 0;
-                    if (this.y < 0) this.y = 0;
-                    else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
-                    if (this.y == gameMap.height - this.height)
+                    if (this.state != "chain" && this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                     {
-                        this.state = "ground";
-                        if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
+                        if (this.x == gameFront [front].x + gameFront [front].width && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                        {
+                            if (gameFront [front].constructor.name == "bell")
+                            {
+                                score += 10;
+                                gameFront [front].rings = 1;
+                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                            }
+                            this.speedX = 0;
+                        }
                     }
-                    if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
                 }
+                if (this.x < 0) this.x = 0;
+                else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
+                if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0) this.speedX = 0;
+                if (this.y < 0) this.y = 0;
+                else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
+                if (this.y == gameMap.height - this.height)
+                {
+                    this.state = "ground";
+                    if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
+                }
+                if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
                 if (this.state == "air")
                 {
                     if (this.speedX != 0)
@@ -2196,6 +2193,7 @@ function mack (type, x, y, heading)
                 {
                     this.chain_bottom = false;
                     this.chain_top = false;
+                    if (this.state != "ground") this.state = "air";
                     for (let back = 0; back < gameBack.length; back++)
                     {
                         if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y + this.height + 16 >= gameBack [back].y && this.y <= gameBack [back].y + gameBack [back].height)
