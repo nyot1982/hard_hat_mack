@@ -2091,16 +2091,19 @@ function mack (type, x, y, heading)
             }
             else
             {
-                if (this.state != "chain")
+                
                 {
                     if (this.dead == 0 && this.state == "ground" && !this.bouncy && !this.elevator) this.speedX = this.moveX;
-                    this.state = "air";
+                    if (this.state != "chain") this.state = "air";
                     for (let front = 0; front < gameFront.length; front++)
                     {
                         if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
                         {
-                            if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0) this.y = gameFront [front].y - this.height;
-                            else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
+                            if (this.state != "chain")
+                            {
+                                if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                                else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
+                            }
                             if (this.y == gameFront [front].y - this.height)
                             {
                                 this.state = "ground";
@@ -2123,7 +2126,7 @@ function mack (type, x, y, heading)
                                 else if (gameFront [front].constructor.name == "beam_h") this.floor = (gameFront [front].y - 80) / 64;
                                 if (!this.elevator) this.speedY = 0;
                             }
-                            else if (this.y == gameFront [front].y + gameFront [front].height)
+                            else if (this.state != "chain" && this.y == gameFront [front].y + gameFront [front].height)
                             {
                                 if (gameFront [front].constructor.name == "bell")
                                 {
@@ -2135,7 +2138,7 @@ function mack (type, x, y, heading)
                                 this.speedY = 0;
                             }
                         }
-                        if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
+                        if (this.state != "chain" && this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
                         {
                             if (this.x == gameFront [front].x + gameFront [front].width && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
                             {
@@ -2195,16 +2198,14 @@ function mack (type, x, y, heading)
                     this.chain_top = false;
                     for (let back = 0; back < gameBack.length; back++)
                     {
-                        if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y - 18 <= gameBack [back].y && this.y + this.height + 16 >= gameBack [back].y)
+                        if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y + this.height + 16 >= gameBack [back].y && this.y <= gameBack [back].y + gameBack [back].height)
                         {
-                            if (this.y - 18 < gameBack [back].y && this.y + this.height + 16 > gameBack [back].y) this.state = "chain";
-                            else
-                            {
-                                this.speedY = 0;
-                                this.state = "ground";
-                                if (this.y - 18 == gameBack [back].y) this.chain_bottom = true;
-                                else if (this.y + this.height + 16 == gameBack [back].y) this.chain_top = true;
+                            if (this.state == "ground")
+                            {                                
+                                if (this.y + this.height + 16 == gameBack [back].y) this.chain_top = true;
+                                else if (this.y <= gameBack [back].y + gameBack [back].height) this.chain_bottom = true;
                             }
+                            else this.state = "chain";
                         }
                     }
                     if (this.state == "chain")
