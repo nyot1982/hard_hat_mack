@@ -17,7 +17,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
             fullscreen: false
         }
     ),
-    level = 2,
+    level = 0,
     levelCompleted = false,
     bonus = 0,
     score = 0,
@@ -318,7 +318,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         canvas: createCanvas (canvasWidth, canvasHeight),
         start: function ()
         {
-            gameText.push (new component ("text", "loading...", "red", Math.round (canvasWidth / 2), 20, "center"));
+            gameText.push (new component ("text", "loading...", "white", Math.round (canvasWidth / 2), 20, "center"));
             gameText.push (new component ("text", "", null, Math.round (canvasWidth / 2), 30, "center"));
             fileRead ('user.bin');
             setIcon ('icon.png');
@@ -788,14 +788,14 @@ function updateGameArea ()
     gameArea.clear ();
     if (gameScreen == null && loading == 0 && gameText [gameText.length - 1].src != "loading completed.")
     {
-        gameText.push (new component ("text", "loading completed.", "#00FF00", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
+        gameText.push (new component ("text", "loading completed.", "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
         setTimeout
         (
             () =>
             {
                 gameLoadScreen ("menu");
             },
-            1000
+            2000
         );
     }
     else
@@ -858,16 +858,6 @@ function updateGameArea ()
     gameArea.frame++;
 }
 
-async function setIcon (file)
-{
-    const pngBuffer = await fs.readFileSync (file);
-    const png = await PNG.sync.read (pngBuffer);
-    const { width, height, data } = png;
-    await window.setIcon (width, height, width * 4, 'rgba32', data);
-    gameText.push (new component ("text", file, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
-    loading--;
-}
-
 async function fileRead (file)
 {
     await fs.readFile
@@ -879,18 +869,21 @@ async function fileRead (file)
             if (error)
             {
                 console.error ('Error reading file:', error.message + '.');
+                gameText.push (new component ("text", file, "red", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
                 return;
             }
             let userData = decodeBase64Url (data);
             if (!userData)
             {
                 console.error ('Error decoding base64Url data.');
+                gameText.push (new component ("text", file, "red", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
                 return;
             }
             userData = JSONparse (userData);
             if (userData == undefined)
             {
                 console.error ('Error parsing JSON data.');
+                gameText.push (new component ("text", file, "red", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
                 return;
             }
             highscore = userData.highscore;
@@ -902,7 +895,7 @@ async function fileRead (file)
             userActions [9].keyboard.keys = [controls [4].code];
             userActions [10].keyboard.keys = [controls [5].code];
             userActions [11].keyboard.keys = [controls [6].code];
-            gameText.push (new component ("text", file, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+            gameText.push (new component ("text", file, "#00FF00", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
             loading--;
         }
     );
@@ -942,12 +935,40 @@ async function fileDelete (file)
     );
 }
 
+async function setIcon (file)
+{
+    const pngBuffer = await fs.readFileSync (file);
+    const png = await PNG.sync.read (pngBuffer);
+    const { width, height, data } = png;
+    let color = "#00FF00";
+    try
+    {
+        await window.setIcon (width, height, width * 4, 'rgba32', data);
+    }
+    catch (error)
+    {
+        console.error ('Error loading icon:', error + '.');
+        color = "red";
+    }
+    gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+    loading--;
+}
+
 async function loadAudio (dir)
 {
     for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
     {
-        gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
-        gameText.push (new component ("text", gameAudios [gameAudio].source, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+        let color = "#00FF00";
+        try
+        {
+            gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
+        }
+        catch (error)
+        {
+            console.error ('Error loading audio:', error + '.');
+            color = "red";
+        }
+        gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
         loading--;
     }
 }
@@ -956,6 +977,7 @@ async function loadImages (dir)
 {
     for (let gameImage = 0; gameImage < gameImages.length; gameImage++)
     {
+        let color = "#00FF00";
         try
         {
             gameImages [gameImage] = await loadImage (dir + "/" + gameImages [gameImage]);
@@ -963,8 +985,9 @@ async function loadImages (dir)
         catch (error)
         {
             console.error ('Error loading picture:', error + '.');
+            color = "red";
         }
-        gameText.push (new component ("text", gameImages [gameImage].src, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+        gameText.push (new component ("text", gameImages [gameImage].src, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
         loading--;
     }
 }
