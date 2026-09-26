@@ -603,7 +603,7 @@ function gameLoadScreen (screen)
 
 function generateGameMap ()
 {
-    bonus = 5100;
+    bonus = 5000;
     levelCompleted = false;
     switch (level)
     {
@@ -819,16 +819,16 @@ function updateGameArea ()
         {
             if (levelCompleted)
             {
-                if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 10 == 0)
+                if (bonus > 0 && gameArea.frame - gameMap.startFrame == 10)
                 {
                     score += 100;
                     bonus -= 100;
-                    gameAudios [2].play ();
                     if (bonus == 0)
                     {
                         gameMap.startFrame = gameArea.frame;
                         gameAudios [7].play ();
                     }
+                    else gameAudios [2].play ();
                 }
                 if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
                 {
@@ -842,7 +842,11 @@ function updateGameArea ()
                 }
             }
             else if (bonus == 0) player.dead = 3;
-            else if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0) bonus -= 100;
+            else if (bonus > 0 && gameArea.frame - gameMap.startFrame == 160)
+            {
+                bonus -= 100;
+                gameMap.startFrame = gameArea.frame;
+            }
             for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
             for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
             if (player != null) player.update ();
@@ -2294,7 +2298,7 @@ function mack (type, x, y, heading)
                                 }
                                 else
                                 {
-                                    bonus = 5100;
+                                    bonus = 5000;
                                     gameMap.startFrame = gameArea.frame;
                                     this.type = gameMap.player.type;
                                     this.x = gameMap.player.x;
