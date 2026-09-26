@@ -73,9 +73,10 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
     gameItems = [],
     gameEnemies = [],
     gameText = [],
-    gameImages = fs.readdirSync ("img"),
-    gameAudios = fs.readdirSync ("audio"),
-    loading = 2 + gameImages.length + gameAudios.length,
+    gameImages = [],
+    gameAudios = [],
+    loading = 0,
+    loadingErrors = 0,
     userActions =
     [
         {
@@ -320,6 +321,9 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         {
             gameText.push (new component ("text", "loading...", "white", Math.round (canvasWidth / 2), 20, "center"));
             gameText.push (new component ("text", "", null, Math.round (canvasWidth / 2), 30, "center"));
+            gameImages = fs.readdirSync ("img");
+            gameAudios = fs.readdirSync ("audio");
+            loading = 2 + gameImages.length + gameAudios.length;
             fileRead ('user.bin');
             setIcon ('icon.png');
             loadImages ('img');
@@ -430,7 +434,8 @@ function userActionStart (control, bt_type, bt_code, bt_value)
     if (bt_type == null) userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control].includes (bt_code));
     else userAction = userActions.findIndex (action => action.screen.includes (gameScreen) && action [control][bt_type].includes (bt_code));
 
-    if (gameScreen == "menu")
+    if (gameScreen == null && control == "keyboard" && bt_code == 41) window.destroy ();
+    else if (gameScreen == "menu")
     {
         if (userAction > -1)
         {
@@ -786,73 +791,77 @@ function generateGameMap ()
 function updateGameArea ()
 {
     gameArea.clear ();
-    if (gameScreen == null && loading == 0 && gameText [gameText.length - 1].src != "loading completed.")
+    if (gameScreen == null)
     {
-        gameText.push (new component ("text", "loading completed.", "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
-        setTimeout
-        (
-            () =>
+        if (loading == 0)
+        {
+            if (loadingErrors > 0)
             {
-                gameLoadScreen ("menu");
-            },
-            2000
-        );
+                if (loadingErrors == 1) loading = "Loading not completed. 1 Error finded.";
+                else loading = "Loading not completed. " + loadingErrors + " Errors finded.";
+                loadingErrors = -1;
+            }
+            else
+            {
+                loading = "Loading completed.";
+                loadingErrors = gameArea.frame;
+            }
+            gameText.push (new component ("text", loading, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
+            loading = -1;
+        }
+        else if (loading == -1 && loadingErrors > -1 && gameArea.frame == loadingErrors + 120) gameLoadScreen ("menu");
     }
     else
     {
         for (let back = 0; back < gameBack.length; back++) gameBack [back].update ();
         for (let front = 0; front < gameFront.length; front++) gameFront [front].update ();
-    }
-    if (gameScreen != "game")
-    {
-        if (gameTitle) gameTitle.update ();
-        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
-    }
-    else
-    {
-        if (levelCompleted)
+        if (gameScreen == "game")
         {
-            if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 10 == 0)
+            if (levelCompleted)
             {
-                score += 100;
-                bonus -= 100;
-                gameAudios [2].play ();
-                if (bonus == 0)
+                if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 10 == 0)
                 {
-                    gameMap.startFrame = gameArea.frame;
-                    gameAudios [7].play ();
+                    score += 100;
+                    bonus -= 100;
+                    gameAudios [2].play ();
+                    if (bonus == 0)
+                    {
+                        gameMap.startFrame = gameArea.frame;
+                        gameAudios [7].play ();
+                    }
+                }
+                if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
+                {
+                    if (score > highscore)
+                    {
+                        highscore = score;
+                        fileWrite ('user.bin');
+                    }
+                    level++;
+                    gameLoadScreen ("game");
                 }
             }
-            if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
+            else if (bonus == 0) player.dead = 3;
+            else if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0) bonus -= 100;
+            for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
+            for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
+            if (player != null) player.update ();
+            if (gameMap.elevatorSpeed != 0)
             {
-                if (score > highscore)
-                {
-                    highscore = score;
-                    fileWrite ('user.bin');
-                }
-                level++;
-                gameLoadScreen ("game");
+                gameMap.elevatorFloor -= gameMap.elevatorSpeed;
+                if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
             }
+            /*console.clear ();
+            console.log ("player:", player);
+            console.log ("gameMap:", gameMap);
+            console.log ("gameEnemies:", gameEnemies);
+            console.log ("gameItems:", gameItems);
+            console.log ("gameFront:", gameFront);
+            console.log ("gameBack:", gameBack);*/
         }
-        else if (bonus == 0) player.dead = 3;
-        else if (bonus > 0 && (gameArea.frame - gameMap.startFrame) % 160 == 0) bonus -= 100;
-        for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
-        for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
-        if (player != null) player.update ();
-        for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
-        if (gameMap.elevatorSpeed != 0)
-        {
-            gameMap.elevatorFloor -= gameMap.elevatorSpeed;
-            if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
-        }
-        /*console.clear ();
-        console.log ("player:", player);
-        console.log ("gameMap:", gameMap);
-        console.log ("gameEnemies:", gameEnemies);
-        console.log ("gameItems:", gameItems);
-        console.log ("gameFront:", gameFront);
-        console.log ("gameBack:", gameBack);*/
     }
+    if (gameTitle) gameTitle.update ();
+    for (let text = 0; text < gameText.length; text++) if (gameText [text]) gameText [text].update (text);
     const buffer = gameArea.canvas.toBuffer ('raw');
     window.render (canvasWidth, canvasHeight, canvasWidth * 4, 'argb8888', buffer);
     gameArea.frame++;
@@ -860,6 +869,7 @@ function updateGameArea ()
 
 async function fileRead (file)
 {
+    let color = "red";
     await fs.readFile
     (
         file,
@@ -869,33 +879,40 @@ async function fileRead (file)
             if (error)
             {
                 console.error ('Error reading file:', error.message + '.');
-                gameText.push (new component ("text", file, "red", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
-                return;
+                loadingErrors++;
             }
-            let userData = decodeBase64Url (data);
-            if (!userData)
+            else
             {
-                console.error ('Error decoding base64Url data.');
-                gameText.push (new component ("text", file, "red", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
-                return;
+                let userData = decodeBase64Url (data);
+                if (!userData)
+                {
+                    console.error ('Error decoding base64Url data.');
+                    loadingErrors++;
+                }
+                else
+                {
+                    userData = JSONparse (userData);
+                    if (userData == undefined)
+                    {
+                        console.error ('Error parsing JSON data.');
+                        loadingErrors++;
+                    }
+                    else
+                    {
+                        highscore = userData.highscore;
+                        controls = userData.controls;
+                        userActions [5].keyboard.keys = [controls [0].code];
+                        userActions [6].keyboard.keys = [controls [1].code];
+                        userActions [7].keyboard.keys = [controls [2].code];
+                        userActions [8].keyboard.keys = [controls [3].code];
+                        userActions [9].keyboard.keys = [controls [4].code];
+                        userActions [10].keyboard.keys = [controls [5].code];
+                        userActions [11].keyboard.keys = [controls [6].code];
+                        color = "#00FF00";
+                    }
+                }
             }
-            userData = JSONparse (userData);
-            if (userData == undefined)
-            {
-                console.error ('Error parsing JSON data.');
-                gameText.push (new component ("text", file, "red", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
-                return;
-            }
-            highscore = userData.highscore;
-            controls = userData.controls;
-            userActions [5].keyboard.keys = [controls [0].code];
-            userActions [6].keyboard.keys = [controls [1].code];
-            userActions [7].keyboard.keys = [controls [2].code];
-            userActions [8].keyboard.keys = [controls [3].code];
-            userActions [9].keyboard.keys = [controls [4].code];
-            userActions [10].keyboard.keys = [controls [5].code];
-            userActions [11].keyboard.keys = [controls [6].code];
-            gameText.push (new component ("text", file, "#00FF00", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+            gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
             loading--;
         }
     );
@@ -937,18 +954,19 @@ async function fileDelete (file)
 
 async function setIcon (file)
 {
+    let color = "#00FF00";
     const pngBuffer = await fs.readFileSync (file);
     const png = await PNG.sync.read (pngBuffer);
     const { width, height, data } = png;
-    let color = "#00FF00";
     try
     {
         await window.setIcon (width, height, width * 4, 'rgba32', data);
     }
     catch (error)
     {
-        console.error ('Error loading icon:', error + '.');
+        console.error ('Error loading icon:', error.message + '.');
         color = "red";
+        loadingErrors++;
     }
     gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
     loading--;
@@ -965,7 +983,7 @@ async function loadAudio (dir)
         }
         catch (error)
         {
-            console.error ('Error loading audio:', error + '.');
+            console.error ('Error loading audio:', error.message + '.');
             color = "red";
         }
         gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
@@ -984,7 +1002,7 @@ async function loadImages (dir)
         }
         catch (error)
         {
-            console.error ('Error loading picture:', error + '.');
+            console.error ('Error loading picture:', error.message + '.');
             color = "red";
         }
         gameText.push (new component ("text", gameImages [gameImage].src, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
