@@ -841,12 +841,12 @@ function updateGameArea ()
                     gameLoadScreen ("game");
                 }
             }
-            else if (bonus == 0) player.dead = 3;
-            else if (bonus > 0 && gameArea.frame - gameMap.startFrame == 160)
+            else if (player.dead == 0 && bonus > 0 && gameArea.frame - gameMap.startFrame == 160)
             {
                 bonus -= 100;
                 gameMap.startFrame = gameArea.frame;
             }
+            else if (bonus == 0) player.dead = 3;
             for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
             for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
             if (player != null) player.update ();
