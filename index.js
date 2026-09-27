@@ -559,7 +559,7 @@ function gameLoadScreen (screen)
         gameTitle = null;
         gameText = [];
         score = 0;
-        level = 1;
+        level = 2;
     }
     gameBack = [];
     gameFront = [];
@@ -823,12 +823,9 @@ function updateGameArea ()
                 {
                     score += 100;
                     bonus -= 100;
-                    if (bonus == 0)
-                    {
-                        gameMap.startFrame = gameArea.frame;
-                        gameAudios [7].play ();
-                    }
+                    if (bonus == 0) gameAudios [7].play ();
                     else gameAudios [2].play ();
+                    gameMap.startFrame = gameArea.frame;
                 }
                 if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
                 {
@@ -844,9 +841,9 @@ function updateGameArea ()
             else if (player.dead == 0 && bonus > 0 && gameArea.frame - gameMap.startFrame == 160)
             {
                 bonus -= 100;
+                if (bonus == 0) player.dead = 1;
                 gameMap.startFrame = gameArea.frame;
             }
-            else if (bonus == 0) player.dead = 3;
             for (let item = 0; item < gameItems.length; item++) gameItems [item].update (item);
             for (let enemy = 0; enemy < gameEnemies.length; enemy++) gameEnemies [enemy].update (enemy);
             if (player != null) player.update ();
@@ -2068,7 +2065,11 @@ function mack (type, x, y, heading)
                         gameFront [gameMap.beamBreaks [this.floor - 1].beam].type = 3;
                         gameMap.items--;
                         gameAudios [3].play ();
-                        if (gameMap.items == 0) levelCompleted = true;
+                        if (gameMap.items == 0)
+                        {
+                            levelCompleted = true;
+                            gameMap.startFrame = gameArea.frame;
+                        }
                     }
                 }
             }
@@ -2244,7 +2245,7 @@ function mack (type, x, y, heading)
             {
                 this.speedX = 0;
                 if (this.state != "air" && !this.elevator) this.speedY = 0;
-                if (this.type != 8 && this.dead < 4 && gameArea.frame % 5 == 0)
+                if (this.type != 8 && gameArea.frame % 5 == 0)
                 {
                     if (this.dead == 2)
                     {
@@ -2263,90 +2264,80 @@ function mack (type, x, y, heading)
                         }
                     }
                     else if (this.dead == 1 && this.type == 4) this.type = 7;
-                    else if (this.type == 7 || this.dead == 3)
+                    else if (this.type == 7)
                     {
-                        if (this.dead == 1) this.type = 8;
-                        else this.dead = 4;
+                        this.type = 8;
                         gameAudios [9].play ();
-                        setTimeout
-                        (
-                            () =>
-                            {
-                                if (this.enemyKill != null && gameEnemies [this.enemyKill].constructor.name == "bolt")
-                                {
-                                    gameEnemies.splice (this.enemyKill, 1);
-                                    this.enemyKill = null;
-                                }
-                                this.ups--;
-                                if (this.ups == 0)
-                                {
-                                    if (score > highscore)
-                                    {
-                                        highscore = score;
-                                        fileWrite ('user.bin');
-                                    }
-                                    gameText.push (new component ("text", "Game over", "white", Math.round (gameMap.width / 2) - 60, 178));
-                                    setTimeout
-                                    (
-                                        () =>
-                                        {
-                                            gameLoadScreen ("menu");
-                                        },
-                                        3000
-                                    );
-                                }
-                                else
-                                {
-                                    bonus = 5000;
-                                    gameMap.startFrame = gameArea.frame;
-                                    this.type = gameMap.player.type;
-                                    this.x = gameMap.player.x;
-                                    this.y = gameMap.player.y;
-                                    this.heading = gameMap.player.heading;
-                                    this.jump = 0;
-                                    this.jumping = false;
-                                    this.bouncy = false;
-                                    this.elevator = false;
-                                    this.state = null;
-                                    this.dead = 0;
-                                    this.deadFrame = 0;
-                                    this.enemyKill = null;
-                                    this.item = null;
-                                    let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
-                                    gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
-                                    gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
-                                    gameEnemies [gameEnemy].x = gameMap.enemies [0].x;
-                                    gameEnemies [gameEnemy].y = gameMap.enemies [0].y;
-                                    if (level == 1)
-                                    {
-                                        gameFront [1].shotFrame = gameArea.frame + 500;
-                                        gameMap.elevatorFloor = 0;
-                                        gameMap.elevatorSpeed = 0;
-                                        for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
-                                        {
-                                            gameMap.beamBreaks [(gameFront [front].y - 144) / 64].beam = null;
-                                            gameItems.push (gameFront [front]);
-                                            gameFront.splice (front, 1);
-                                            front--;
-                                        }
-                                        for (let item = 0; item < gameItems.length; item++)
-                                        {
-                                            if (gameItems [item].constructor.name == "hammer_drill")
-                                            {
-                                                gameItems [item].direction = 0;
-                                                gameItems [item].x = Math.round (gameMap.width / 2) - 100;
-                                                gameItems [item].y = 306;
-                                            }
-                                            else if (gameItems [item].constructor.name == "beam" && gameItems [item].type > 0) gameItems [item].type = 0;
-                                        }
-                                    }
-                                }
-                            },
-                            2000
-                        );
+                        gameMap.startFrame = gameArea.frame; 
                     }
                     else this.type = 4; 
                 }
+                else if (this.ups > 0 && this.type == 8 && gameArea.frame - gameMap.startFrame == 120)
+                {
+                    if (this.enemyKill != null && gameEnemies [this.enemyKill].constructor.name == "bolt")
+                    {
+                        gameEnemies.splice (this.enemyKill, 1);
+                        this.enemyKill = null;
+                    }
+                    this.ups--;
+                    if (this.ups > 0)
+                    {
+                        bonus = 5000;
+                        gameMap.startFrame = gameArea.frame;
+                        this.type = gameMap.player.type;
+                        this.x = gameMap.player.x;
+                        this.y = gameMap.player.y;
+                        this.heading = gameMap.player.heading;
+                        this.jump = 0;
+                        this.jumping = false;
+                        this.bouncy = false;
+                        this.elevator = false;
+                        this.state = null;
+                        this.dead = 0;
+                        this.deadFrame = 0;
+                        this.enemyKill = null;
+                        this.item = null;
+                        let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
+                        gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
+                        gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
+                        gameEnemies [gameEnemy].x = gameMap.enemies [0].x;
+                        gameEnemies [gameEnemy].y = gameMap.enemies [0].y;
+                        if (level == 1)
+                        {
+                            gameFront [1].shotFrame = gameArea.frame + 500;
+                            gameMap.elevatorFloor = 0;
+                            gameMap.elevatorSpeed = 0;
+                            for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "beam" && gameFront [front].type < 3)
+                            {
+                                gameMap.beamBreaks [(gameFront [front].y - 144) / 64].beam = null;
+                                gameItems.push (gameFront [front]);
+                                gameFront.splice (front, 1);
+                                front--;
+                            }
+                            for (let item = 0; item < gameItems.length; item++)
+                            {
+                                if (gameItems [item].constructor.name == "hammer_drill")
+                                {
+                                    gameItems [item].direction = 0;
+                                    gameItems [item].x = Math.round (gameMap.width / 2) - 100;
+                                    gameItems [item].y = 306;
+                                }
+                                else if (gameItems [item].constructor.name == "beam" && gameItems [item].type > 0) gameItems [item].type = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (score > highscore)
+                        {
+                            highscore = score;
+                            fileWrite ('user.bin');
+                        }
+                        gameText.push (new component ("text", "Game over", "white", Math.round (gameMap.width / 2) - 60, 178));
+                        gameMap.startFrame = gameArea.frame;
+                    }
+                }
+                else if (this.ups == 0 && gameArea.frame - gameMap.startFrame == 180) gameLoadScreen ("menu");
             }
             else if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
