@@ -4,8 +4,8 @@ import { PNG } from 'pngjs';
 import { createCanvas, loadImage } from 'canvas';
 import audio from 'audio';
 
-let windowWidth = sdl.video.displays [0].geometry.width,//640,
-    windowHeight = sdl.video.displays [0].geometry.height,//400,
+let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
+    windowHeight = 400,//sdl.video.displays [0].geometry.height,//400,
     window = sdl.video.createWindow
     (
         {
@@ -727,6 +727,8 @@ function generateGameMap ()
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 233, 288, 8));
+            gameFront.push (new magnet ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 49, 16));
+            gameFront.push (new engine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 55, 52));
             gameFront.push (new beam_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 83, 80, 70));
             gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 11, 80, 70));
             gameFront.push (new beam_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 144, 166));
@@ -1952,6 +1954,95 @@ function tool (color, color2, color3, x, y)
                 ctx.fillRect (6, 22, 14, 2);
                 ctx.fillStyle = this.color2;
                 ctx.fillRect (0, 24, 26, 2);
+        }
+        ctx.restore ();
+    }
+}
+
+function magnet (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = 26;
+    this.height = 32;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = this.color3;
+        ctx.fillRect (10, 0, 6, 22);
+        ctx.fillStyle = this.color;
+        ctx.fillRect (4, 22, 18, 2);
+        ctx.fillRect (2, 24, 22, 2);
+        ctx.fillRect (0, 28, 26, 2);
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (2, 26, 22, 2);
+        ctx.fillRect (2, 30, 22, 2);
+        ctx.restore ();
+    }
+}
+
+function engine (color, color2, color3, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = 28;
+    this.height = 28;
+    this.type = 0;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = this.color;
+        if (gameArea.frame % 25 == 0)
+        {
+            if (this.type == 0) this.type = 1;
+            else this.type = 0;
+        }
+        switch (this.type)
+        {
+            case 0:
+                ctx.fillRect (4, 2, 10, 2);
+                ctx.fillRect (2, 4, 14, 2);
+                ctx.fillRect (4, 12, 20, 2);
+                ctx.fillRect (2, 14, 24, 12);
+                ctx.fillRect (4, 26, 20, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (8, 0, 2, 2);
+                ctx.fillRect (10, 14, 10, 12);
+                ctx.fillRect (8, 16, 2, 8);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (6, 6, 6, 6);
+                ctx.fillRect (6, 16, 2, 8);
+                ctx.fillRect (12, 16, 4, 2);
+                ctx.fillRect (8, 18, 14, 4);
+            break;
+            case 1:
+                ctx.fillRect (4, 6, 10, 2);
+                ctx.fillRect (2, 8, 14, 2);
+                ctx.fillRect (2, 12, 24, 2);
+                ctx.fillRect (0, 14, 28, 12);
+                ctx.fillRect (2, 26, 24, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (8, 4, 2, 2);
+                ctx.fillRect (6, 14, 18, 12);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (6, 10, 6, 2);
+                ctx.fillRect (12, 16, 6, 2);
+                ctx.fillRect (10, 18, 10, 4);
+                ctx.fillRect (12, 22, 6, 2);
         }
         ctx.restore ();
     }
