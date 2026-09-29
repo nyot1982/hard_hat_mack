@@ -725,14 +725,15 @@ function generateGameMap ()
                 ]
             };
             gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new wire ("#FFFFFF", 2, [{x: Math.round (gameMap.width / 2) - 35, y: 64}, {x: Math.round (gameMap.width / 2) - 27, y: 56}, {x: Math.round (gameMap.width / 2) - 1, y: 56}, {x: Math.round (gameMap.width / 2) - 1, y: 320}]));
+            gameBack.push (new wire ("#FFFFFF", 2, [{x: Math.round (gameMap.width / 2) - 35, y: 64}, {x: Math.round (gameMap.width / 2) - 27, y: 56}, {x: Math.round (gameMap.width / 2) - 1, y: 56}, {x: Math.round (gameMap.width / 2) - 1, y: 322}]));
             gameBack.push (new chain ("#55FFFF", Math.round (gameMap.width / 2) + 233, 288, 8));
+            gameBack.push (new concrete_mixer (0, "#FFFFFF", null, null, Math.round (gameMap.width / 2) - 74, 346));
+            gameFront.push (new concrete_mixer (1, "#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 74, 356));
             gameFront.push (new magnet ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 49, 16));
             gameFront.push (new engine ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 55, 52));
             gameFront.push (new incinerator ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 262, 64));
             gameFront.push (new conveyor_belt ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 141, 100));
             gameFront.push (new conveyor_belt ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 196, 334));
-            gameFront.push (new concrete_mixer ("#FFFFFF", "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 74, 346));
             gameFront.push (new girder_h (1, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 83, 80, 70));
             gameFront.push (new girder_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) + 11, 80, 70));
             gameFront.push (new girder_h (2, "#FF55FF", "#55FFFF", Math.round (gameMap.width / 2) - 251, 144, 166));
@@ -2191,16 +2192,25 @@ function conveyor_belt (color, color2, color3, x, y, width, height)
     }
 }
 
-function concrete_mixer (color, color2, color3, x, y)
+function concrete_mixer (type, color, color2, color3, x, y)
 {
+    this.type = type;
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
-    this.width = 44;
-    this.height = 32;
-
+    if (this.type == 0)
+    {
+        this.width = 34;
+        this.height = 10;
+    }
+    else
+    {
+        this.width = 44;
+        this.height = 22;
+    }
+    
     this.update = function ()
     {
         let ctx = gameArea.ctx;
@@ -2208,26 +2218,34 @@ function concrete_mixer (color, color2, color3, x, y)
         ctx.save ();
         ctx.translate (Math.round (this.x), Math.round (this.y));
         ctx.fillStyle = this.color;
-        ctx.fillRect (6, 0, 22, 2);
-        ctx.fillRect (2, 2, 30, 4);
-        ctx.fillRect (0, 6, 34, 14);
-        ctx.fillRect (2, 20, 30, 2);
-        ctx.fillRect (4, 22, 26, 2);
-        ctx.fillRect (38, 10, 6, 2);
-        ctx.fillRect (34, 14, 10, 2);
-        ctx.fillRect (36, 18, 6, 2);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (38, 12, 6, 2);
-        ctx.fillRect (10, 24, 14, 4);
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (36, 16, 6, 2);
-        ctx.fillRect (0, 28, 34, 4);
-        ctx.fillStyle = "black";
-        ctx.fillRect (8, 2, 18, 2);
-        ctx.fillRect (6, 4, 22, 4);
-        ctx.fillRect (8, 8, 18, 2);
-        ctx.fillRect (4, 12, 4, 8);
-        ctx.fillRect (6, 20, 6, 2);
+        switch (this.type)
+        {
+            case 0:
+                ctx.fillRect (6, 0, 22, 2);
+                ctx.fillRect (2, 2, 30, 4);
+                ctx.fillRect (0, 6, 34, 4);
+                ctx.fillStyle = "black";
+                ctx.fillRect (8, 2, 18, 2);
+                ctx.fillRect (6, 4, 22, 4);
+                ctx.fillRect (8, 8, 18, 2);
+            break;
+            case 1:
+                ctx.fillRect (0, 0, 34, 10);
+                ctx.fillRect (2, 10, 30, 2);
+                ctx.fillRect (4, 12, 26, 2);
+                ctx.fillRect (38, 0, 6, 2);
+                ctx.fillRect (34, 4, 10, 2);
+                ctx.fillRect (36, 8, 6, 2);
+                ctx.fillStyle = this.color2;
+                ctx.fillRect (38, 2, 6, 2);
+                ctx.fillRect (10, 14, 14, 4);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (36, 6, 6, 2);
+                ctx.fillRect (0, 18, 34, 4);
+                ctx.fillStyle = "black";
+                ctx.fillRect (4, 2, 4, 8);
+                ctx.fillRect (6, 10, 6, 2);
+        }
         ctx.restore ();
     }
 }
@@ -2398,7 +2416,7 @@ function mack (type, x, y, heading)
                                 else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                                 this.speedY = gameMap.elevatorSpeed;
                             }
-                            else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
+                            else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "concrete_mixer" || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
                             else if (gameFront [front].constructor.name == "girder_h") this.floor = (gameFront [front].y - 80) / 64;
                             else if (gameFront [front].constructor.name == "conveyor_belt")
                             {
