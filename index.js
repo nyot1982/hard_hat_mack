@@ -2420,7 +2420,7 @@ function mack (type, x, y, heading)
                             {
                                 this.elevator = true;
                                 this.speedX = 0;
-                                if (this.item == null) this.x -= (this.x - gameFront [front].x) / 2;
+                                if (this.item == null) this.x -= (this.x - Math.round (gameFront [front].x) / 2);
                                 else this.x = gameFront [front].x;
                                 if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                 else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
@@ -3182,7 +3182,7 @@ function component (type, src, color, x, y, width, height)
     this.update = function ()
     {
         let ctx = gameArea.ctx;
-        if (this.type == "image") ctx.drawImage (gameImages [this.image], this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        if (this.type == "image") ctx.drawImage (gameImages [this.image], this.x - Math.round (this.width / 2), this.y - Math.round (this.height / 2), this.width, this.height);
         else if (this.type == "rect")
         {
             ctx.beginPath ();
