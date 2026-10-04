@@ -583,7 +583,7 @@ function gameLoadScreen (screen)
             gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
             gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 169, gameText [3].y));
             gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 195, gameText [3].y + 22));
-            gameText.push (new mack (0, Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
+            gameText.push (new mack (0, "#FFFFFF", "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
             gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 183, gameText [3].y + 22));
             gameText.push (new girder_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
             gameText.push (new component ("image", "electronic_arts.png", "", 40 * canvasWidth / 640 + 96, canvasHeight - 16 * canvasHeight / 400 - 33, 192, 66));
@@ -779,7 +779,7 @@ function generateGameMap ()
         gameText.push (new component ("value", "level", "white", gameMap.x + 532, 224, "left", 2));
         gameText.push (new component ("text", "Mack", "white", gameMap.x + 546, 288, "vertical"));
         gameText.push (new component ("value", "player.ups", "white", gameMap.x + 546, 368, "left", 1));
-        player = new mack (gameMap.player.type, gameMap.player.x, gameMap.player.y, gameMap.player.heading);
+        player = new mack (gameMap.player.type, "#FFFFFF", "#FF55FF", "#55FFFF", gameMap.player.x, gameMap.player.y, gameMap.player.heading);
     }
     else
     {
@@ -2284,9 +2284,12 @@ function concrete_mixer (type, color, color2, color3, x, y)
     }
 }
 
-function mack (type, x, y, heading)
+function mack (type, color, color2, color3, x, y, heading)
 {
     this.type = (type != null ? type : 0);
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.heading = (heading != null ? heading : 1);
@@ -2703,7 +2706,7 @@ function mack (type, x, y, heading)
         ctx.save ();
         ctx.scale (this.heading, 1);
         ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
-        ctx.fillStyle = "#FFFFFF";
+        ctx.fillStyle = this.color;
         switch (this.type)
         {
             case 0:
@@ -2719,13 +2722,13 @@ function mack (type, x, y, heading)
                 ctx.fillRect (16, 24, 6, 2);
                 ctx.fillRect (18, 26, 4, 2);
                 ctx.fillRect (18, 28, 6, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 8, 4, 2);
                 ctx.fillRect (8, 10, 10, 2);
                 ctx.fillRect (8, 12, 6, 2);
                 ctx.fillRect (4, 20, 14, 2);
                 ctx.fillRect (6, 22, 16, 2);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (6, 14, 10, 6);
                 ctx.fillRect (16, 16, 6, 4);
                 ctx.fillRect (22, 14, 2, 2);
@@ -2740,14 +2743,14 @@ function mack (type, x, y, heading)
                 ctx.fillRect (4, 28, 8, 2);
                 ctx.fillRect (18, 24, 8, 2);
                 ctx.fillRect (20, 26, 6, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 8, 4, 2);
                 ctx.fillRect (8, 10, 10, 2);
                 ctx.fillRect (8, 12, 6, 2);
                 ctx.fillRect (4, 20, 18, 4);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (6, 14, 14, 6);
-                ctx.fillStyle = "#FFFFFF";
+                ctx.fillStyle = this.color;
                 ctx.fillRect (10, 16, 6, 2);
                 ctx.fillRect (10, 18, 10, 2);
             break;
@@ -2762,12 +2765,12 @@ function mack (type, x, y, heading)
                 ctx.fillRect (8, 24, 8, 2);
                 ctx.fillRect (8, 26, 6, 2);
                 ctx.fillRect (8, 28, 10, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 8, 4, 2);
                 ctx.fillRect (8, 10, 10, 2);
                 ctx.fillRect (8, 12, 8, 2);
                 ctx.fillRect (8, 20, 10, 4);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (6, 14, 10, 6);
                 ctx.fillRect (16, 14, 4, 4);
                 ctx.fillRect (18, 12, 4, 4);
@@ -2794,12 +2797,12 @@ function mack (type, x, y, heading)
                 ctx.fillRect (16, 26, 6, 2);
                 ctx.fillRect (2, 28, 8, 2);
                 ctx.fillRect (16, 28, 8, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 8, 10, 4);
                 ctx.fillRect (8, 20, 10, 4);
                 ctx.fillRect (4, 22, 4, 4);
                 ctx.fillRect (18, 22, 4, 4);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (8, 12, 10, 6);
                 ctx.fillRect (12, 18, 2, 2);
             break;
@@ -2817,12 +2820,12 @@ function mack (type, x, y, heading)
                 ctx.fillRect (16, 22, 6, 2);
                 ctx.fillRect (2, 24, 8, 2);
                 ctx.fillRect (16, 24, 8, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 8, 10, 4);
                 ctx.fillRect (8, 18, 10, 2);
                 ctx.fillRect (4, 20, 2, 2);
                 ctx.fillRect (20, 20, 2, 2);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (8, 12, 10, 4);
                 ctx.fillRect (12, 16, 2, 2);
             break;
@@ -2837,13 +2840,13 @@ function mack (type, x, y, heading)
                 ctx.fillRect (0, 26, 8, 2);
                 ctx.fillRect (16, 24, 8, 2);
                 ctx.fillRect (18, 26, 6, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 8, 4, 2);
                 ctx.fillRect (8, 10, 10, 2);
                 ctx.fillRect (8, 12, 6, 2);
                 ctx.fillRect (4, 20, 14, 2);
                 ctx.fillRect (4, 22, 18, 2);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (6, 14, 10, 6);
                 ctx.fillRect (16, 16, 6, 4);
                 ctx.fillRect (22, 14, 2, 2);
@@ -2862,10 +2865,10 @@ function mack (type, x, y, heading)
                 ctx.fillRect (16, 26, 6, 2);
                 ctx.fillRect (2, 28, 8, 2);
                 ctx.fillRect (16, 28, 8, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 16, 10, 2);
                 ctx.fillRect (4, 24, 18, 2);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (8, 18, 10, 2);
                 ctx.fillRect (6, 20, 14, 2);
                 ctx.fillRect (12, 22, 2, 2);
@@ -2880,11 +2883,11 @@ function mack (type, x, y, heading)
                 ctx.fillRect (14, 24, 4, 4);
                 ctx.fillRect (2, 28, 8, 2);
                 ctx.fillRect (16, 28, 8, 2);
-                ctx.fillStyle = "#FF55FF";
+                ctx.fillStyle = this.color2;
                 ctx.fillRect (8, 20, 10, 2);
                 ctx.fillRect (4, 26, 4, 2);
                 ctx.fillRect (18, 26, 4, 2);
-                ctx.fillStyle = "#55FFFF";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (8, 22, 10, 2);
         }
         ctx.restore ();
