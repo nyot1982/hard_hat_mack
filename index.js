@@ -319,7 +319,7 @@ let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
         canvas: createCanvas (canvasWidth, canvasHeight),
         start: function ()
         {
-            gameText.push (new component ("text", "loading...", "white", Math.round (canvasWidth / 2), 20, "center"));
+            gameText.push (new component ("text", "loading...", "#ffffff", Math.round (canvasWidth / 2), 20, "center"));
             gameText.push (new component ("text", "", null, Math.round (canvasWidth / 2), 30, "center"));
             gameImages = fs.readdirSync ("img");
             gameAudios = fs.readdirSync ("audio");
@@ -574,25 +574,25 @@ function gameLoadScreen (screen)
             canvasHeight = windowHeight;
             gameArea.canvas.width = canvasWidth;
             gameArea.canvas.height = canvasHeight;
-            gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
+            gameBack.push (new back ("#000000", 0, 0, canvasWidth, canvasHeight));
             gameTitle = new component ("image", "title.png", "", Math.round (canvasWidth / 2), 46 * canvasHeight / 400, 362, 40);
-            gameText.push (new component ("text", "Node.js version by Marc Pinyot Gascón.", "white", Math.round (canvasWidth / 2), 96 * canvasHeight / 400, "center"));
-            gameText.push (new component ("text", "An original game design by", "white", Math.round (canvasWidth / 2), 152 * canvasHeight / 400, "center"));
-            gameText.push (new component ("text", "Michael Abbot & Matthew Alexander.", "white", Math.round (canvasWidth / 2), gameText [1].y + 24, "center"));
-            gameText.push (new component ("text", "Vandal", "white", Math.round (canvasWidth / 2) - 223, 220 * canvasHeight / 400));
-            gameText.push (new component ("text", "Mack", "white", Math.round (canvasWidth / 2) - 27, gameText [3].y));
-            gameText.push (new component ("text", "Osha", "white", Math.round (canvasWidth / 2) + 169, gameText [3].y));
+            gameText.push (new component ("text", "Node.js version by Marc Pinyot Gascón.", "#ffffff", Math.round (canvasWidth / 2), 96 * canvasHeight / 400, "center"));
+            gameText.push (new component ("text", "An original game design by", "#ffffff", Math.round (canvasWidth / 2), 152 * canvasHeight / 400, "center"));
+            gameText.push (new component ("text", "Michael Abbot & Matthew Alexander.", "#ffffff", Math.round (canvasWidth / 2), gameText [1].y + 24, "center"));
+            gameText.push (new component ("text", "Vandal", "#ffffff", Math.round (canvasWidth / 2) - 223, 220 * canvasHeight / 400));
+            gameText.push (new component ("text", "Mack", "#ffffff", Math.round (canvasWidth / 2) - 27, gameText [3].y));
+            gameText.push (new component ("text", "Osha", "#ffffff", Math.round (canvasWidth / 2) + 169, gameText [3].y));
             gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 195, gameText [3].y + 22));
-            gameText.push (new mack (0, "#FFFFFF", "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
+            gameText.push (new mack (0, "#ffffff", "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
             gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 183, gameText [3].y + 22));
-            gameText.push (new girder_h (0, "#FF55FF", "#55FFFF", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
+            gameText.push (new girder_h (0, "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
             gameText.push (new component ("image", "electronic_arts.png", "", 40 * canvasWidth / 640 + 96, canvasHeight - 16 * canvasHeight / 400 - 33, 192, 66));
-            gameText.push (new component ("text", "(C) 2026 nYoT", "white", canvasWidth - 40 * canvasWidth / 640 - 176, canvasHeight - 16 * canvasHeight / 400 - 14));
+            gameText.push (new component ("text", "(C) 2026 nYoT", "#ffffff", canvasWidth - 40 * canvasWidth / 640 - 176, canvasHeight - 16 * canvasHeight / 400 - 14));
         break;
         case 'config':
-            gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-            gameTitle = new component ("text", "Configuration menu", "white", Math.round (canvasWidth / 2), 40 * canvasHeight / 400, "center");
-            gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", 40 * canvasWidth / 640, gameTitle.y + 50));
+            gameBack.push (new back ("#000000", 0, 0, canvasWidth, canvasHeight));
+            gameTitle = new component ("text", "Configuration menu", "#ffffff", Math.round (canvasWidth / 2), 40 * canvasHeight / 400, "center");
+            gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "#ffffff", 40 * canvasWidth / 640, gameTitle.y + 50));
         break;
         case 'game':
             canvasHeight = 400;
@@ -636,24 +636,24 @@ function generateGameMap ()
                     }
                 ]
             };
-            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new girder_v ("#FFFFFF", "#55FFFF", gameMap.x + 125, 96, 240));
-            gameBack.push (new girder_v ("#FFFFFF", "#55FFFF", gameMap.x + 373, 96, 240));
-            gameBack.push (new chain ("#55FFFF", gameMap.x + 326, 96, 4));
-            gameBack.push (new chain ("#55FFFF", gameMap.x + 74, 160, 4));
-            gameBack.push (new chain ("#55FFFF", gameMap.x + 438, 224, 4));
-            gameBack.push (new chain ("#55FFFF", gameMap.x + 74, 288, 4));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 101, 352));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 201, 352));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 301, 352));
-            gameBack.push (new column ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 401, 352));
-            gameBack.push (new elevator (1, "#FFFFFF", "#55FFFF", gameMap.x + 9, 288, 4, 48));
-            gameBack.push (new elevator (2, "#FFFFFF", null, gameMap.x + 59, 288, 4, 48));
-            gameBack.push (new support ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 30, 346));
-            gameFront.push (new bell ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 123, 18));
-            gameFront.push (new machine ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 532, 54));
-            gameFront.push (new girder_h (0, "#55FFFF", "#FF55FF", gameMap.x + 65, 80, 390));
-            gameItems.push (new tool ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 344, 52));
+            gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 125, 96, 240));
+            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 373, 96, 240));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 326, 96, 4));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 74, 160, 4));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 438, 224, 4));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 74, 288, 4));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 101, 352));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 201, 352));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 301, 352));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 401, 352));
+            gameBack.push (new elevator (1, "#ffffff", "#55ffff", gameMap.x + 9, 288, 4, 48));
+            gameBack.push (new elevator (2, "#ffffff", null, gameMap.x + 59, 288, 4, 48));
+            gameBack.push (new support ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 30, 346));
+            gameFront.push (new bell ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 123, 18));
+            gameFront.push (new machine ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 532, 54));
+            gameFront.push (new girder_h (0, "#55ffff", "#ff55ff", gameMap.x + 65, 80, 390));
+            gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 344, 52));
             for (let i = 0; i < 4; i++)
             {
                 girderBreak = Math.floor (Math.random () * 6);
@@ -664,8 +664,8 @@ function generateGameMap ()
                         girderPiece: null
                     }
                 );
-                gameFront.push (new girder_h (1, "#55FFFF", "#FF55FF", gameMap.x + 65, 144 + i * 64, 111 + girderBreak * 28));
-                gameFront.push (new girder_h (2, "#55FFFF", "#FF55FF", gameMap.x + 204 + girderBreak * 28, 144 + i * 64, 251 - girderBreak * 28));
+                gameFront.push (new girder_h (1, "#55ffff", "#ff55ff", gameMap.x + 65, 144 + i * 64, 111 + girderBreak * 28));
+                gameFront.push (new girder_h (2, "#55ffff", "#ff55ff", gameMap.x + 204 + girderBreak * 28, 144 + i * 64, 251 - girderBreak * 28));
                 girderBreak = Math.floor (Math.random () * 2);
                 if (girderBreak == 0)
                 {
@@ -696,13 +696,13 @@ function generateGameMap ()
                         if (girderTurn == -45) girderX = 396;
                         else girderX = 407;
                 }
-                gameItems.push (new girder_piece ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + girderX, girderY, girderTurn));
+                gameItems.push (new girder_piece ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + girderX, girderY, girderTurn));
             }
-            gameFront.push (new elevator (0, "#FFFFFF", "#FF55FF", gameMap.x + 9, 280, 54, 8));
+            gameFront.push (new elevator (0, "#ffffff", "#ff55ff", gameMap.x + 9, 280, 54, 8));
             gameFront.push (new elevator (2, null, null, gameMap.x + 9, 288, 0, 48));
-            gameFront.push (new elevator (3, "#FFFFFF", "#55FFFF", gameMap.x + 9, 336, 54, 10));
-            gameFront.push (new springboard ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 488, 354));
-            gameItems.push (new jackhammer ("#FFFFFF", "#FF55FF", gameMap.x + 160, 306));
+            gameFront.push (new elevator (3, "#ffffff", "#55ffff", gameMap.x + 9, 336, 54, 10));
+            gameFront.push (new springboard ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 488, 354));
+            gameItems.push (new jackhammer ("#ffffff", "#ff55ff", gameMap.x + 160, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.x + 65, 240));
         break;
         case 2:
@@ -728,32 +728,36 @@ function generateGameMap ()
                     }
                 ]
             };
-            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new wire ("#FFFFFF", 2, [{x: gameMap.x + 217, y: 64}, {x: gameMap.x + 225, y: 56}, {x: gameMap.x + 251, y: 56}, {x: gameMap.x + 251, y: 322}]));
-            gameBack.push (new chain ("#55FFFF", gameMap.x + 484, 288, 8));
-            gameBack.push (new concrete_mixer (0, "#FFFFFF", null, null, gameMap.x + 170, 346));
-            gameFront.push (new concrete_mixer (1, "#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 170, 356));
-            gameFront.push (new magnet ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 300, 16));
-            gameFront.push (new engine ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 198, 52));
-            gameFront.push (new incinerator ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 530, 64));
-            gameFront.push (new conveyor_belt ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 392, 100));
-            gameFront.push (new conveyor_belt ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 54, 334));
-            gameFront.push (new girder_h (1, "#FF55FF", "#55FFFF", gameMap.x + 169, 80, 70));
-            gameFront.push (new girder_h (2, "#FF55FF", "#55FFFF", gameMap.x + 263, 80, 70));
-            gameFront.push (new girder_h (2, "#FF55FF", "#55FFFF", gameMap.x, 144, 166));
-            gameFront.push (new girder_h (1, "#FF55FF", "#55FFFF", gameMap.x + 336, 144, 166));
-            gameFront.push (new girder_h (2, "#FF55FF", "#55FFFF", gameMap.x, 208, 166));
-            gameFront.push (new girder_h (1, "#FF55FF", "#55FFFF", gameMap.x + 336, 208, 166));
-            gameFront.push (new girder_h (2, "#FF55FF", "#55FFFF", gameMap.x, 272, 166));
-            gameFront.push (new girder_h (1, "#FF55FF", "#55FFFF", gameMap.x + 336, 272, 166));
-            gameFront.push (new girder_h (0, "#FF55FF", "#55FFFF", gameMap.x + 196, 322, 110));
-            gameItems.push (new tool ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 280, 350));
-            gameItems.push (new lunchbox ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 111, 122));
-            gameItems.push (new lunchbox ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 27, 186));
-            gameItems.push (new lunchbox ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 447, 186));
-            gameItems.push (new lunchbox ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x, 250));
-            gameItems.push (new lunchbox ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 363, 250));
-            gameItems.push (new lunchbox ("#FFFFFF", "#FF55FF", "#55FFFF", gameMap.x + 308, 356));
+            gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new wire ("#ffffff", 2, [{x: gameMap.x + 217, y: 64}, {x: gameMap.x + 225, y: 56}, {x: gameMap.x + 251, y: 56}, {x: gameMap.x + 251, y: 322}]));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 484, 288, 8));
+            gameBack.push (new concrete_mixer (0, "#ffffff", null, null, gameMap.x + 170, 346));
+            gameBack.push (new trap ("#ffffff", "#ff55ff", gameMap.x + 84, 194, 26, 14));
+            gameFront.push (new concrete_mixer (1, "#ffffff", "#ff55ff", "#55ffff", gameMap.x + 170, 356));
+            gameFront.push (new magnet ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 300, 16));
+            gameFront.push (new crane ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 198, 52));
+            gameFront.push (new incinerator ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 530, 64));
+            gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 392, 100));
+            gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 54, 334));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 169, 80, 70));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x + 263, 80, 70));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x, 144, 166));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 336, 144, 166));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x, 208, 166));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 336, 208, 166));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x, 272, 166));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 336, 272, 166));
+            gameFront.push (new girder_h (0, "#ff55ff", "#55ffff", gameMap.x + 196, 322, 110));
+            gameFront.push (new duct ("#ffffff", "#ff55ff", gameMap.x, 292));
+            gameFront.push (new spigot ("#ffffff", "#55ffff", gameMap.x + 58, 306));
+            gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 280, 350));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 111, 122));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 27, 186));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 447, 186));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x, 250));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 363, 250));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 308, 356));
+            gameEnemies.push (new trap ("#ffffff", "#ff55ff", gameMap.x + 92, 202, 10, 6));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.enemies [0].x, gameMap.enemies [0].y));
         break;
         case 3:
@@ -764,22 +768,22 @@ function generateGameMap ()
                 width: canvasWidth,
                 height: canvasHeight
             };
-            gameBack.push (new back ("black", 0, 0, gameMap.width, gameMap.height));
+            gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
     }
-    gameFront.push (new floor ("white", gameMap.x, 378, 512, 6));
+    gameFront.push (new floor ("#ffffff", gameMap.x, 378, 512, 6));
     if (player == null)
     {
-        gameText.push (new component ("text", "Bonus:", "white", gameMap.x, 0));
-        gameText.push (new component ("value", "bonus", "white", gameMap.x + 84, 0, "left", 5));
-        gameText.push (new component ("text", "Score:", "white", gameMap.x + 182, 0));
-        gameText.push (new component ("value", "score", "white", gameMap.x + 266, 0, "left", 5));
-        gameText.push (new component ("text", "Hi-score:", "white", gameMap.x + 364, 0));
-        gameText.push (new component ("value", "highscore", "white", gameMap.x + 490, 0, "left", 5));
-        gameText.push (new component ("text", "Level", "white", gameMap.x + 546, 128, "vertical"));
-        gameText.push (new component ("value", "level", "white", gameMap.x + 532, 224, "left", 2));
-        gameText.push (new component ("text", "Mack", "white", gameMap.x + 546, 288, "vertical"));
-        gameText.push (new component ("value", "player.ups", "white", gameMap.x + 546, 368, "left", 1));
-        player = new mack (gameMap.player.type, "#FFFFFF", "#FF55FF", "#55FFFF", gameMap.player.x, gameMap.player.y, gameMap.player.heading);
+        gameText.push (new component ("text", "Bonus:", "#ffffff", gameMap.x, 0));
+        gameText.push (new component ("value", "bonus", "#ffffff", gameMap.x + 84, 0, "left", 5));
+        gameText.push (new component ("text", "Score:", "#ffffff", gameMap.x + 182, 0));
+        gameText.push (new component ("value", "score", "#ffffff", gameMap.x + 266, 0, "left", 5));
+        gameText.push (new component ("text", "Hi-score:", "#ffffff", gameMap.x + 364, 0));
+        gameText.push (new component ("value", "highscore", "#ffffff", gameMap.x + 490, 0, "left", 5));
+        gameText.push (new component ("text", "Level", "#ffffff", gameMap.x + 546, 128, "vertical"));
+        gameText.push (new component ("value", "level", "#ffffff", gameMap.x + 532, 224, "left", 2));
+        gameText.push (new component ("text", "Mack", "#ffffff", gameMap.x + 546, 288, "vertical"));
+        gameText.push (new component ("value", "player.ups", "#ffffff", gameMap.x + 546, 368, "left", 1));
+        player = new mack (gameMap.player.type, "#ffffff", "#ff55ff", "#55ffff", gameMap.player.x, gameMap.player.y, gameMap.player.heading);
     }
     else
     {
@@ -817,7 +821,7 @@ function updateGameArea ()
                 loading = "Loading completed.";
                 loadingErrors = gameArea.frame;
             }
-            gameText.push (new component ("text", loading, "white", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
+            gameText.push (new component ("text", loading, "#ffffff", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
             loading = -1;
         }
         else if (loading == -1 && loadingErrors > -1 && gameArea.frame == loadingErrors + 120) gameLoadScreen ("menu");
@@ -1108,7 +1112,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (6, 4, this.width - 12, 8);
                     for (let x = 30; x + 30 < this.width; x += 84)
                     {
-                        ctx.fillStyle = "black";
+                        ctx.fillStyle = "#000000";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                         if (level == 0 && (x == 114 || x == 254)) x -= 28;
@@ -1120,7 +1124,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (6, 4, this.width - 6, 8);
                     for (let x = 30; x + 22 < this.width; x += 84)
                     {
-                        ctx.fillStyle = "black";
+                        ctx.fillStyle = "#000000";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                         if (level == 1 && x == 30) x += 28;
@@ -1130,7 +1134,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (0, 4, this.width - 6, 8);
                     for (let x = 52; this.width - x > 0; x += 84)
                     {
-                        ctx.fillStyle = "black";
+                        ctx.fillStyle = "#000000";
                         ctx.fillRect (this.width - x, 6, 6, 4);
                         ctx.fillRect (this.width - x + 16, 6, 6, 4);
                         if (level == 1 && x == 52) x += 28;
@@ -1140,7 +1144,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (0, 4, this.width, 8);
                     for (let x = 30; x + 22 < this.width; x += 84)
                     {
-                        ctx.fillStyle = "black";
+                        ctx.fillStyle = "#000000";
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                     }
@@ -1174,7 +1178,7 @@ function girder_v (color, color2, x, y, height)
             ctx.fillRect (4, 0, 14, this.height);
             for (let y = 24; y + 5 < this.height; y += 64)
             {
-                ctx.fillStyle = "black";
+                ctx.fillStyle = "#000000";
                 ctx.fillRect (8, y, 6, 4);
                 ctx.fillRect (8, y + 14, 6, 4);
             }
@@ -1220,7 +1224,7 @@ function girder_piece (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, this.height - 4, this.width, 4);
                 ctx.fillStyle = this.color2;
                 ctx.fillRect (2, 4, this.width - 4, this.height - 8);
-                ctx.fillStyle = "black";
+                ctx.fillStyle = "#000000";
                 ctx.fillRect (3, 6, 6, 4);
                 ctx.fillRect (19, 6, 6, 4);
             break;
@@ -1241,7 +1245,7 @@ function girder_piece (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, 4, this.width, this.height - 8);
                 if (gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 1 || gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 4)
                 {
-                    ctx.fillStyle = "black";
+                    ctx.fillStyle = "#000000";
                     ctx.fillRect (3, 6, 6, 4);
                     ctx.fillRect (19, 6, 6, 4);
                 }
@@ -1644,7 +1648,7 @@ function machine (color, color2, color3, x, y)
             if (this.type == 0 && gameArea.frame == this.shotFrame)
             {
                 this.type = 1;
-                gameEnemies.push (new bolt ("#FFFFFF", this.x, this.y));
+                gameEnemies.push (new bolt ("#ffffff", this.x, this.y));
             }
             else if (this.type == 1 && gameArea.frame - this.shotFrame == 120)
             {
@@ -1854,7 +1858,7 @@ function jackhammer (color, color2, x, y)
     }
 }
 
-function lunchbox (color, color2, color3, x, y)
+function toolbox (color, color2, color3, x, y)
 {
     this.color = color;
     this.color2 = color2;
@@ -1881,10 +1885,61 @@ function lunchbox (color, color2, color3, x, y)
         ctx.fillRect (10, 0, 8, 2);
         ctx.fillRect (8, 2, 2, 4);
         ctx.fillRect (18, 2, 2, 4);
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "#000000";
         ctx.fillRect (10, 6, 2, 2);
         ctx.fillRect (12, 8, 2, 2);
         ctx.fillRect (14, 10, 2, 4);  
+        ctx.restore ();
+    }
+}
+
+function duct (color, color2, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = 78;
+    this.height = 14;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = this.color;
+        ctx.fillRect (0, 4, 76, 2);
+        ctx.fillRect (0, 8, 78, 2);
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (0, 0, 70, 2);
+        ctx.fillRect (0, 2, 74, 2);
+        ctx.fillRect (0, 6, 78, 2);
+        ctx.fillRect (0, 10, 78, 4);
+        ctx.restore ();
+    }
+}
+
+function spigot (color, color2, x, y)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = 18;
+    this.height = 12;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (0, 0, this.width, this.height);
+        ctx.fillStyle = this.color;
+        ctx.fillRect (0, 4, this.width, 2);
+        ctx.fillRect (0, 8, this.width, 2);
         ctx.restore ();
     }
 }
@@ -2026,7 +2081,7 @@ function magnet (color, color2, color3, x, y)
     }
 }
 
-function engine (color, color2, color3, x, y)
+function crane (color, color2, color3, x, y)
 {
     this.color = color;
     this.color2 = color2;
@@ -2128,7 +2183,7 @@ function incinerator (color, color2, color3, x, y)
         ctx.fillRect (0, 46, 28, 4);
         ctx.fillStyle = this.color;
         ctx.fillRect (4, 8, 22, 8);
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "#000000";
         ctx.fillRect (8, 10, 14, 4);
         ctx.fillStyle = this.color;
         ctx.fillRect (14, 12, 4, 2);
@@ -2221,6 +2276,39 @@ function incinerator (color, color2, color3, x, y)
     }
 }
 
+function trap (color, color2, x, y, width, height)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = width;
+    this.height = height;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        const canvasAux = createCanvas (1, this.height);
+        canvasAux.width = 1;
+        canvasAux.height = this.height;
+        const ctxAux = canvasAux.getContext ("2d");
+        ctxAux.lineWidth = 0;
+        for (let y = 0; y + 2 <= this.height; y += 2)
+        {
+            if (ctxAux.fillStyle == this.color) ctxAux.fillStyle = this.color2;
+            else ctxAux.fillStyle = this.color;
+            ctxAux.fillRect (0, y, 1, 2);
+        }
+        const pattern = ctx.createPattern (canvasAux);
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillStyle = pattern;
+        ctx.fillRect (0, 0, this.width, this.height);
+        ctx.restore ();
+    }
+}
+
 function conveyor_belt (color, color2, color3, x, y, width, height)
 {
     this.color = color;
@@ -2281,7 +2369,7 @@ function conveyor_belt (color, color2, color3, x, y, width, height)
             ctx.fillRect (7, 40, 2, 2);
             ctx.fillRect (84, 40, 6, 2);
             ctx.fillRect (90, 38, 10, 4);
-            ctx.fillStyle = "black";
+            ctx.fillStyle = "#000000";
             ctx.fillRect (7, 36, 2, 4);
             ctx.restore ();
             this.turn += 10;
@@ -2322,7 +2410,7 @@ function concrete_mixer (type, color, color2, color3, x, y)
                 ctx.fillRect (6, 0, 22, 2);
                 ctx.fillRect (2, 2, 30, 4);
                 ctx.fillRect (0, 6, 34, 4);
-                ctx.fillStyle = "black";
+                ctx.fillStyle = "#000000";
                 ctx.fillRect (8, 2, 18, 2);
                 ctx.fillRect (6, 4, 22, 4);
                 ctx.fillRect (8, 8, 18, 2);
@@ -2340,7 +2428,7 @@ function concrete_mixer (type, color, color2, color3, x, y)
                 ctx.fillStyle = this.color3;
                 ctx.fillRect (36, 6, 6, 2);
                 ctx.fillRect (0, 18, 34, 4);
-                ctx.fillStyle = "black";
+                ctx.fillStyle = "#000000";
                 ctx.fillRect (4, 2, 4, 8);
                 ctx.fillRect (6, 10, 6, 2);
         }
@@ -2411,7 +2499,7 @@ function mack (type, color, color2, color3, x, y, heading)
                 {
                     if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y)
                     {
-                        if (gameItems [item].constructor.name == "tool" || gameItems [item].constructor.name == "lunchbox")
+                        if (gameItems [item].constructor.name == "tool" || gameItems [item].constructor.name == "toolbox")
                         {
                             if (gameItems [item].constructor.name == "tool") score += 200;
                             else
@@ -2563,6 +2651,7 @@ function mack (type, color, color2, color3, x, y, heading)
                                     if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                     else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                                 }
+                                else if (gameFront [front].constructor.name == "conveyor_belt") this.dead = 1;
                                 this.speedX = 0;
                             }
                         }
@@ -2756,7 +2845,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             highscore = score;
                             fileWrite ('user.bin');
                         }
-                        gameText.push (new component ("text", "Game over", "white", Math.round (gameMap.width / 2), 178, "center"));
+                        gameText.push (new component ("text", "Game over", "#ffffff", Math.round (gameMap.width / 2), 178, "center"));
                         gameMap.startFrame = gameArea.frame;
                     }
                 }
@@ -3139,7 +3228,7 @@ function enemy (name, type, x, y)
                 switch (this.type)
                 {
                     case 0:
-                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillStyle = "#55ffff";
                         ctx.fillRect (8, 0, 4, 2);
                         ctx.fillRect (14, 0, 4, 2);
                         ctx.fillRect (4, 4, 6, 2);
@@ -3151,14 +3240,14 @@ function enemy (name, type, x, y)
                         ctx.fillRect (8, 22, 10, 2);
                         ctx.fillRect (4, 24, 6, 4);
                         ctx.fillRect (16, 24, 6, 6);
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (2, 2, 2, 2);
                         ctx.fillRect (10, 2, 6, 2);
                         ctx.fillRect (22, 2, 2, 2);
                         ctx.fillRect (12, 4, 2, 2);
                         ctx.fillRect (6, 6, 14, 2);
                         ctx.fillRect (6, 14, 14, 6);
-                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillStyle = "#ffffff";
                         ctx.fillRect (8, 10, 10, 2);
                         ctx.fillRect (2, 12, 4, 2);
                         ctx.fillRect (20, 12, 4, 2);
@@ -3167,11 +3256,11 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 24, 4, 2)
                         ctx.fillRect (2, 28, 8, 2);
                         ctx.fillRect (16, 30, 8, 2);
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (12, 10, 2, 2);
                     break;
                     case 1:
-                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillStyle = "#55ffff";
                         ctx.fillRect (8, 0, 2, 2);
                         ctx.fillRect (4, 2, 16, 2);
                         ctx.fillRect (16, 4, 6, 2);
@@ -3183,7 +3272,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (8, 22, 10, 2);
                         ctx.fillRect (4, 24, 6, 6);
                         ctx.fillRect (16, 24, 6, 4);
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (2, 0, 2, 2);
                         ctx.fillRect (14, 0, 2, 2);
                         ctx.fillRect (18, 0, 2, 2);
@@ -3193,7 +3282,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (6, 6, 2, 2);
                         ctx.fillRect (14, 6, 2, 2);
                         ctx.fillRect (6, 16, 14, 4);
-                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillStyle = "#ffffff";
                         ctx.fillRect (8, 10, 10, 2);
                         ctx.fillRect (4, 14, 4, 2);
                         ctx.fillRect (10, 14, 6, 2);
@@ -3204,7 +3293,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 24, 4, 2)
                         ctx.fillRect (2, 30, 8, 2);
                         ctx.fillRect (16, 28, 8, 2);
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (12, 10, 2, 2);
                 }
             break;
@@ -3212,9 +3301,9 @@ function enemy (name, type, x, y)
                 switch (this.type)
                 {
                     case 0:
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (8, 0, 10, 10);
-                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillStyle = "#ffffff";
                         ctx.fillRect (6, 2, 14, 6);
                         ctx.fillRect (0, 10, 4, 4);
                         ctx.fillRect (10, 10, 6, 2);
@@ -3224,19 +3313,19 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 16, 6, 14);
                         ctx.fillRect (4, 28, 8, 2);
                         ctx.fillRect (14, 30, 8, 2);
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (10, 4, 6, 2);
                         ctx.fillRect (12, 12, 2, 2);
                         ctx.fillRect (10, 14, 6, 6);
-                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillStyle = "#55ffff";
                         ctx.fillRect (2, 10, 2, 2);
                         ctx.fillRect (6, 20, 6, 6);
                         ctx.fillRect (14, 20, 6, 8);
                     break;
                     case 1:
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (8, 0, 10, 10);
-                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillStyle = "#ffffff";
                         ctx.fillRect (6, 2, 14, 6);
                         ctx.fillRect (0, 6, 4, 4);
                         ctx.fillRect (2, 12, 2, 2);
@@ -3248,11 +3337,11 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 16, 6, 12);
                         ctx.fillRect (4, 30, 8, 2);
                         ctx.fillRect (14, 28, 8, 2);
-                        ctx.fillStyle = "#FF55FF";
+                        ctx.fillStyle = "#ff55ff";
                         ctx.fillRect (10, 4, 6, 2);
                         ctx.fillRect (12, 12, 2, 2);
                         ctx.fillRect (10, 14, 6, 6);
-                        ctx.fillStyle = "#55FFFF";
+                        ctx.fillStyle = "#55ffff";
                         ctx.fillRect (2, 6, 2, 6);
                         ctx.fillRect (22, 10, 2, 2);
                         ctx.fillRect (6, 20, 6, 8);
