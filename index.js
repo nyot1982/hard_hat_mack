@@ -591,8 +591,8 @@ function gameLoadScreen (screen)
         break;
         case 'config':
             gameBack.push (new back ("black", 0, 0, canvasWidth, canvasHeight));
-            gameTitle = new component ("text", "Configuration menu", "white", Math.round (canvasWidth / 2), 100, "center");
-            gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", Math.round (canvasWidth / 2) - 500, gameTitle.y + 105));
+            gameTitle = new component ("text", "Configuration menu", "white", Math.round (canvasWidth / 2), 40 * canvasHeight / 400, "center");
+            gameText.push (new component ("text", "Press key for " + controls [editKey].key + ":", "white", 40 * canvasWidth / 640, gameTitle.y + 50));
         break;
         case 'game':
             canvasHeight = 400;
@@ -2140,18 +2140,82 @@ function incinerator (color, color2, color3, x, y)
         ctx.fillRect (6, 0, 6, 4);
         ctx.fillRect (18, 0, 6, 4);
         ctx.fillRect (6, 38, 22, 8);
+        ctx.fillStyle = this.color2;
         if (gameArea.frame % 25 == 0)
         {
-            if (this.type == 2) this.type = 0;
+            if (this.type == 3) this.type = 0;
             else this.type++;
         }
         switch (this.type)
         {
-            case 0:
-                ctx.fillRect (4, 4, 22, 26);
-            break;
             case 1:
-                ctx.fillRect (4, 6, 10, 2);
+                ctx.fillRect (-18, 14, 2, 2);
+                ctx.fillRect (-10, 16, 2, 2);
+                ctx.fillRect (-2, 16, 2, 2);
+                ctx.fillRect (-18, 20, 2, 4);
+                ctx.fillRect (-16, 24, 4, 2);
+                ctx.fillRect (-14, 26, 2, 2);
+                ctx.fillRect (-10, 24, 2, 2);
+                ctx.fillRect (-6, 28, 2, 2);
+                ctx.fillRect (-2, 28, 2, 4);
+                ctx.fillRect (-16, 18, 6, 6);
+                ctx.fillRect (-8, 20, 8, 8);
+                ctx.fillStyle = this.color;
+                ctx.fillRect (-16, 16, 4, 2);
+                ctx.fillRect (-14, 18, 6, 2);
+                ctx.fillRect (-4, 18, 4, 2);
+                ctx.fillRect (-10, 20, 6, 2);
+                ctx.fillRect (-14, 22, 6, 2);
+                ctx.fillRect (-6, 26, 6, 2);
+            break;
+            case 2:
+                ctx.fillRect (-18, 0, 4, 8);
+                ctx.fillRect (-14, 6, 6, 22);
+                ctx.fillRect (-10, 12, 6, 18);
+                ctx.fillRect (-2, 16, 2, 2);
+                ctx.fillRect (-4, 20, 4, 12);
+                ctx.fillRect (-26, 18, 8, 2);
+                ctx.fillRect (-18, 18, 4, 8);
+                ctx.fillRect (-22, 24, 2, 2);
+                ctx.fillStyle = this.color;
+                ctx.fillRect (-20, 2, 4, 6);
+                ctx.fillRect (-10, 10, 4, 2);
+                ctx.fillRect (-26, 14, 4, 2);
+                ctx.fillRect (-10, 14, 2, 2);
+                ctx.fillRect (-24, 16, 4, 2);
+                ctx.fillRect (-18, 16, 6, 2);
+                ctx.fillRect (-14, 18, 6, 2);
+                ctx.fillRect (-6, 18, 6, 2);
+                ctx.fillRect (-26, 20, 10, 2);
+                ctx.fillRect (-22, 22, 6, 2);
+                ctx.fillRect (-14, 22, 6, 2);
+                ctx.fillRect (-6, 24, 2, 2);
+            break;
+            case 3:
+                ctx.fillRect (-14, 0, 4, 8);
+                ctx.fillRect (-26, 6, 2, 4);
+                ctx.fillRect (-10, 6, 2, 8);
+                ctx.fillRect (-26, 10, 4, 10);
+                ctx.fillRect (-18, 10, 4, 2);
+                ctx.fillRect (-22, 12, 2, 2);
+                ctx.fillRect (-16, 12, 4, 2);
+                ctx.fillRect (-8, 12, 4, 4);
+                ctx.fillRect (-18, 14, 6, 2);
+                ctx.fillRect (-22, 16, 2, 2);
+                ctx.fillRect (-10, 16, 10, 14);
+                ctx.fillRect (-22, 18, 8, 8);
+                ctx.fillRect (-14, 20, 4, 8);
+                ctx.fillStyle = this.color;
+                ctx.fillRect (-26, 2, 4, 4);
+                ctx.fillRect (-16, 2, 4, 6);
+                ctx.fillRect (-28, 4, 2, 6);
+                ctx.fillRect (-22, 8, 4, 2);
+                ctx.fillRect (-10, 10, 4, 2);
+                ctx.fillRect (-18, 16, 6, 2);
+                ctx.fillRect (-14, 18, 6, 2);
+                ctx.fillRect (-26, 20, 10, 2);
+                ctx.fillRect (-22, 22, 6, 2);
+                ctx.fillRect (-14, 22, 6, 2);
         }
         ctx.restore ();
     }
