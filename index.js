@@ -502,7 +502,7 @@ function userActionStart (control, bt_type, bt_code, bt_value)
                     player.moveX = bt_value;
                 break;
                 case 'jump':
-                    player.jump = -2;
+                    player.jump = -0.9;
                 break;
                 case 'drop':
                     player.dropItem ();
@@ -586,6 +586,9 @@ function gameLoadScreen (screen)
             gameText.push (new mack (0, "#ffffff", "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
             gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 183, gameText [3].y + 22));
             gameText.push (new girder_h (0, "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
+            gameText.push (new component ("text", "Space: Play", "#ffffff", Math.round (canvasWidth / 2), 308 * canvasHeight / 400, "center"));
+            gameText.push (new component ("text", "Enter: Config", "#ffffff", Math.round (canvasWidth / 2), gameText [10].y + 24, "center"));
+            gameText.push (new component ("text", "Esc: Quit", "#ffffff", Math.round (canvasWidth / 2), gameText [11].y + 24, "center"));
             gameText.push (new component ("image", "electronic_arts.png", "", 40 * canvasWidth / 640 + 96, canvasHeight - 16 * canvasHeight / 400 - 33, 192, 66));
             gameText.push (new component ("text", "(C) 2026 nYoT", "#ffffff", canvasWidth - 40 * canvasWidth / 640 - 176, canvasHeight - 16 * canvasHeight / 400 - 14));
         break;
@@ -624,36 +627,36 @@ function generateGameMap ()
                 player:
                 {
                     type: 0,
-                    x: Math.round ((canvasWidth - 558) / 2) + 420,
+                    x: Math.round ((canvasWidth - 558) / 2) + 411,
                     y: 306,
                     heading: -1
                 },
                 enemies:
                 [
                     {
-                        x: Math.round ((canvasWidth - 558) / 2) + 65,
+                        x: Math.round ((canvasWidth - 558) / 2) + 56,
                         y: 240
                     }
                 ]
             };
             gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 125, 96, 240));
-            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 373, 96, 240));
-            gameBack.push (new chain ("#55ffff", gameMap.x + 326, 96, 4));
-            gameBack.push (new chain ("#55ffff", gameMap.x + 74, 160, 4));
-            gameBack.push (new chain ("#55ffff", gameMap.x + 438, 224, 4));
-            gameBack.push (new chain ("#55ffff", gameMap.x + 74, 288, 4));
-            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 101, 352));
-            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 201, 352));
-            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 301, 352));
-            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 401, 352));
-            gameBack.push (new elevator (1, "#ffffff", "#55ffff", gameMap.x + 9, 288, 4, 48));
-            gameBack.push (new elevator (2, "#ffffff", null, gameMap.x + 59, 288, 4, 48));
-            gameBack.push (new support ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 30, 346));
-            gameFront.push (new bell ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 123, 18));
-            gameFront.push (new machine ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 532, 54));
-            gameFront.push (new girder_h (0, "#55ffff", "#ff55ff", gameMap.x + 65, 80, 390));
-            gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 344, 52));
+            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 116, 96, 240));
+            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 364, 96, 240));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 317, 96, 4));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 65, 160, 4));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 429, 224, 4));
+            gameBack.push (new chain ("#55ffff", gameMap.x + 65, 288, 4));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 92, 352));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 192, 352));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 292, 352));
+            gameBack.push (new column ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 392, 352));
+            gameBack.push (new elevator (1, "#ffffff", "#55ffff", gameMap.x, 288, 4, 48));
+            gameBack.push (new elevator (2, "#ffffff", null, gameMap.x + 50, 288, 4, 48));
+            gameBack.push (new support ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 21, 346));
+            gameFront.push (new bell ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 114, 18));
+            gameFront.push (new machine ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 523, 54));
+            gameFront.push (new girder_h (0, "#55ffff", "#ff55ff", gameMap.x + 56, 80, 390));
+            gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 335, 52));
             for (let i = 0; i < 4; i++)
             {
                 girderBreak = Math.floor (Math.random () * 6);
@@ -664,8 +667,8 @@ function generateGameMap ()
                         girderPiece: null
                     }
                 );
-                gameFront.push (new girder_h (1, "#55ffff", "#ff55ff", gameMap.x + 65, 144 + i * 64, 111 + girderBreak * 28));
-                gameFront.push (new girder_h (2, "#55ffff", "#ff55ff", gameMap.x + 204 + girderBreak * 28, 144 + i * 64, 251 - girderBreak * 28));
+                gameFront.push (new girder_h (1, "#55ffff", "#ff55ff", gameMap.x + 56, 144 + i * 64, 111 + girderBreak * 28));
+                gameFront.push (new girder_h (2, "#55ffff", "#ff55ff", gameMap.x + 195 + girderBreak * 28, 144 + i * 64, 251 - girderBreak * 28));
                 girderBreak = Math.floor (Math.random () * 2);
                 if (girderBreak == 0)
                 {
@@ -681,29 +684,29 @@ function generateGameMap ()
                 switch (girderBreak)
                 {
                     case 0:
-                        if (girderTurn == -45) girderX = 93;
-                        else girderX = 104;
+                        if (girderTurn == -45) girderX = 84;
+                        else girderX = 95;
                     break;
                     case 1:
-                        if (girderTurn == -45) girderX = 148;
-                        else girderX = 159;
+                        if (girderTurn == -45) girderX = 139;
+                        else girderX = 150;
                     break;
                     case 2:
-                        if (girderTurn == -45) girderX = 341;
-                        else girderX = 352;
+                        if (girderTurn == -45) girderX = 332;
+                        else girderX = 343;
                     break;
                     case 3:
-                        if (girderTurn == -45) girderX = 396;
-                        else girderX = 407;
+                        if (girderTurn == -45) girderX = 387;
+                        else girderX = 398;
                 }
                 gameItems.push (new girder_piece ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + girderX, girderY, girderTurn));
             }
-            gameFront.push (new elevator (0, "#ffffff", "#ff55ff", gameMap.x + 9, 280, 54, 8));
-            gameFront.push (new elevator (2, null, null, gameMap.x + 9, 288, 0, 48));
-            gameFront.push (new elevator (3, "#ffffff", "#55ffff", gameMap.x + 9, 336, 54, 10));
+            gameFront.push (new elevator (0, "#ffffff", "#ff55ff", gameMap.x, 280, 54, 8));
+            gameFront.push (new elevator (2, null, null, gameMap.x, 288, 0, 48));
+            gameFront.push (new elevator (3, "#ffffff", "#55ffff", gameMap.x, 336, 54, 10));
             gameFront.push (new springboard ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 488, 354));
-            gameItems.push (new jackhammer ("#ffffff", "#ff55ff", gameMap.x + 160, 306));
-            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.x + 65, 240));
+            gameItems.push (new jackhammer ("#ffffff", "#ff55ff", gameMap.x + 151, 306));
+            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.x + 56, 240));
         break;
         case 2:
             gameMap =
@@ -766,7 +769,15 @@ function generateGameMap ()
                 startFrame: gameArea.frame,
                 x: Math.round ((canvasWidth - 558) / 2),
                 width: canvasWidth,
-                height: canvasHeight
+                height: canvasHeight,
+                items: 0,
+                player:
+                {
+                    type: 1,
+                    x: Math.round ((canvasWidth - 558) / 2) + 8,
+                    y: 348,
+                    heading: 1
+                }
             };
             gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
     }
@@ -799,6 +810,7 @@ function generateGameMap ()
         player.dead = 0;
         player.deadFrame = 0;
         player.item = null;
+        player.gravity = gravity;
     }
     gameAudios [8].play ();
 }
@@ -1734,7 +1746,7 @@ function jackhammer (color, color2, x, y)
             {
                 if (this.direction == 0)
                 {
-                    if (this.x == gameMap.x + 160 && this.y == 306)
+                    if (this.x == gameMap.x + 151 && this.y == 306)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
@@ -1749,37 +1761,37 @@ function jackhammer (color, color2, x, y)
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 427 && this.y == 242)
+                    else if (this.x == gameMap.x + 418 && this.y == 242)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 90 && this.y == 242)
+                    else if (this.x == gameMap.x + 81 && this.y == 242)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 90 && this.y == 178)
+                    else if (this.x == gameMap.x + 81 && this.y == 178)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 150 && this.y == 178 && this.speedY == 0)
+                    else if (this.x == gameMap.x + 141 && this.y == 178 && this.speedY == 0)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 150 && this.y == 114 && this.speedX == 0)
+                    else if (this.x == gameMap.x + 141 && this.y == 114 && this.speedX == 0)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 210 && this.y == 114 && this.speedX > 0)
+                    else if (this.x == gameMap.x + 201 && this.y == 114 && this.speedX > 0)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 210 && this.y == 50)
+                    else if (this.x == gameMap.x + 201 && this.y == 50)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
@@ -1788,32 +1800,32 @@ function jackhammer (color, color2, x, y)
                 }
                 else
                 {
-                    if (this.x == gameMap.x + 427 && this.y == 50)
+                    if (this.x == gameMap.x + 418 && this.y == 50)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 427 && this.y == 114)
+                    else if (this.x == gameMap.x + 418 && this.y == 114)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 90 && this.y == 114)
+                    else if (this.x == gameMap.x + 81 && this.y == 114)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 90 && this.y == 178)
+                    else if (this.x == gameMap.x + 81 && this.y == 178)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 402 && this.y == 178)
+                    else if (this.x == gameMap.x + 393 && this.y == 178)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 402 && this.y == 242)
+                    else if (this.x == gameMap.x + 393 && this.y == 242)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
@@ -2464,13 +2476,14 @@ function mack (type, color, color2, color3, x, y, heading)
     this.floor = 0;
     this.enemyKill = null;
     this.item = null;
+    this.gravity = gravity;
 
     this.dropItem = function ()
     {
         if (this.item != null && gameItems [this.item].constructor.name == "jackhammer")
         {
             gameItems [this.item].direction = 0;
-            gameItems [this.item].x = gameMap.x + 160;
+            gameItems [this.item].x = gameMap.x + 151;
             gameItems [this.item].y = 306;
             this.item = null;
         }
@@ -2525,13 +2538,13 @@ function mack (type, color, color2, color3, x, y, heading)
                 }
                 if (this.item != null)
                 {
-                    if (this.heading == 1 && this.x < gameMap.x + 515 - this.width || this.x < gameMap.x + 28 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
+                    if (this.heading == 1 && this.x < gameMap.x + 506 - this.width || this.x < gameMap.x + 19 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
                     else gameItems [this.item].x = this.x - gameItems [this.item].width;
                     gameItems [this.item].y = this.y;
                     if (gameItems [this.item].constructor.name == "girder_piece")
                     {
                         gameItems [this.item].y += 4;
-                        if (this.floor > 0 && gameMap.girderBreaks [this.floor - 1].girderPiece == null && gameItems [this.item].x == gameMap.x + 176 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameItems [this.item].type > 0)
+                        if (this.floor > 0 && gameMap.girderBreaks [this.floor - 1].girderPiece == null && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameItems [this.item].type > 0)
                         {
                             score += 25;
                             gameItems [this.item].type = 2;
@@ -2543,7 +2556,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             gameAudios [0].play ();
                         }
                     }
-                    else if (this.floor > 0 && gameItems [this.item].constructor.name == "jackhammer" && gameItems [this.item].x == gameMap.x + 176 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
+                    else if (this.floor > 0 && gameItems [this.item].constructor.name == "jackhammer" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
                     {
                         score += 50;
                         gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type = 3;
@@ -2672,23 +2685,25 @@ function mack (type, color, color2, color3, x, y, heading)
                 {
                     if (this.speedX != 0)
                     {
-                        if (!this.jumping || this.y >= this.jumping)
+                        if (!this.jumping || this.speedX < 0 && this.x == this.jumping - 62 || this.speedX > 0 && this.x == this.jumping + 62)
                         {
                             this.speedX = 0;
                             this.jumping = false;
+                            this.gravity = gravity;
                         }
                     }
                     if (this.springboard)
                     {
                         if (this.floor > 0 && this.y <= 50 + this.floor * 64 - 66 || this.floor == 0 && this.y <= 306)
                         {
-                            this.jumping = this.y;
+                            this.jumping = this.x;
                             this.springboard = false;
                             this.speedX = -1;
-                            this.speedY = -2;
+                            this.speedY = -0.9;
+                            this.gravity = 0.03;
                         }
                     }
-                    if (!this.springboard || this.springboard && this.dead > 0) this.speedY = Number ((this.speedY + gravity).toFixed (2));
+                    if (!this.springboard || this.springboard && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
                     if (this.dead == 0)
                     {
                         if (this.speedX == 0) this.type = 4;
@@ -2734,9 +2749,14 @@ function mack (type, color, color2, color3, x, y, heading)
                         {
                             gameAudios [6].play ();
                             this.speedY += this.jump;
-                            this.jumping = this.y;
+                            this.jumping = this.x;
+                            this.gravity = 0.03;
                         }
-                        else this.jumping = false;
+                        else
+                        {
+                            this.jumping = false;
+                            this.gravity = gravity;
+                        }
                         if (this.type > 3 && this.type < 14 && !this.springboard) this.type = 1;
                         if (!this.conveyor_belt && this.speedX != 0 && gameArea.frame % 5 == 0)
                         {
@@ -2804,6 +2824,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         this.deadFrame = 0;
                         this.enemyKill = null;
                         this.item = null;
+                        this.gravity = gravity;
                         let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
                         gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
                         gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
@@ -2826,7 +2847,7 @@ function mack (type, color, color2, color3, x, y, heading)
                                 if (gameItems [item].constructor.name == "jackhammer")
                                 {
                                     gameItems [item].direction = 0;
-                                    gameItems [item].x = gameMap.x + 160;
+                                    gameItems [item].x = gameMap.x + 151;
                                     gameItems [item].y = 306;
                                 }
                                 else if (gameItems [item].constructor.name == "girder_piece" && gameItems [item].type > 0) gameItems [item].type = 0;
@@ -3067,57 +3088,57 @@ function enemy (name, type, x, y)
             {
                 if (this.direction == 0)
                 {
-                    if (this.x == gameMap.x + 429 && this.y == 304)
+                    if (this.x == gameMap.x + 420 && this.y == 304)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 304)
+                    else if (this.x == gameMap.x + 56 && this.y == 304)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 240)
+                    else if (this.x == gameMap.x + 56 && this.y == 240)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 429 && this.y == 240)
+                    else if (this.x == gameMap.x + 420 && this.y == 240)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 429 && this.y == 176)
+                    else if (this.x == gameMap.x + 420 && this.y == 176)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 176)
+                    else if (this.x == gameMap.x + 56 && this.y == 176)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 112)
+                    else if (this.x == gameMap.x + 56 && this.y == 112)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 429 && this.y == 112)
+                    else if (this.x == gameMap.x + 420 && this.y == 112)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 317 && this.y == 112 && this.speedX == -1)
+                    else if (this.x == gameMap.x + 308 && this.y == 112 && this.speedX == -1)
                     {
                         this.speedX = 0;
                         this.speedY = -1;
                     }
-                    else if (this.x == gameMap.x + 317 && this.y == 48 && this.speedY == -1)
+                    else if (this.x == gameMap.x + 308 && this.y == 48 && this.speedY == -1)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 48)
+                    else if (this.x == gameMap.x + 56 && this.y == 48)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
@@ -3126,52 +3147,52 @@ function enemy (name, type, x, y)
                 }
                 else
                 {
-                    if (this.x == gameMap.x + 429 && this.y == 48)
+                    if (this.x == gameMap.x + 420 && this.y == 48)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 317 && this.y == 48 && this.speedX == -1)
+                    else if (this.x == gameMap.x + 308 && this.y == 48 && this.speedX == -1)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 317 && this.y == 112 && this.speedY == 1)
+                    else if (this.x == gameMap.x + 308 && this.y == 112 && this.speedY == 1)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 429 && this.y == 112)
+                    else if (this.x == gameMap.x + 420 && this.y == 112)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 112)
+                    else if (this.x == gameMap.x + 56 && this.y == 112)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 176)
+                    else if (this.x == gameMap.x + 56 && this.y == 176)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 429 && this.y == 176)
+                    else if (this.x == gameMap.x + 420 && this.y == 176)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 429 && this.y == 240)
+                    else if (this.x == gameMap.x + 420 && this.y == 240)
                     {
                         this.speedX = -1;
                         this.speedY = 0;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 240)
+                    else if (this.x == gameMap.x + 56 && this.y == 240)
                     {
                         this.speedX = 0;
                         this.speedY = 1;
                     }
-                    else if (this.x == gameMap.x + 65 && this.y == 304)
+                    else if (this.x == gameMap.x + 56 && this.y == 304)
                     {
                         this.speedX = 1;
                         this.speedY = 0;
@@ -3766,6 +3787,54 @@ function component (type, src, color, x, y, width, height)
                         ctx.fillRect (x + 2, y + 10, 6, 2);
                         ctx.fillRect (x, y + 12, 6, 2);
                         width = 12;
+                    break;
+                    case "{":
+                        ctx.fillRect (x + 4, y, 6, 2);
+                        ctx.fillRect (x + 2, y + 2, 4, 4);
+                        ctx.fillRect (x, y + 6, 4, 2);
+                        ctx.fillRect (x + 2, y + 8, 4, 4);
+                        ctx.fillRect (x + 4, y + 12, 6, 2);
+                        width = 12;
+                    break;
+                    case "}":
+                        ctx.fillRect (x, y, 6, 2);
+                        ctx.fillRect (x + 4, y + 2, 4, 4);
+                        ctx.fillRect (x + 6, y + 6, 4, 2);
+                        ctx.fillRect (x + 4, y + 8, 4, 4);
+                        ctx.fillRect (x, y + 12, 6, 2);
+                        width = 12;
+                    break;
+                    case "<":
+                        ctx.fillRect (x + 6, y, 4, 2);
+                        ctx.fillRect (x + 4, y + 2, 4, 2);
+                        ctx.fillRect (x + 2, y + 4, 4, 2);
+                        ctx.fillRect (x, y + 6, 4, 2);
+                        ctx.fillRect (x + 2, y + 8, 4, 2);
+                        ctx.fillRect (x + 4, y + 10, 4, 2);
+                        ctx.fillRect (x + 6, y + 12, 4, 2);
+                        width = 12;
+                    break;
+                    case ">":
+                        ctx.fillRect (x, y, 4, 2);
+                        ctx.fillRect (x + 2, y + 2, 4, 2);
+                        ctx.fillRect (x + 4, y + 4, 4, 2);
+                        ctx.fillRect (x + 6, y + 6, 4, 2);
+                        ctx.fillRect (x + 4, y + 8, 4, 2);
+                        ctx.fillRect (x + 2, y + 10, 4, 2);
+                        ctx.fillRect (x, y + 12, 4, 2);
+                        width = 12;
+                    break;
+                    case "[":
+                        ctx.fillRect (x, y, 8, 2);
+                        ctx.fillRect (x, y + 2, 4, 10);
+                        ctx.fillRect (x, y + 12, 8, 2);
+                        width = 10;
+                    break;
+                    case "]":
+                        ctx.fillRect (x, y, 8, 2);
+                        ctx.fillRect (x + 4, y + 2, 4, 10);
+                        ctx.fillRect (x, y + 12, 8, 2);
+                        width = 10;
                     break;
                     case "/":
                         ctx.fillRect (x, y + 10, 2, 4);
