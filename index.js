@@ -319,8 +319,8 @@ let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
         canvas: createCanvas (canvasWidth, canvasHeight),
         start: function ()
         {
-            gameText.push (new component ("text", "loading...", "#ffffff", Math.round (canvasWidth / 2), 20, "center"));
-            gameText.push (new component ("text", "", null, Math.round (canvasWidth / 2), 30, "center"));
+            gameText.push (new component ("text", "loading...", "#ffffff", Math.round (canvasWidth / 2), 20, "center", 9));
+            gameText.push (new component ("text", "", null, Math.round (canvasWidth / 2), 30, "center", 9));
             gameImages = fs.readdirSync ("img");
             gameAudios = fs.readdirSync ("audio");
             loading = 2 + gameImages.length + gameAudios.length;
@@ -579,16 +579,16 @@ function gameLoadScreen (screen)
             gameText.push (new component ("text", "Node.js version by Marc Pinyot Gascón.", "#ffffff", Math.round (canvasWidth / 2), 96 * canvasHeight / 400, "center"));
             gameText.push (new component ("text", "An original game design by", "#ffffff", Math.round (canvasWidth / 2), 152 * canvasHeight / 400, "center"));
             gameText.push (new component ("text", "Michael Abbot & Matthew Alexander.", "#ffffff", Math.round (canvasWidth / 2), gameText [1].y + 24, "center"));
-            gameText.push (new component ("text", "Vandal", "#ffffff", Math.round (canvasWidth / 2) - 223, 220 * canvasHeight / 400));
-            gameText.push (new component ("text", "Mack", "#ffffff", Math.round (canvasWidth / 2) - 27, gameText [3].y));
-            gameText.push (new component ("text", "Osha", "#ffffff", Math.round (canvasWidth / 2) + 169, gameText [3].y));
+            gameText.push (new component ("text", "Vandal", "#55ffff", Math.round (canvasWidth / 2) - 223, 220 * canvasHeight / 400));
+            gameText.push (new component ("text", "Mack", "#55ffff", Math.round (canvasWidth / 2) - 27, gameText [3].y));
+            gameText.push (new component ("text", "Osha", "#55ffff", Math.round (canvasWidth / 2) + 169, gameText [3].y));
             gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 195, gameText [3].y + 22));
             gameText.push (new mack (0, "#ffffff", "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
             gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 183, gameText [3].y + 22));
             gameText.push (new girder_h (0, "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
-            gameText.push (new component ("text", "Space: Play", "#ffffff", Math.round (canvasWidth / 2), 308 * canvasHeight / 400, "center"));
-            gameText.push (new component ("text", "Enter: Config", "#ffffff", Math.round (canvasWidth / 2), gameText [10].y + 24, "center"));
-            gameText.push (new component ("text", "Esc: Quit", "#ffffff", Math.round (canvasWidth / 2), gameText [11].y + 24, "center"));
+            gameText.push (new component ("text", "Space: Play", "#ff55ff", Math.round (canvasWidth / 2), 320 * canvasHeight / 400, "center", 9));
+            gameText.push (new component ("text", "Enter: Config", "#ff55ff", Math.round (canvasWidth / 2), gameText [10].y + 18, "center", 9));
+            gameText.push (new component ("text", "Esc: Quit", "#ff55ff", Math.round (canvasWidth / 2), gameText [11].y + 18, "center", 9));
             gameText.push (new component ("image", "electronic_arts.png", "", 40 * canvasWidth / 640 + 96, canvasHeight - 16 * canvasHeight / 400 - 33, 192, 66));
             gameText.push (new component ("text", "(C) 2026 nYoT", "#ffffff", canvasWidth - 40 * canvasWidth / 640 - 176, canvasHeight - 16 * canvasHeight / 400 - 14));
         break;
@@ -833,7 +833,7 @@ function updateGameArea ()
                 loading = "Loading completed.";
                 loadingErrors = gameArea.frame;
             }
-            gameText.push (new component ("text", loading, "#ffffff", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 36, "center"));
+            gameText.push (new component ("text", loading, "#ffffff", Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 29, "center", 9));
             loading = -1;
         }
         else if (loading == -1 && loadingErrors > -1 && gameArea.frame == loadingErrors + 120) gameLoadScreen ("menu");
@@ -940,7 +940,7 @@ async function fileRead (file)
                     }
                 }
             }
-            gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+            gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
             loading--;
         }
     );
@@ -996,7 +996,7 @@ async function setIcon (file)
         color = "red";
         loadingErrors++;
     }
-    gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+    gameText.push (new component ("text", file, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
     loading--;
 }
 
@@ -1014,7 +1014,7 @@ async function loadAudio (dir)
             console.error ('Error loading audio:', error.message + '.');
             color = "red";
         }
-        gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+        gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
         loading--;
     }
 }
@@ -1033,7 +1033,7 @@ async function loadImages (dir)
             console.error ('Error loading picture:', error.message + '.');
             color = "red";
         }
-        gameText.push (new component ("text", gameImages [gameImage].src, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 26, "center"));
+        gameText.push (new component ("text", gameImages [gameImage].src, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
         loading--;
     }
 }
@@ -3387,9 +3387,11 @@ function component (type, src, color, x, y, width, height)
     this.y = y;
     if (this.type == "text" || this.type == "value")
     {
-        this.startX = this.x;
-        this.direction = (width ? width : "left");
+        this.direction = (width != null ? width : "left");
+        if (this.direction == "vertical") this.tildeY = 0;
+        else this.tildeY = 6;
         if (this.type == "value") this.chars = (height != null ? height : 0);
+        else this.size = (height != null ? height : 12);
     }
     else
     {
@@ -3428,7 +3430,10 @@ function component (type, src, color, x, y, width, height)
             else ctx.fillStyle = "transparent";
             this.width = 0;
             this.height = 0;
-            for (let i = 0, x = this.x, y = this.y; i < this.text.length; i++)
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.scale (this.size / 12, this.size / 12);
+            for (let i = 0; i < this.text.length; i++)
             {
                 let char = this.text.substr (i, 1).toUpperCase (),
                     width = 14,
@@ -3436,436 +3441,433 @@ function component (type, src, color, x, y, width, height)
 
                 if (char == "Á" || char == "É" || char == "Í" || char == "Ó" || char == "Ú")
                 {
-                    if (this.direction != "vertical") y -= 6;
-                    ctx.fillRect (x + 6, y, 4, 2);
-                    ctx.fillRect (x + 4, y + 2, 4, 2);
-                    y += 6;
+                    ctx.fillRect (6, 0 - this.tildeY, 4, 2);
+                    ctx.fillRect (4, 2 - this.tildeY, 4, 2);
                 }
                 else if (char == "À" || char == "È" || char == "Ì" || char == "Ò" || char == "Ù")
                 {
-                    if (this.direction != "vertical") y -= 6;
-                    ctx.fillRect (x + 2, y, 4, 2);
-                    ctx.fillRect (x + 4, y + 2, 4, 2);
-                    y += 6;
+                    ctx.fillRect (2, 0 - this.tildeY, 4, 2);
+                    ctx.fillRect (4, 2 - this.tildeY, 4, 2);
                 }
                 switch (char)
                 {
                     case "0":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 10);
-                        ctx.fillRect (x + 6, y + 4, 2, 4);
-                        ctx.fillRect (x + 4, y + 6, 2, 4);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 10);
+                        ctx.fillRect (6, 4, 2, 4);
+                        ctx.fillRect (4, 6, 2, 4);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "1":
-                        ctx.fillRect (x + 4, y, 4, 12);
-                        ctx.fillRect (x + 2, y + 2, 2, 4);
-                        ctx.fillRect (x, y + 4, 2, 2);
-                        ctx.fillRect (x, y + 12, 12, 2);
+                        ctx.fillRect (4, 0, 4, 12);
+                        ctx.fillRect (2, 2, 2, 4);
+                        ctx.fillRect (0, 4, 2, 2);
+                        ctx.fillRect (0, 12, 12, 2);
                     break;
                     case "2":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 2);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 6, y + 6, 4, 2);
-                        ctx.fillRect (x + 4, y + 8, 4, 2);
-                        ctx.fillRect (x + 2, y + 10, 4, 2);
-                        ctx.fillRect (x, y + 12, 12, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 2);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (6, 6, 4, 2);
+                        ctx.fillRect (4, 8, 4, 2);
+                        ctx.fillRect (2, 10, 4, 2);
+                        ctx.fillRect (0, 12, 12, 2);
                     break;
                     case "3":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 2);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x, y + 10, 4, 2);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 2);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (4, 6, 6, 2);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (0, 10, 4, 2);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "4":
-                        ctx.fillRect (x + 6, y, 2, 2);
-                        ctx.fillRect (x + 8, y, 4, 14);
-                        ctx.fillRect (x + 4, y + 2, 4, 2);
-                        ctx.fillRect (x + 2, y + 4, 4, 2);
-                        ctx.fillRect (x, y + 6, 4, 2);
-                        ctx.fillRect (x, y + 8, 8, 2);
+                        ctx.fillRect (6, 0, 2, 2);
+                        ctx.fillRect (8, 0, 4, 14);
+                        ctx.fillRect (4, 2, 4, 2);
+                        ctx.fillRect (2, 4, 4, 2);
+                        ctx.fillRect (0, 6, 4, 2);
+                        ctx.fillRect (0, 8, 8, 2);
                     break;
                     case "5":
-                        ctx.fillRect (x, y, 12, 2);
-                        ctx.fillRect (x, y + 2, 4, 4);
-                        ctx.fillRect (x, y + 6, 10, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x, y + 10, 4, 2);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (0, 0, 12, 2);
+                        ctx.fillRect (0, 2, 4, 4);
+                        ctx.fillRect (0, 6, 10, 2);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (0, 10, 4, 2);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "6":
-                        ctx.fillRect (x + 4, y, 6, 2);
-                        ctx.fillRect (x + 2, y + 2, 4, 2);
-                        ctx.fillRect (x, y + 4, 4, 8);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (4, 0, 6, 2);
+                        ctx.fillRect (2, 2, 4, 2);
+                        ctx.fillRect (0, 4, 4, 8);
+                        ctx.fillRect (4, 6, 6, 2);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "7":
-                        ctx.fillRect (x, y, 12, 2);
-                        ctx.fillRect (x, y + 2, 4, 2);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 6, y + 4, 4, 2);
-                        ctx.fillRect (x + 4, y + 6, 4, 8);
+                        ctx.fillRect (0, 0, 12, 2);
+                        ctx.fillRect (0, 2, 4, 2);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (6, 4, 4, 2);
+                        ctx.fillRect (4, 6, 4, 8);
                     break;
                     case "8":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 4);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 2, y + 6, 8, 2);
-                        ctx.fillRect (x, y + 8, 4, 4);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 4);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (2, 6, 8, 2);
+                        ctx.fillRect (0, 8, 4, 4);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "9":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 4);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 2, y + 6, 10, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 2);
-                        ctx.fillRect (x + 6, y + 10, 4, 2);
-                        ctx.fillRect (x + 4, y + 12, 4, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 4);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (2, 6, 10, 2);
+                        ctx.fillRect (8, 8, 4, 2);
+                        ctx.fillRect (6, 10, 4, 2);
+                        ctx.fillRect (4, 12, 4, 2);
                     break;
                     case "A":
                     case "À":
                     case "Á":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 12);
-                        ctx.fillRect (x + 8, y + 2, 4, 12);
-                        ctx.fillRect (x + 4, y + 6, 4, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 12);
+                        ctx.fillRect (8, 2, 4, 12);
+                        ctx.fillRect (4, 6, 4, 2);
                     break;
                     case "B":
-                        ctx.fillRect (x, y, 10, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x, y + 12, 10, 2);
+                        ctx.fillRect (0, 0, 10, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (4, 6, 6, 2);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (0, 12, 10, 2);
                     break;
                     case "C":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 8, y + 10, 4, 2);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (8, 10, 4, 2);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "D":
-                        ctx.fillRect (x , y, 4, 14);
-                        ctx.fillRect (x + 4, y + 0, 4, 2);
-                        ctx.fillRect (x + 6, y + 2, 4, 2);
-                        ctx.fillRect (x + 8, y + 4, 4, 6);
-                        ctx.fillRect (x + 6, y + 10, 4, 2);
-                        ctx.fillRect (x + 4, y + 12, 4, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (4, 0, 4, 2);
+                        ctx.fillRect (6, 2, 4, 2);
+                        ctx.fillRect (8, 4, 4, 6);
+                        ctx.fillRect (6, 10, 4, 2);
+                        ctx.fillRect (4, 12, 4, 2);
                     break;
                     case "E":
                     case "È":
                     case "É":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
-                        ctx.fillRect (x + 8, y + 10, 4, 2);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (4, 6, 6, 2);
+                        ctx.fillRect (8, 10, 4, 2);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "F":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 12);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 12);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (4, 6, 6, 2);
                     break;
                     case "G":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 6, y + 6, 6, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (6, 6, 6, 2);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "H":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 8, y, 4, 14);
-                        ctx.fillRect (x + 4, y + 6, 4, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (8, 0, 4, 14);
+                        ctx.fillRect (4, 6, 4, 2);
                     break;
                     case "I":
                     case "Ì":
                     case "Í":
-                        ctx.fillRect (x, y, 12, 2);
-                        ctx.fillRect (x + 4, y + 2, 4, 10);
-                        ctx.fillRect (x, y + 12, 12, 2);
+                        ctx.fillRect (0, 0, 12, 2);
+                        ctx.fillRect (4, 2, 4, 10);
+                        ctx.fillRect (0, 12, 12, 2);
                     break;
                     case "J":
-                        ctx.fillRect (x + 8, y, 4, 12);
-                        ctx.fillRect (x, y + 8, 4, 4);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (8, 0, 4, 12);
+                        ctx.fillRect (0, 8, 4, 4);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "K":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 8, y, 4, 2);
-                        ctx.fillRect (x + 6, y + 2, 4, 2);
-                        ctx.fillRect (x + 4, y + 4, 4, 2);
-                        ctx.fillRect (x + 4, y + 6, 2, 2);
-                        ctx.fillRect (x + 4, y + 8, 4, 2);
-                        ctx.fillRect (x + 6, y + 10, 4, 2);
-                        ctx.fillRect (x + 8, y + 12, 4, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (8, 0, 4, 2);
+                        ctx.fillRect (6, 2, 4, 2);
+                        ctx.fillRect (4, 4, 4, 2);
+                        ctx.fillRect (4, 6, 2, 2);
+                        ctx.fillRect (4, 8, 4, 2);
+                        ctx.fillRect (6, 10, 4, 2);
+                        ctx.fillRect (8, 12, 4, 2);
                     break;
                     case "L":
-                        ctx.fillRect (x, y, 4, 12);
-                        ctx.fillRect (x, y + 12, 12, 2);
+                        ctx.fillRect (0, 0, 4, 12);
+                        ctx.fillRect (0, 12, 12, 2);
                     break;
                     case "M":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 8, y, 4, 14);
-                        ctx.fillRect (x + 4, y + 2, 4, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (8, 0, 4, 14);
+                        ctx.fillRect (4, 2, 4, 2);
                     break;
                     case "N":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 8, y, 4, 14);
-                        ctx.fillRect (x + 4, y + 4, 2, 2);
-                        ctx.fillRect (x + 6, y + 6, 2, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (8, 0, 4, 14);
+                        ctx.fillRect (4, 4, 2, 2);
+                        ctx.fillRect (6, 6, 2, 2);
                     break;
                     case "O":
                     case "Ò":
                     case "Ó":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 10);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 10);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "P":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 4, y, 6, 2);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (4, 0, 6, 2);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (4, 6, 6, 2);
                     break;
                     case "Q":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x + 8, y + 2, 4, 8);
-                        ctx.fillRect (x + 2, y + 12, 6, 2);
-                        ctx.fillRect (x + 4, y + 6, 2, 2);
-                        ctx.fillRect (x + 6, y + 8, 2, 2);
-                        ctx.fillRect (x + 8, y + 10, 2, 2);
-                        ctx.fillRect (x + 10, y + 12, 2, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (8, 2, 4, 8);
+                        ctx.fillRect (2, 12, 6, 2);
+                        ctx.fillRect (4, 6, 2, 2);
+                        ctx.fillRect (6, 8, 2, 2);
+                        ctx.fillRect (8, 10, 2, 2);
+                        ctx.fillRect (10, 12, 2, 2);
                     break;
                     case "R":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 4, y, 6, 2);
-                        ctx.fillRect (x + 8, y + 2, 4, 4);
-                        ctx.fillRect (x + 4, y + 6, 6, 2);
-                        ctx.fillRect (x + 4, y + 8, 4, 2);
-                        ctx.fillRect (x + 6, y + 10, 4, 2);
-                        ctx.fillRect (x + 8, y + 12, 4, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (4, 0, 6, 2);
+                        ctx.fillRect (8, 2, 4, 4);
+                        ctx.fillRect (4, 6, 6, 2);
+                        ctx.fillRect (4, 8, 4, 2);
+                        ctx.fillRect (6, 10, 4, 2);
+                        ctx.fillRect (8, 12, 4, 2);
                     break;
                     case "S":
-                        ctx.fillRect (x + 2, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 4);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 2, y + 6, 8, 2);
-                        ctx.fillRect (x + 8, y + 8, 4, 4);
-                        ctx.fillRect (x, y + 10, 4, 2);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (2, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 4);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (2, 6, 8, 2);
+                        ctx.fillRect (8, 8, 4, 4);
+                        ctx.fillRect (0, 10, 4, 2);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "T":
-                        ctx.fillRect (x, y, 12, 2);
-                        ctx.fillRect (x + 4, y + 2, 4, 12);
+                        ctx.fillRect (0, 0, 12, 2);
+                        ctx.fillRect (4, 2, 4, 12);
                     break;
                     case "U":
                     case "Ù":
                     case "Ú":
-                        ctx.fillRect (x, y, 4, 12);
-                        ctx.fillRect (x + 8, y, 4, 12);
-                        ctx.fillRect (x + 2, y + 12, 8, 2);
+                        ctx.fillRect (0, 0, 4, 12);
+                        ctx.fillRect (8, 0, 4, 12);
+                        ctx.fillRect (2, 12, 8, 2);
                     break;
                     case "V":
-                        ctx.fillRect (x, y, 4, 10);
-                        ctx.fillRect (x + 8, y, 4, 10);
-                        ctx.fillRect (x + 2, y + 10, 8, 2);
-                        ctx.fillRect (x + 4, y + 12, 4, 2);
+                        ctx.fillRect (0, 0, 4, 10);
+                        ctx.fillRect (8, 0, 4, 10);
+                        ctx.fillRect (2, 10, 8, 2);
+                        ctx.fillRect (4, 12, 4, 2);
                     break;
                     case "W":
-                        ctx.fillRect (x, y, 4, 14);
-                        ctx.fillRect (x + 8, y, 4, 14);
-                        ctx.fillRect (x + 4, y + 10, 4, 2);
+                        ctx.fillRect (0, 0, 4, 14);
+                        ctx.fillRect (8, 0, 4, 14);
+                        ctx.fillRect (4, 10, 4, 2);
                     break;
                     case "X":
-                        ctx.fillRect (x, y, 4, 4);
-                        ctx.fillRect (x + 8, y, 4, 4);
-                        ctx.fillRect (x + 2, y + 4, 8, 2);
-                        ctx.fillRect (x + 4, y + 6, 4, 2);
-                        ctx.fillRect (x + 2, y + 8, 8, 2);
-                        ctx.fillRect (x, y + 10, 4, 4);
-                        ctx.fillRect (x + 8, y + 10, 4, 4);
+                        ctx.fillRect (0, 0, 4, 4);
+                        ctx.fillRect (8, 0, 4, 4);
+                        ctx.fillRect (2, 4, 8, 2);
+                        ctx.fillRect (4, 6, 4, 2);
+                        ctx.fillRect (2, 8, 8, 2);
+                        ctx.fillRect (0, 10, 4, 4);
+                        ctx.fillRect (8, 10, 4, 4);
                     break;
                     case "Y":
-                        ctx.fillRect (x, y, 4, 6);
-                        ctx.fillRect (x + 8, y, 4, 6);
-                        ctx.fillRect (x + 2, y + 6, 8, 2);
-                        ctx.fillRect (x + 4, y + 8, 4, 6);
+                        ctx.fillRect (0, 0, 4, 6);
+                        ctx.fillRect (8, 0, 4, 6);
+                        ctx.fillRect (2, 6, 8, 2);
+                        ctx.fillRect (4, 8, 4, 6);
                     break;
                     case "Z":
-                        ctx.fillRect (x, y, 12, 2);
-                        ctx.fillRect (x + 8, y + 2, 4, 2);
-                        ctx.fillRect (x + 6, y + 4, 4, 2);
-                        ctx.fillRect (x + 4, y + 6, 4, 2);
-                        ctx.fillRect (x + 2, y + 8, 4, 2);
-                        ctx.fillRect (x, y + 10, 4, 2);
-                        ctx.fillRect (x, y + 12, 12, 2);
+                        ctx.fillRect (0, 0, 12, 2);
+                        ctx.fillRect (8, 2, 4, 2);
+                        ctx.fillRect (6, 4, 4, 2);
+                        ctx.fillRect (4, 6, 4, 2);
+                        ctx.fillRect (2, 8, 4, 2);
+                        ctx.fillRect (0, 10, 4, 2);
+                        ctx.fillRect (0, 12, 12, 2);
                     break;
                     case "&":
-                        ctx.fillRect (x + 2, y, 6, 2);
-                        ctx.fillRect (x, y + 2, 4, 4);
-                        ctx.fillRect (x + 8, y + 2, 2, 2);
-                        ctx.fillRect (x + 2, y + 6, 4, 2);
-                        ctx.fillRect (x, y + 8, 4, 4);
-                        ctx.fillRect (x + 6, y + 8, 2, 2);
-                        ctx.fillRect (x + 10, y + 8, 2, 2);
-                        ctx.fillRect (x + 8, y + 10, 2, 2);
-                        ctx.fillRect (x + 2, y + 12, 6, 2);
-                        ctx.fillRect (x + 10, y + 12, 2, 2);
+                        ctx.fillRect (2, 0, 6, 2);
+                        ctx.fillRect (0, 2, 4, 4);
+                        ctx.fillRect (8, 2, 2, 2);
+                        ctx.fillRect (2, 6, 4, 2);
+                        ctx.fillRect (0, 8, 4, 4);
+                        ctx.fillRect (6, 8, 2, 2);
+                        ctx.fillRect (10, 8, 2, 2);
+                        ctx.fillRect (8, 10, 2, 2);
+                        ctx.fillRect (2, 12, 6, 2);
+                        ctx.fillRect (10, 12, 2, 2);
                     break;
                     case "=":
-                        ctx.fillRect (x, y + 2, 12, 4);
-                        ctx.fillRect (x, y + 8, 12, 4);
+                        ctx.fillRect (0, 2, 12, 4);
+                        ctx.fillRect (0, 8, 12, 4);
                     break;
                     case "-":
-                        ctx.fillRect (x, y + 5, 12, 4);
+                        ctx.fillRect (0, 5, 12, 4);
                     break;
                     case "_":
-                        ctx.fillRect (x, y + 12, 12, 4);
+                        ctx.fillRect (0, 12, 12, 4);
                         height = 18;
                     break;
                     case "+":
-                        ctx.fillRect (x + 4, y + 1, 4, 12);
-                        ctx.fillRect (x, y + 5, 12, 4);
+                        ctx.fillRect (4, 1, 4, 12);
+                        ctx.fillRect (0, 5, 12, 4);
                         height = 14;
                     break;
                     case "·":
-                        ctx.fillRect (x, y + 5, 4, 4);
+                        ctx.fillRect (0, 5, 4, 4);
                         width = 6;
                     break;
                     case ".":
-                        ctx.fillRect (x, y + 10, 4, 4);
+                        ctx.fillRect (0, 10, 4, 4);
                         width = 6;
                     break;
                     case ",":
-                        ctx.fillRect (x, y + 10, 4, 4);
-                        ctx.fillRect (x + 2, y + 14, 2, 2);
-                        ctx.fillRect (x, y + 16, 2, 2);
+                        ctx.fillRect (0, 10, 4, 4);
+                        ctx.fillRect (2, 14, 2, 2);
+                        ctx.fillRect (0, 16, 2, 2);
                         width = 6;
                         height = 20;
                     break;
                     case ":":
-                        ctx.fillRect (x, y + 2, 4, 4);
-                        ctx.fillRect (x, y + 8, 4, 4);
+                        ctx.fillRect (0, 2, 4, 4);
+                        ctx.fillRect (0, 8, 4, 4);
                         width = 6;
                     break;
                     case ";":
-                        ctx.fillRect (x, y + 4, 4, 4);
-                        ctx.fillRect (x, y + 10, 4, 4);
-                        ctx.fillRect (x + 2, y + 14, 2, 2);
-                        ctx.fillRect (x, y + 16, 2, 2);
+                        ctx.fillRect (0, 4, 4, 4);
+                        ctx.fillRect (0, 10, 4, 4);
+                        ctx.fillRect (2, 14, 2, 2);
+                        ctx.fillRect (0, 16, 2, 2);
                         width = 6;
                         height = 20;
                     break;
                     case "(":
-                        ctx.fillRect (x + 4, y, 6, 2);
-                        ctx.fillRect (x + 2, y + 2, 6, 2);
-                        ctx.fillRect (x, y + 4, 6, 6);
-                        ctx.fillRect (x + 2, y + 10, 6, 2);
-                        ctx.fillRect (x + 4, y + 12, 6, 2);
+                        ctx.fillRect (4, 0, 6, 2);
+                        ctx.fillRect (2, 2, 6, 2);
+                        ctx.fillRect (0, 4, 6, 6);
+                        ctx.fillRect (2, 10, 6, 2);
+                        ctx.fillRect (4, 12, 6, 2);
                         width = 12;
                     break;
                     case ")":
-                        ctx.fillRect (x, y, 6, 2);
-                        ctx.fillRect (x + 2, y + 2, 6, 2);
-                        ctx.fillRect (x + 4, y + 4, 6, 6);
-                        ctx.fillRect (x + 2, y + 10, 6, 2);
-                        ctx.fillRect (x, y + 12, 6, 2);
+                        ctx.fillRect (0, 0, 6, 2);
+                        ctx.fillRect (2, 2, 6, 2);
+                        ctx.fillRect (4, 4, 6, 6);
+                        ctx.fillRect (2, 10, 6, 2);
+                        ctx.fillRect (0, 12, 6, 2);
                         width = 12;
                     break;
                     case "{":
-                        ctx.fillRect (x + 4, y, 6, 2);
-                        ctx.fillRect (x + 2, y + 2, 4, 4);
-                        ctx.fillRect (x, y + 6, 4, 2);
-                        ctx.fillRect (x + 2, y + 8, 4, 4);
-                        ctx.fillRect (x + 4, y + 12, 6, 2);
+                        ctx.fillRect (4, 0, 6, 2);
+                        ctx.fillRect (2, 2, 4, 4);
+                        ctx.fillRect (0, 6, 4, 2);
+                        ctx.fillRect (2, 8, 4, 4);
+                        ctx.fillRect (4, 12, 6, 2);
                         width = 12;
                     break;
                     case "}":
-                        ctx.fillRect (x, y, 6, 2);
-                        ctx.fillRect (x + 4, y + 2, 4, 4);
-                        ctx.fillRect (x + 6, y + 6, 4, 2);
-                        ctx.fillRect (x + 4, y + 8, 4, 4);
-                        ctx.fillRect (x, y + 12, 6, 2);
+                        ctx.fillRect (0, 0, 6, 2);
+                        ctx.fillRect (4, 2, 4, 4);
+                        ctx.fillRect (6, 6, 4, 2);
+                        ctx.fillRect (4, 8, 4, 4);
+                        ctx.fillRect (0, 12, 6, 2);
                         width = 12;
                     break;
                     case "<":
-                        ctx.fillRect (x + 6, y, 4, 2);
-                        ctx.fillRect (x + 4, y + 2, 4, 2);
-                        ctx.fillRect (x + 2, y + 4, 4, 2);
-                        ctx.fillRect (x, y + 6, 4, 2);
-                        ctx.fillRect (x + 2, y + 8, 4, 2);
-                        ctx.fillRect (x + 4, y + 10, 4, 2);
-                        ctx.fillRect (x + 6, y + 12, 4, 2);
+                        ctx.fillRect (6, 0, 4, 2);
+                        ctx.fillRect (4, 2, 4, 2);
+                        ctx.fillRect (2, 4, 4, 2);
+                        ctx.fillRect (0, 6, 4, 2);
+                        ctx.fillRect (2, 8, 4, 2);
+                        ctx.fillRect (4, 10, 4, 2);
+                        ctx.fillRect (6, 12, 4, 2);
                         width = 12;
                     break;
                     case ">":
-                        ctx.fillRect (x, y, 4, 2);
-                        ctx.fillRect (x + 2, y + 2, 4, 2);
-                        ctx.fillRect (x + 4, y + 4, 4, 2);
-                        ctx.fillRect (x + 6, y + 6, 4, 2);
-                        ctx.fillRect (x + 4, y + 8, 4, 2);
-                        ctx.fillRect (x + 2, y + 10, 4, 2);
-                        ctx.fillRect (x, y + 12, 4, 2);
+                        ctx.fillRect (0, 0, 4, 2);
+                        ctx.fillRect (2, 2, 4, 2);
+                        ctx.fillRect (4, 4, 4, 2);
+                        ctx.fillRect (6, 6, 4, 2);
+                        ctx.fillRect (4, 8, 4, 2);
+                        ctx.fillRect (2, 10, 4, 2);
+                        ctx.fillRect (0, 12, 4, 2);
                         width = 12;
                     break;
                     case "[":
-                        ctx.fillRect (x, y, 8, 2);
-                        ctx.fillRect (x, y + 2, 4, 10);
-                        ctx.fillRect (x, y + 12, 8, 2);
+                        ctx.fillRect (0, 0, 8, 2);
+                        ctx.fillRect (0, 2, 4, 10);
+                        ctx.fillRect (0, 12, 8, 2);
                         width = 10;
                     break;
                     case "]":
-                        ctx.fillRect (x, y, 8, 2);
-                        ctx.fillRect (x + 4, y + 2, 4, 10);
-                        ctx.fillRect (x, y + 12, 8, 2);
+                        ctx.fillRect (0, 0, 8, 2);
+                        ctx.fillRect (4, 2, 4, 10);
+                        ctx.fillRect (0, 12, 8, 2);
                         width = 10;
                     break;
                     case "/":
-                        ctx.fillRect (x, y + 10, 2, 4);
-                        ctx.fillRect (x + 2, y + 8, 2, 4);
-                        ctx.fillRect (x + 4, y + 6, 2, 4);
-                        ctx.fillRect (x + 6, y + 4, 2, 4);
-                        ctx.fillRect (x + 8, y + 2, 2, 4);
-                        ctx.fillRect (x + 10, y, 2, 4);
+                        ctx.fillRect (0, 10, 2, 4);
+                        ctx.fillRect (2, 8, 2, 4);
+                        ctx.fillRect (4, 6, 2, 4);
+                        ctx.fillRect (6, 4, 2, 4);
+                        ctx.fillRect (8, 2, 2, 4);
+                        ctx.fillRect (10, 0, 2, 4);
                     break;
                     case "\\":
-                        ctx.fillRect (x, y, 2, 4);
-                        ctx.fillRect (x + 2, y + 2, 2, 4);
-                        ctx.fillRect (x + 4, y + 4, 2, 4);
-                        ctx.fillRect (x + 6, y + 6, 2, 4);
-                        ctx.fillRect (x + 8, y + 8, 2, 4);
-                        ctx.fillRect (x + 10, y + 10, 2, 4);
+                        ctx.fillRect (0, 0, 2, 4);
+                        ctx.fillRect (2, 2, 2, 4);
+                        ctx.fillRect (4, 4, 2, 4);
+                        ctx.fillRect (6, 6, 2, 4);
+                        ctx.fillRect (8, 8, 2, 4);
+                        ctx.fillRect (10, 10, 2, 4);
                 }
                 if (this.direction == "vertical")
                 {
                     this.height += height;
-                    y += height;
                     if (width > this.width) this.width = width;
+                    ctx.translate (0, height);
                 }
                 else
                 {
                     this.width += width;
-                    x += width;
                     if (height > this.height) this.height = height;
+                    ctx.translate (width, 0);
                 }   
             }
-            if (this.direction == "center") this.x = this.startX - Math.round (this.width / 2);
+            ctx.restore ();
+            if (this.direction == "center") this.x = Math.round (canvasWidth / 2) - Math.round (this.width / 2 * this.size / 12);
         }
     }
 }
