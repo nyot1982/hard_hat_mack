@@ -582,10 +582,10 @@ function gameLoadScreen (screen)
             gameText.push (new component ("text", "Vandal", "#55ffff", Math.round (canvasWidth / 2) - 223, 220 * canvasHeight / 400));
             gameText.push (new component ("text", "Mack", "#55ffff", Math.round (canvasWidth / 2) - 27, gameText [3].y));
             gameText.push (new component ("text", "Osha", "#55ffff", Math.round (canvasWidth / 2) + 169, gameText [3].y));
-            gameText.push (new enemy (0, 0, Math.round (canvasWidth / 2) - 195, gameText [3].y + 22));
+            gameText.push (new enemy (0, 0, "#ffffff", "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 195, gameText [3].y + 22));
             gameText.push (new mack (0, "#ffffff", "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 13, gameText [3].y + 24));
-            gameText.push (new enemy (1, 0, Math.round (canvasWidth / 2) + 183, gameText [3].y + 22));
-            gameText.push (new girder_h (0, "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
+            gameText.push (new enemy (1, 0, "#ffffff", "#ff55ff", "#55ffff", Math.round (canvasWidth / 2) + 183, gameText [3].y + 22));
+            gameText.push (new girder_h (0, "#ff55ff", "#55ffff", "#000000", Math.round (canvasWidth / 2) - 223, gameText [3].y + 54, 446));
             gameText.push (new component ("text", "Space: Play", "#ff55ff", Math.round (canvasWidth / 2), 320 * canvasHeight / 400, "center", 9));
             gameText.push (new component ("text", "Enter: Config", "#ff55ff", Math.round (canvasWidth / 2), gameText [10].y + 18, "center", 9));
             gameText.push (new component ("text", "Esc: Quit", "#ff55ff", Math.round (canvasWidth / 2), gameText [11].y + 18, "center", 9));
@@ -640,8 +640,8 @@ function generateGameMap ()
                 ]
             };
             gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
-            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 116, 96, 240));
-            gameBack.push (new girder_v ("#ffffff", "#55ffff", gameMap.x + 364, 96, 240));
+            gameBack.push (new girder_v ("#ffffff", "#55ffff", "#000000", gameMap.x + 116, 96, 240));
+            gameBack.push (new girder_v ("#ffffff", "#55ffff", "#000000", gameMap.x + 364, 96, 240));
             gameBack.push (new chain ("#55ffff", gameMap.x + 317, 96, 4));
             gameBack.push (new chain ("#55ffff", gameMap.x + 65, 160, 4));
             gameBack.push (new chain ("#55ffff", gameMap.x + 429, 224, 4));
@@ -655,7 +655,7 @@ function generateGameMap ()
             gameBack.push (new support ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 21, 346));
             gameFront.push (new bell ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 114, 18));
             gameFront.push (new machine ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 523, 54));
-            gameFront.push (new girder_h (0, "#55ffff", "#ff55ff", gameMap.x + 56, 80, 390));
+            gameFront.push (new girder_h (0, "#55ffff", "#ff55ff", "#000000", gameMap.x + 56, 80, 390));
             gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 335, 52));
             for (let i = 0; i < 4; i++)
             {
@@ -667,8 +667,8 @@ function generateGameMap ()
                         girderPiece: null
                     }
                 );
-                gameFront.push (new girder_h (1, "#55ffff", "#ff55ff", gameMap.x + 56, 144 + i * 64, 111 + girderBreak * 28));
-                gameFront.push (new girder_h (2, "#55ffff", "#ff55ff", gameMap.x + 195 + girderBreak * 28, 144 + i * 64, 251 - girderBreak * 28));
+                gameFront.push (new girder_h (1, "#55ffff", "#ff55ff", "#000000", gameMap.x + 56, 144 + i * 64, 111 + girderBreak * 28));
+                gameFront.push (new girder_h (2, "#55ffff", "#ff55ff", "#000000", gameMap.x + 195 + girderBreak * 28, 144 + i * 64, 251 - girderBreak * 28));
                 girderBreak = Math.floor (Math.random () * 2);
                 if (girderBreak == 0)
                 {
@@ -699,14 +699,14 @@ function generateGameMap ()
                         if (girderTurn == -45) girderX = 387;
                         else girderX = 398;
                 }
-                gameItems.push (new girder_piece ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + girderX, girderY, girderTurn));
+                gameItems.push (new girder_piece ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + girderX, girderY, girderTurn));
             }
             gameFront.push (new elevator (0, "#ffffff", "#ff55ff", gameMap.x, 280, 54, 8));
             gameFront.push (new elevator (2, null, null, gameMap.x, 288, 0, 48));
             gameFront.push (new elevator (3, "#ffffff", "#55ffff", gameMap.x, 336, 54, 10));
             gameFront.push (new springboard ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 488, 354));
             gameItems.push (new jackhammer ("#ffffff", "#ff55ff", gameMap.x + 151, 306));
-            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.x + 56, 240));
+            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, "#ffffff", "#ff55ff", "#55ffff", gameMap.x + 56, 240));
         break;
         case 2:
             gameMap =
@@ -734,34 +734,34 @@ function generateGameMap ()
             gameBack.push (new back ("#000000", 0, 0, gameMap.width, gameMap.height));
             gameBack.push (new wire ("#ffffff", 2, [{x: gameMap.x + 217, y: 64}, {x: gameMap.x + 225, y: 56}, {x: gameMap.x + 251, y: 56}, {x: gameMap.x + 251, y: 322}]));
             gameBack.push (new chain ("#55ffff", gameMap.x + 484, 288, 8));
-            gameBack.push (new concrete_mixer (0, "#ffffff", null, null, gameMap.x + 170, 346));
+            gameBack.push (new concrete_mixer (0, "#ffffff", null, null, "#000000", gameMap.x + 170, 346));
             gameBack.push (new trap ("#ffffff", "#ff55ff", gameMap.x + 84, 194, 26, 14));
-            gameFront.push (new concrete_mixer (1, "#ffffff", "#ff55ff", "#55ffff", gameMap.x + 170, 356));
+            gameFront.push (new concrete_mixer (1, "#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 170, 356));
             gameFront.push (new magnet ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 300, 16));
             gameFront.push (new crane ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 198, 52));
-            gameFront.push (new incinerator ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 530, 64));
-            gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 392, 100));
-            gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 54, 334));
-            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 169, 80, 70));
-            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x + 263, 80, 70));
-            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x, 144, 166));
-            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 336, 144, 166));
-            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x, 208, 166));
-            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 336, 208, 166));
-            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", gameMap.x, 272, 166));
-            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", gameMap.x + 336, 272, 166));
-            gameFront.push (new girder_h (0, "#ff55ff", "#55ffff", gameMap.x + 196, 322, 110));
+            gameFront.push (new incinerator ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 530, 64));
+            gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 392, 100));
+            gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 54, 334));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", "#000000", gameMap.x + 169, 80, 70));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", "#000000", gameMap.x + 263, 80, 70));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", "#000000", gameMap.x, 144, 166));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", "#000000", gameMap.x + 336, 144, 166));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", "#000000", gameMap.x, 208, 166));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", "#000000", gameMap.x + 336, 208, 166));
+            gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", "#000000", gameMap.x, 272, 166));
+            gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", "#000000", gameMap.x + 336, 272, 166));
+            gameFront.push (new girder_h (0, "#ff55ff", "#55ffff", "#000000", gameMap.x + 196, 322, 110));
             gameFront.push (new duct ("#ffffff", "#ff55ff", gameMap.x, 292));
             gameFront.push (new spigot ("#ffffff", "#55ffff", gameMap.x + 58, 306));
             gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 280, 350));
-            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 111, 122));
-            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 27, 186));
-            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 447, 186));
-            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x, 250));
-            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 363, 250));
-            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 308, 356));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 111, 122));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 27, 186));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 447, 186));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x, 250));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 363, 250));
+            gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 308, 356));
             gameEnemies.push (new trap ("#ffffff", "#ff55ff", gameMap.x + 92, 202, 10, 6));
-            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, gameMap.enemies [0].x, gameMap.enemies [0].y));
+            gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, "#ffffff", "#ff55ff", "#55ffff", gameMap.enemies [0].x, gameMap.enemies [0].y));
         break;
         case 3:
             gameMap =
@@ -1084,11 +1084,12 @@ function floor (color, x, y, width, height)
     }
 }
 
-function girder_h (type, color, color2, x, y, width)
+function girder_h (type, color, color2, color3, x, y, width)
 {
     this.type = (type != null ? type : 0);
     this.color = color;
     this.color2 = color2;
+    this.color3 = color3;
     this.x = x;
     this.y = y;
     this.width = width;
@@ -1124,7 +1125,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (6, 4, this.width - 12, 8);
                     for (let x = 30; x + 30 < this.width; x += 84)
                     {
-                        ctx.fillStyle = "#000000";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                         if (level == 0 && (x == 114 || x == 254)) x -= 28;
@@ -1136,7 +1137,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (6, 4, this.width - 6, 8);
                     for (let x = 30; x + 22 < this.width; x += 84)
                     {
-                        ctx.fillStyle = "#000000";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                         if (level == 1 && x == 30) x += 28;
@@ -1146,7 +1147,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (0, 4, this.width - 6, 8);
                     for (let x = 52; this.width - x > 0; x += 84)
                     {
-                        ctx.fillStyle = "#000000";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (this.width - x, 6, 6, 4);
                         ctx.fillRect (this.width - x + 16, 6, 6, 4);
                         if (level == 1 && x == 52) x += 28;
@@ -1156,7 +1157,7 @@ function girder_h (type, color, color2, x, y, width)
                     ctx.fillRect (0, 4, this.width, 8);
                     for (let x = 30; x + 22 < this.width; x += 84)
                     {
-                        ctx.fillStyle = "#000000";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (x, 6, 6, 4);
                         ctx.fillRect (x + 16, 6, 6, 4);
                     }
@@ -1166,10 +1167,11 @@ function girder_h (type, color, color2, x, y, width)
     }
 }
 
-function girder_v (color, color2, x, y, height)
+function girder_v (color, color2, color3, x, y, height)
 {
     this.color = color;
     this.color2 = color2;
+    this.color3 = color3;
     this.x = x;
     this.y = y;
     this.width = 22;
@@ -1190,7 +1192,7 @@ function girder_v (color, color2, x, y, height)
             ctx.fillRect (4, 0, 14, this.height);
             for (let y = 24; y + 5 < this.height; y += 64)
             {
-                ctx.fillStyle = "#000000";
+                ctx.fillStyle = this.color3;
                 ctx.fillRect (8, y, 6, 4);
                 ctx.fillRect (8, y + 14, 6, 4);
             }
@@ -1199,11 +1201,12 @@ function girder_v (color, color2, x, y, height)
     }
 }
 
-function girder_piece (color, color2, color3, x, y, turn)
+function girder_piece (color, color2, color3, color4, x, y, turn)
 {
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
+    this.color4 = color4;
     this.x = x;
     this.startX = this.x;
     this.y = y;
@@ -1236,7 +1239,7 @@ function girder_piece (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, this.height - 4, this.width, 4);
                 ctx.fillStyle = this.color2;
                 ctx.fillRect (2, 4, this.width - 4, this.height - 8);
-                ctx.fillStyle = "#000000";
+                ctx.fillStyle = this.color4;
                 ctx.fillRect (3, 6, 6, 4);
                 ctx.fillRect (19, 6, 6, 4);
             break;
@@ -1257,7 +1260,7 @@ function girder_piece (color, color2, color3, x, y, turn)
                 ctx.fillRect (0, 4, this.width, this.height - 8);
                 if (gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 1 || gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 4)
                 {
-                    ctx.fillStyle = "#000000";
+                    ctx.fillStyle = this.color4;
                     ctx.fillRect (3, 6, 6, 4);
                     ctx.fillRect (19, 6, 6, 4);
                 }
@@ -1870,11 +1873,12 @@ function jackhammer (color, color2, x, y)
     }
 }
 
-function toolbox (color, color2, color3, x, y)
+function toolbox (color, color2, color3, color4, x, y)
 {
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
+    this.color4 = color4;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.width = 28;
@@ -1897,7 +1901,7 @@ function toolbox (color, color2, color3, x, y)
         ctx.fillRect (10, 0, 8, 2);
         ctx.fillRect (8, 2, 2, 4);
         ctx.fillRect (18, 2, 2, 4);
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = this.color4;
         ctx.fillRect (10, 6, 2, 2);
         ctx.fillRect (12, 8, 2, 2);
         ctx.fillRect (14, 10, 2, 4);  
@@ -2171,11 +2175,12 @@ function wire (color, thick, points)
     }
 }
 
-function incinerator (color, color2, color3, x, y)
+function incinerator (color, color2, color3, color4, x, y)
 {
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
+    this.color4 = color4;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.width = 28;
@@ -2195,7 +2200,7 @@ function incinerator (color, color2, color3, x, y)
         ctx.fillRect (0, 46, 28, 4);
         ctx.fillStyle = this.color;
         ctx.fillRect (4, 8, 22, 8);
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = this.color4;
         ctx.fillRect (8, 10, 14, 4);
         ctx.fillStyle = this.color;
         ctx.fillRect (14, 12, 4, 2);
@@ -2321,11 +2326,12 @@ function trap (color, color2, x, y, width, height)
     }
 }
 
-function conveyor_belt (color, color2, color3, x, y, width, height)
+function conveyor_belt (color, color2, color3, color4, x, y, width, height)
 {
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
+    this.color4 = color4;
     this.x = (x != null ? x : 0);
     this.startX = this.x;
     this.y = (y != null ? y : 0);
@@ -2336,7 +2342,7 @@ function conveyor_belt (color, color2, color3, x, y, width, height)
        
     this.update = function ()
     {
-        if (this.color != null && this.color2 != null && this.color3 != null)
+        if (this.color != null && this.color2 != null && this.color3 != null && this.color4 != null)
         {
             this.x = this.startX + 102;
             this.y = this.startY + 12;
@@ -2347,11 +2353,11 @@ function conveyor_belt (color, color2, color3, x, y, width, height)
             ctx.translate (Math.round (this.startX), Math.round (this.startY));
             ctx.fillStyle = this.color;
             ctx.fillRect (0, 34, 2, 8);
-            gameFront.push (new conveyor_belt (null, null, null, this.startX, this.startY + 34, 2, 8));
+            gameFront.push (new conveyor_belt (null, null, null, null, this.startX, this.startY + 34, 2, 8));
             for (let i = 0; i < 17; i++)
             {
                 ctx.fillRect (2 + i * 6, 32 - i * 2, 12, 12);
-                gameFront.push (new conveyor_belt (null, null, null, this.startX + 2 + i * 6, this.startY + 32 - i * 2, 12, 12));
+                gameFront.push (new conveyor_belt (null, null, null, null, this.startX + 2 + i * 6, this.startY + 32 - i * 2, 12, 12));
             }
             ctx.fillRect (110, 2, 2, 8);
             gameFront.push (new conveyor_belt (null, null, null, this.startX + 110, this.startY + 2, 2, 8));
@@ -2381,7 +2387,7 @@ function conveyor_belt (color, color2, color3, x, y, width, height)
             ctx.fillRect (7, 40, 2, 2);
             ctx.fillRect (84, 40, 6, 2);
             ctx.fillRect (90, 38, 10, 4);
-            ctx.fillStyle = "#000000";
+            ctx.fillStyle = this.color4;
             ctx.fillRect (7, 36, 2, 4);
             ctx.restore ();
             this.turn += 10;
@@ -2390,12 +2396,13 @@ function conveyor_belt (color, color2, color3, x, y, width, height)
     }
 }
 
-function concrete_mixer (type, color, color2, color3, x, y)
+function concrete_mixer (type, color, color2, color3, color4, x, y)
 {
     this.type = type;
     this.color = color;
     this.color2 = color2;
     this.color3 = color3;
+    this.color4 = color4;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     if (this.type == 0)
@@ -2422,7 +2429,7 @@ function concrete_mixer (type, color, color2, color3, x, y)
                 ctx.fillRect (6, 0, 22, 2);
                 ctx.fillRect (2, 2, 30, 4);
                 ctx.fillRect (0, 6, 34, 4);
-                ctx.fillStyle = "#000000";
+                ctx.fillStyle = this.color4;
                 ctx.fillRect (8, 2, 18, 2);
                 ctx.fillRect (6, 4, 22, 4);
                 ctx.fillRect (8, 8, 18, 2);
@@ -2440,7 +2447,7 @@ function concrete_mixer (type, color, color2, color3, x, y)
                 ctx.fillStyle = this.color3;
                 ctx.fillRect (36, 6, 6, 2);
                 ctx.fillRect (0, 18, 34, 4);
-                ctx.fillStyle = "#000000";
+                ctx.fillStyle = this.color4;
                 ctx.fillRect (4, 2, 4, 8);
                 ctx.fillRect (6, 10, 6, 2);
         }
@@ -3073,10 +3080,13 @@ function mack (type, color, color2, color3, x, y, heading)
     }
 }
 
-function enemy (name, type, x, y)
+function enemy (name, type, color, color2, color3, x, y)
 {
     this.name = (name != null ? name : 0);
     this.type = (type != null ? type : 0);
+    this.color = color;
+    this.color2 = color2;
+    this.color3 = color3;
     this.x = (x != null ? x : 0);
     this.y = (y != null ? y : 0);
     this.width = 26;
@@ -3254,7 +3264,7 @@ function enemy (name, type, x, y)
                 switch (this.type)
                 {
                     case 0:
-                        ctx.fillStyle = "#55ffff";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (8, 0, 4, 2);
                         ctx.fillRect (14, 0, 4, 2);
                         ctx.fillRect (4, 4, 6, 2);
@@ -3266,14 +3276,14 @@ function enemy (name, type, x, y)
                         ctx.fillRect (8, 22, 10, 2);
                         ctx.fillRect (4, 24, 6, 4);
                         ctx.fillRect (16, 24, 6, 6);
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (2, 2, 2, 2);
                         ctx.fillRect (10, 2, 6, 2);
                         ctx.fillRect (22, 2, 2, 2);
                         ctx.fillRect (12, 4, 2, 2);
                         ctx.fillRect (6, 6, 14, 2);
                         ctx.fillRect (6, 14, 14, 6);
-                        ctx.fillStyle = "#ffffff";
+                        ctx.fillStyle = this.color;
                         ctx.fillRect (8, 10, 10, 2);
                         ctx.fillRect (2, 12, 4, 2);
                         ctx.fillRect (20, 12, 4, 2);
@@ -3282,11 +3292,11 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 24, 4, 2)
                         ctx.fillRect (2, 28, 8, 2);
                         ctx.fillRect (16, 30, 8, 2);
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (12, 10, 2, 2);
                     break;
                     case 1:
-                        ctx.fillStyle = "#55ffff";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (8, 0, 2, 2);
                         ctx.fillRect (4, 2, 16, 2);
                         ctx.fillRect (16, 4, 6, 2);
@@ -3298,7 +3308,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (8, 22, 10, 2);
                         ctx.fillRect (4, 24, 6, 6);
                         ctx.fillRect (16, 24, 6, 4);
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (2, 0, 2, 2);
                         ctx.fillRect (14, 0, 2, 2);
                         ctx.fillRect (18, 0, 2, 2);
@@ -3308,7 +3318,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (6, 6, 2, 2);
                         ctx.fillRect (14, 6, 2, 2);
                         ctx.fillRect (6, 16, 14, 4);
-                        ctx.fillStyle = "#ffffff";
+                        ctx.fillStyle = this.color;
                         ctx.fillRect (8, 10, 10, 2);
                         ctx.fillRect (4, 14, 4, 2);
                         ctx.fillRect (10, 14, 6, 2);
@@ -3319,7 +3329,7 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 24, 4, 2)
                         ctx.fillRect (2, 30, 8, 2);
                         ctx.fillRect (16, 28, 8, 2);
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (12, 10, 2, 2);
                 }
             break;
@@ -3327,9 +3337,9 @@ function enemy (name, type, x, y)
                 switch (this.type)
                 {
                     case 0:
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (8, 0, 10, 10);
-                        ctx.fillStyle = "#ffffff";
+                        ctx.fillStyle = this.color;
                         ctx.fillRect (6, 2, 14, 6);
                         ctx.fillRect (0, 10, 4, 4);
                         ctx.fillRect (10, 10, 6, 2);
@@ -3339,19 +3349,19 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 16, 6, 14);
                         ctx.fillRect (4, 28, 8, 2);
                         ctx.fillRect (14, 30, 8, 2);
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (10, 4, 6, 2);
                         ctx.fillRect (12, 12, 2, 2);
                         ctx.fillRect (10, 14, 6, 6);
-                        ctx.fillStyle = "#55ffff";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (2, 10, 2, 2);
                         ctx.fillRect (6, 20, 6, 6);
                         ctx.fillRect (14, 20, 6, 8);
                     break;
                     case 1:
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (8, 0, 10, 10);
-                        ctx.fillStyle = "#ffffff";
+                        ctx.fillStyle = this.color;
                         ctx.fillRect (6, 2, 14, 6);
                         ctx.fillRect (0, 6, 4, 4);
                         ctx.fillRect (2, 12, 2, 2);
@@ -3363,11 +3373,11 @@ function enemy (name, type, x, y)
                         ctx.fillRect (14, 16, 6, 12);
                         ctx.fillRect (4, 30, 8, 2);
                         ctx.fillRect (14, 28, 8, 2);
-                        ctx.fillStyle = "#ff55ff";
+                        ctx.fillStyle = this.color2;
                         ctx.fillRect (10, 4, 6, 2);
                         ctx.fillRect (12, 12, 2, 2);
                         ctx.fillRect (10, 14, 6, 6);
-                        ctx.fillStyle = "#55ffff";
+                        ctx.fillStyle = this.color3;
                         ctx.fillRect (2, 6, 2, 6);
                         ctx.fillRect (22, 10, 2, 2);
                         ctx.fillRect (6, 20, 6, 8);
