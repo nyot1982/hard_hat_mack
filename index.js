@@ -4,8 +4,8 @@ import { PNG } from 'pngjs';
 import { createCanvas, loadImage } from 'canvas';
 import audio from 'audio';
 
-let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
-    windowHeight = 400,//sdl.video.displays [0].geometry.height,//400,
+let windowWidth = sdl.video.displays [0].geometry.width,//640,
+    windowHeight = sdl.video.displays [0].geometry.height,//400,
     window = sdl.video.createWindow
     (
         {
@@ -2666,6 +2666,7 @@ function mack (type, color, color2, color3, x, y, heading)
                                 }
                                 else if (gameFront [front].constructor.name == "conveyor_belt") this.dead = 1;
                                 this.speedX = 0;
+                                this.gravity = gravity;
                             }
                         }
                     }
@@ -2703,7 +2704,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             this.gravity = 0.03;
                         }
                     }
-                    if (!this.springboard || this.springboard && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
+                    if (!this.girder || !this.springboard || this.springboard && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
                     if (this.dead == 0)
                     {
                         if (this.speedX == 0) this.type = 4;
@@ -2748,9 +2749,13 @@ function mack (type, color, color2, color3, x, y, heading)
                         if (this.jump != 0)
                         {
                             gameAudios [6].play ();
-                            this.speedY += this.jump;
                             this.jumping = this.x;
-                            this.gravity = 0.03;
+                            if (this.moveX == 0) this.speedY -= 1.8;
+                            else
+                            {
+                                this.gravity = 0.03;
+                                this.speedY += this.jump;
+                            }
                         }
                         else
                         {
