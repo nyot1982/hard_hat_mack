@@ -4,8 +4,8 @@ import { PNG } from 'pngjs';
 import { createCanvas, loadImage } from 'canvas';
 import audio from 'audio';
 
-let windowWidth = sdl.video.displays [0].geometry.width,//640,
-    windowHeight = sdl.video.displays [0].geometry.height,//400,
+let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
+    windowHeight = 400,//sdl.video.displays [0].geometry.height,//400,
     window = sdl.video.createWindow
     (
         {
@@ -654,7 +654,7 @@ function generateGameMap ()
             gameBack.push (new elevator (2, "#ffffff", null, gameMap.x + 50, 288, 4, 48));
             gameBack.push (new support ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 21, 346));
             gameFront.push (new bell ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 114, 18));
-            gameFront.push (new machine ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 523, 54));
+            gameFront.push (new machine ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 532, 54));
             gameFront.push (new girder_h (0, "#55ffff", "#ff55ff", "#000000", gameMap.x + 56, 80, 390));
             gameItems.push (new tool ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 335, 52));
             for (let i = 0; i < 4; i++)
@@ -812,7 +812,7 @@ function generateGameMap ()
         player.item = null;
         player.gravity = gravity;
     }
-    gameAudios [8].play ();
+    //gameAudios [8].play ();
 }
 
 function updateGameArea ()
@@ -850,8 +850,8 @@ function updateGameArea ()
                 {
                     score += 100;
                     bonus -= 100;
-                    if (bonus == 0) gameAudios [7].play ();
-                    else gameAudios [2].play ();
+                    //if (bonus == 0) gameAudios [7].play ();
+                    //else gameAudios [2].play ();
                     gameMap.startFrame = gameArea.frame;
                 }
                 if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
@@ -1523,7 +1523,8 @@ function springboard (color, color2, color3, x, y)
                     if (this.type == 4)
                     {
                         player.y = this.y - player.height;
-                        player.speedY = -4;
+                        player.gravity = 0;
+                        player.speedY = -3;
                         //if (player.dead > 0) player.speedY = Number ((player.speedY * 0.8).toFixed (2));
                         this.type = 0;
                     }
@@ -1704,7 +1705,7 @@ function bolt (color, x, y, bounce)
                         {
                             this.speedY = -(this.speedY * this.bounce);
                             this.bounced = gameFront [front].y;
-                            gameAudios [1].play ();
+                            //gameAudios [1].play ();
                         }
                     }
                 }
@@ -2545,7 +2546,7 @@ function mack (type, color, color2, color3, x, y, heading)
                 }
                 if (this.item != null)
                 {
-                    if (this.heading == 1 && this.x < gameMap.x + 506 - this.width || this.x < gameMap.x + 19 + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
+                    if (this.heading == 1 && this.x < gameMap.x + 506 - this.width || this.x < gameMap.x + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
                     else gameItems [this.item].x = this.x - gameItems [this.item].width;
                     gameItems [this.item].y = this.y;
                     if (gameItems [this.item].constructor.name == "girder_piece")
@@ -2560,7 +2561,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             gameFront.push (gameItems [this.item]);
                             gameItems.splice (this.item, 1);
                             this.item = null;
-                            gameAudios [0].play ();
+                            //gameAudios [0].play ();
                         }
                     }
                     else if (this.floor > 0 && gameItems [this.item].constructor.name == "jackhammer" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
@@ -2568,7 +2569,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         score += 50;
                         gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type = 3;
                         gameMap.items--;
-                        gameAudios [3].play ();
+                        //gameAudios [3].play ();
                         if (gameMap.items == 0)
                         {
                             levelCompleted = true;
@@ -2621,7 +2622,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             {
                                 this.elevator = true;
                                 this.speedX = 0;
-                                if (this.item == null) this.x -= (this.x - Math.round (gameFront [front].x) / 2);
+                                if (this.item == null) this.x -= Math.round (gameFront [front].x) / 2 - this.width / 4;
                                 else this.x = gameFront [front].x;
                                 if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                 else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
@@ -2755,7 +2756,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         }
                         if (this.jump != 0)
                         {
-                            gameAudios [6].play ();
+                            //gameAudios [6].play ();
                             this.jumping = this.x;
                             if (this.moveX == 0) this.speedY -= 1.8;
                             else
@@ -2781,7 +2782,7 @@ function mack (type, color, color2, color3, x, y, heading)
             if (this.dead > 0)
             {
                 this.speedX = 0;
-                if (this.state != "air" && !this.elevator) this.speedY = 0;
+                if (this.state != "air" && !this.elevator && !this.girder) this.speedY = 0;
                 if (this.type != 8 && gameArea.frame % 5 == 0)
                 {
                     if (this.dead == 2)
@@ -2804,7 +2805,7 @@ function mack (type, color, color2, color3, x, y, heading)
                     else if (this.type == 7)
                     {
                         this.type = 8;
-                        gameAudios [9].play ();
+                        //gameAudios [9].play ();
                         gameMap.startFrame = gameArea.frame; 
                     }
                     else this.type = 4; 
