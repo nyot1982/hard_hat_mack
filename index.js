@@ -2679,17 +2679,34 @@ function mack (type, color, color2, color3, x, y, heading)
                         }
                     }
                 }
-                if (this.x < 0) this.x = 0;
-                else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
-                if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0) this.speedX = 0;
-                if (this.y < 0) this.y = 0;
-                else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
-                if (this.y == gameMap.height - this.height)
+                if (level == 1)
                 {
-                    this.state = "ground";
-                    if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
+                    if (this.x < 0) this.x = 0;
+                    else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
+                    if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0)
+                    {
+                        this.speedX = 0;
+                        this.gravity = gravity;
+                    }
+                    if (this.y < 0) this.y = 0;
+                    else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
+                    if (this.y == gameMap.height - this.height)
+                    {
+                        this.state = "ground";
+                        if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
+                    }
+                    if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
                 }
-                if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
+                else
+                {
+                    if (this.x < gameMap.x) this.x = gameMap.x;
+                    else if (this.x > gameMap.x + 502 - this.width) this.x = gameMap.x + 502 - this.width;
+                    if (this.x == gameMap.x && this.speedX < 0 || this.x == gameMap.x + 502 - this.width && this.speedX > 0)
+                    {
+                        this.speedX = 0;
+                        this.gravity = gravity;
+                    }
+                }
                 if (this.state == "air")
                 {
                     if (this.speedX != 0)
