@@ -739,9 +739,15 @@ function generateGameMap ()
             gameFront.push (new concrete_mixer (1, "#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 170, 356));
             gameFront.push (new magnet ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 300, 16));
             gameFront.push (new crane ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 198, 52));
-            gameFront.push (new incinerator ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 530, 64));
+            gameFront.push (new incinerator ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 532, 64));
             gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 392, 100));
+            gameFront.push (new conveyor_belt (null, null, null, null, gameMap.x + 392, 134, 2, 8));
+            for (let i = 0; i < 17; i++) gameFront.push (new conveyor_belt (null, null, null, null, gameMap.x + 394 + i * 6, 132 - i * 2, 12, 12));
+            gameFront.push (new conveyor_belt (null, null, null, gameMap.x + 502, 102, 2, 8));
             gameFront.push (new conveyor_belt ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 54, 334));
+            gameFront.push (new conveyor_belt (null, null, null, null, gameMap.x + 54, 368, 2, 8));
+            for (let i = 0; i < 17; i++) gameFront.push (new conveyor_belt (null, null, null, null, gameMap.x + 56 + i * 6, 366 - i * 2, 12, 12));
+            gameFront.push (new conveyor_belt (null, null, null, gameMap.x + 164, 336, 2, 8));
             gameFront.push (new girder_h (1, "#ff55ff", "#55ffff", "#000000", gameMap.x + 169, 80, 70));
             gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", "#000000", gameMap.x + 263, 80, 70));
             gameFront.push (new girder_h (2, "#ff55ff", "#55ffff", "#000000", gameMap.x, 144, 166));
@@ -761,6 +767,16 @@ function generateGameMap ()
             gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 363, 250));
             gameItems.push (new toolbox ("#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 308, 356));
             gameEnemies.push (new trap ("#ffffff", "#ff55ff", gameMap.x + 92, 202, 10, 6));
+            gameEnemies.push (new vice ("#ffffff", gameMap.x + 72, 260, 14, 12, 1));
+            gameEnemies.push (new vice ("#ffffff", gameMap.x + 86, 260, 14, 12, -1));
+            gameEnemies.push (new hydraulic ("#ffffff", gameMap.x + 430, 224, 6, 2));
+            gameEnemies.push (new stamper ("#ffffff", "#ff55ff", gameMap.x + 420, 226, 26, 12));
+            gameEnemies.push (new tnt ("#ff55ff", "#55ffff", gameMap.x + 370, 362, 14, 16));
+            gameEnemies.push (new component ("rect", null, "#ff55ff", gameMap.x + 378, 358, 2, 2));
+            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 376, 360, 2, 2));
+            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 380, 356, 2, 2));
+            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 380, 352, 2, 2));
+            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 384, 354, 2, 2));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, "#ffffff", "#ff55ff", "#55ffff", gameMap.enemies [0].x, gameMap.enemies [0].y));
         break;
         case 3:
@@ -2169,7 +2185,7 @@ function wire (color, thick, points)
         let ctx = gameArea.ctx;
         ctx.beginPath ();
         ctx.moveTo (Math.round (this.points [0].x), Math.round (this.points [0].y));
-        for (let i = 1; i < this.points.length; i++) ctx.lineTo (this.points [i].x, (i + 1 == this.points.length ? gameFront [14].y + gameFront [14].speedY : this.points [i].y));
+        for (let i = 1; i < this.points.length; i++) ctx.lineTo (this.points [i].x, (i + 1 == this.points.length ? gameFront [52].y + gameFront [52].speedY : this.points [i].y));
         ctx.lineWidth = this.thick;
         ctx.strokeStyle = this.color;
         ctx.stroke ();
@@ -2327,6 +2343,124 @@ function trap (color, color2, x, y, width, height)
     }
 }
 
+function vice (color, x, y, width, height, heading)
+{
+    this.color = color;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = width;
+    this.height = height;
+    this.heading = (heading != null ? heading : 1);
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.fillStyle = this.color;
+        ctx.save ();
+        ctx.scale (this.heading, 1);
+        ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
+        ctx.fillRect (10, 0, 4, 8);
+        ctx.fillRect (6, 4, 2, 2);
+        ctx.fillRect (4, 6, 4, 2);
+        ctx.fillRect (2, 8, 4, 2);
+        ctx.fillRect (0, 10, 6, 2);
+        ctx.fillRect (8, 10, 2, 2);
+        ctx.restore ();
+    }
+}
+
+function hydraulic (color, x, y, width, height)
+{
+    this.color = color;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = width;
+    this.height = height;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.fillStyle = this.color;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillRect (0, 0, 2, 2);
+        ctx.fillRect (4, 0, 2, 2);
+        ctx.restore ();
+    }
+}
+
+function stamper (color, color2, x, y, width, height)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = width;
+    this.height = height;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.fillStyle = this.color;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillRect (2, 0, this.width - 4, 2);
+        ctx.fillRect (0, 2, this.width, this.height - 2);
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (6, 2, 14, 2);
+        ctx.fillRect (6, 4, 2, 2);
+        ctx.fillRect (14, 4, 2, 2);
+        ctx.fillRect (10, 6, 2, 2);
+        ctx.fillRect (18, 6, 2, 2);
+        ctx.fillRect (6, 8, 14, 2);
+        ctx.restore ();
+    }
+}
+
+function tnt (color, color2, x, y, width, height)
+{
+    this.color = color;
+    this.color2 = color2;
+    this.x = (x != null ? x : 0);
+    this.y = (y != null ? y : 0);
+    this.width = width;
+    this.height = height;
+    this.type = 0;
+
+    this.update = function ()
+    {
+        let ctx = gameArea.ctx;
+        ctx.lineWidth = 0;
+        ctx.fillStyle = this.color;
+        ctx.save ();
+        ctx.translate (Math.round (this.x), Math.round (this.y));
+        ctx.fillRect (0, 0, this.width, this.height);
+        ctx.fillStyle = this.color2;
+        ctx.fillRect (0, 8, this.width, 2);
+        ctx.restore ();
+        if (gameArea.frame % 25 == 0)
+        {
+            if (this.type == 0) this.type = 1;
+            else this.type = 0;
+        }
+        switch (this.type)
+        {
+            case 0:
+                this.color2, this.x + 10, this.y - 6
+                this.color2, this.x + 10, this.y - 10
+                this.color2, this.x + 14, this.y - 8
+            break;
+            case 1:
+                this.color, this.x + 12, this.y - 6
+                this.color2, this.x + 10, this.y - 8
+                this.color2, this.x + 14, this.y - 10
+        }
+    }
+}
+
 function conveyor_belt (color, color2, color3, color4, x, y, width, height)
 {
     this.color = color;
@@ -2354,14 +2488,8 @@ function conveyor_belt (color, color2, color3, color4, x, y, width, height)
             ctx.translate (Math.round (this.startX), Math.round (this.startY));
             ctx.fillStyle = this.color;
             ctx.fillRect (0, 34, 2, 8);
-            gameFront.push (new conveyor_belt (null, null, null, null, this.startX, this.startY + 34, 2, 8));
-            for (let i = 0; i < 17; i++)
-            {
-                ctx.fillRect (2 + i * 6, 32 - i * 2, 12, 12);
-                gameFront.push (new conveyor_belt (null, null, null, null, this.startX + 2 + i * 6, this.startY + 32 - i * 2, 12, 12));
-            }
+            for (let i = 0; i < 17; i++) ctx.fillRect (2 + i * 6, 32 - i * 2, 12, 12);
             ctx.fillRect (110, 2, 2, 8);
-            gameFront.push (new conveyor_belt (null, null, null, this.startX + 110, this.startY + 2, 2, 8));
             ctx.fillRect (102, 12, 6, 32);
             ctx.fillRect (88, 36, 14, 8);
             ctx.fillRect (86, 38, 2, 2);
