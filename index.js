@@ -705,7 +705,7 @@ function generateGameMap ()
             gameFront.push (new elevator (2, null, null, gameMap.x, 288, 0, 48));
             gameFront.push (new elevator (3, "#ffffff", "#55ffff", gameMap.x, 336, 54, 10));
             gameFront.push (new springboard ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 488, 354));
-            gameItems.push (new jackhammer ("#ffffff", "#ff55ff", gameMap.x + 151, 306));
+            gameItems.push (new rivet_gun ("#ffffff", "#ff55ff", gameMap.x + 151, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, "#ffffff", "#ff55ff", "#55ffff", gameMap.x + 56, 240));
         break;
         case 2:
@@ -1724,7 +1724,7 @@ function bolt (color, x, y, bounce)
     }
 }
 
-function jackhammer (color, color2, x, y)
+function rivet_gun (color, color2, x, y)
 {
     this.color = color;
     this.color2 = color2;
@@ -2488,7 +2488,7 @@ function mack (type, color, color2, color3, x, y, heading)
 
     this.dropItem = function ()
     {
-        if (this.item != null && gameItems [this.item].constructor.name == "jackhammer")
+        if (this.item != null && gameItems [this.item].constructor.name == "rivet_gun")
         {
             gameItems [this.item].direction = 0;
             gameItems [this.item].x = gameMap.x + 151;
@@ -2564,7 +2564,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             //gameAudios [0].play ();
                         }
                     }
-                    else if (this.floor > 0 && gameItems [this.item].constructor.name == "jackhammer" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
+                    else if (this.floor > 0 && gameItems [this.item].constructor.name == "rivet_gun" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
                     {
                         score += 50;
                         gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type = 3;
@@ -2628,7 +2628,12 @@ function mack (type, color, color2, color3, x, y, heading)
                                 else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                                 this.speedY = gameMap.elevatorSpeed;
                             }
-                            else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "concrete_mixer" || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0) this.dead = 1;
+                            else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "concrete_mixer" || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0)
+                            {
+                                if (gameFront [front].constructor.name == "girder_h") this.girder = true;
+                                else if (gameFront [front].constructor.name == "conveyor_belt") this.conveyor_belt = true;
+                                this.dead = 1;
+                            }
                             else if (gameFront [front].constructor.name == "girder_h")
                             {
                                 if (level != 2) this.floor = (gameFront [front].y - 80) / 64;
@@ -2874,7 +2879,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             }
                             for (let item = 0; item < gameItems.length; item++)
                             {
-                                if (gameItems [item].constructor.name == "jackhammer")
+                                if (gameItems [item].constructor.name == "rivet_gun")
                                 {
                                     gameItems [item].direction = 0;
                                     gameItems [item].x = gameMap.x + 151;
