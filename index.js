@@ -736,6 +736,11 @@ function generateGameMap ()
             gameBack.push (new chain ("#55ffff", gameMap.x + 484, 288, 8));
             gameBack.push (new concrete_mixer (0, "#ffffff", null, null, "#000000", gameMap.x + 170, 346));
             gameBack.push (new trap ("#ffffff", "#ff55ff", gameMap.x + 84, 194, 26, 14));
+            gameBack.push (new component ("rect", null, "#ff55ff", gameMap.x + 378, 358, 2, 2));
+            gameBack.push (new component ("rect", null, "#55ffff", gameMap.x + 376, 360, 2, 2));
+            gameBack.push (new component ("rect", null, "#55ffff", gameMap.x + 380, 356, 2, 2));
+            gameBack.push (new component ("rect", null, "#55ffff", gameMap.x + 380, 352, 2, 2));
+            gameBack.push (new component ("rect", null, "#55ffff", gameMap.x + 384, 354, 2, 2));
             gameFront.push (new concrete_mixer (1, "#ffffff", "#ff55ff", "#55ffff", "#000000", gameMap.x + 170, 356));
             gameFront.push (new magnet ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 300, 16));
             gameFront.push (new crane ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 198, 52));
@@ -772,11 +777,6 @@ function generateGameMap ()
             gameEnemies.push (new hydraulic ("#ffffff", gameMap.x + 430, 224, 6, 2));
             gameEnemies.push (new stamper ("#ffffff", "#ff55ff", gameMap.x + 420, 226, 26, 12));
             gameEnemies.push (new tnt ("#ff55ff", "#55ffff", gameMap.x + 370, 362, 14, 16));
-            gameEnemies.push (new component ("rect", null, "#ff55ff", gameMap.x + 378, 358, 2, 2));
-            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 376, 360, 2, 2));
-            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 380, 356, 2, 2));
-            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 380, 352, 2, 2));
-            gameEnemies.push (new component ("rect", null, "#55ffff", gameMap.x + 384, 354, 2, 2));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, "#ffffff", "#ff55ff", "#55ffff", gameMap.enemies [0].x, gameMap.enemies [0].y));
         break;
         case 3:
@@ -2441,7 +2441,7 @@ function tnt (color, color2, x, y, width, height)
         ctx.fillStyle = this.color2;
         ctx.fillRect (0, 8, this.width, 2);
         ctx.restore ();
-        if (gameArea.frame % 25 == 0)
+        if (gameArea.frame % 10 == 0)
         {
             if (this.type == 0) this.type = 1;
             else this.type = 0;
@@ -2449,14 +2449,26 @@ function tnt (color, color2, x, y, width, height)
         switch (this.type)
         {
             case 0:
-                this.color2, this.x + 10, this.y - 6
-                this.color2, this.x + 10, this.y - 10
-                this.color2, this.x + 14, this.y - 8
+                gameBack [gameBack.length - 3].color = this.color2;
+                gameBack [gameBack.length - 3].x = this.x + 10;
+                gameBack [gameBack.length - 3].y = this.y - 6;
+                gameBack [gameBack.length - 2].color = this.color2;
+                gameBack [gameBack.length - 2].x = this.x + 10;
+                gameBack [gameBack.length - 2].y = this.y - 10;
+                gameBack [gameBack.length - 1].color = this.color2;
+                gameBack [gameBack.length - 1].x = this.x + 14;
+                gameBack [gameBack.length - 1].y = this.y - 8;
             break;
             case 1:
-                this.color, this.x + 12, this.y - 6
-                this.color2, this.x + 10, this.y - 8
-                this.color2, this.x + 14, this.y - 10
+                gameBack [gameBack.length - 3].color = this.color;
+                gameBack [gameBack.length - 3].x = this.x + 12;
+                gameBack [gameBack.length - 3].y = this.y - 6;
+                gameBack [gameBack.length - 2].color = this.color2;
+                gameBack [gameBack.length - 2].x = this.x + 10;
+                gameBack [gameBack.length - 2].y = this.y - 8;
+                gameBack [gameBack.length - 1].color = this.color2;
+                gameBack [gameBack.length - 1].x = this.x + 14;
+                gameBack [gameBack.length - 1].y = this.y - 10;
         }
     }
 }
@@ -3018,8 +3030,8 @@ function mack (type, color, color2, color3, x, y, heading)
                         }
                         else if (level == 2)
                         {
-                            gameFront [14].speedY = 0;
-                            gameFront [14].y = 322;
+                            gameFront [52].speedY = 0;
+                            gameFront [52].y = 322;
                         }
                     }
                     else
