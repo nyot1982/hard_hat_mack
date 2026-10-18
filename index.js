@@ -502,7 +502,7 @@ function userActionStart (control, bt_type, bt_code, bt_value)
                     player.moveX = bt_value;
                 break;
                 case 'jump':
-                    player.jump = -0.9;
+                    player.jump = -1;
                 break;
                 case 'drop':
                     player.dropItem ();
@@ -2870,7 +2870,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             this.jumping = this.x;
                             this.springboard = false;
                             this.speedX = -1;
-                            this.speedY = -0.9;
+                            this.speedY = -1;
                             this.gravity = 0.03;
                         }
                     }
@@ -2920,7 +2920,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         {
                             //gameAudios [6].play ();
                             this.jumping = this.x;
-                            if (this.moveX == 0) this.speedY -= 1.8;
+                            if (this.moveX == 0) this.speedY -= 2;
                             else
                             {
                                 this.gravity = 0.03;
