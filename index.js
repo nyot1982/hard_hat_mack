@@ -704,7 +704,7 @@ function generateGameMap ()
             gameFront.push (new elevator (0, "#ffffff", "#ff55ff", gameMap.x, 280, 54, 8));
             gameFront.push (new elevator (2, null, null, gameMap.x, 288, 0, 48));
             gameFront.push (new elevator (3, "#ffffff", "#55ffff", gameMap.x, 336, 54, 10));
-            gameFront.push (new springboard ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 488, 354));
+            gameFront.push (new spring_board ("#ffffff", "#ff55ff", "#55ffff", gameMap.x + 488, 354));
             gameItems.push (new rivet_gun ("#ffffff", "#ff55ff", gameMap.x + 151, 306));
             gameEnemies.push (new enemy (Math.floor (Math.random () * 2), 0, "#ffffff", "#ff55ff", "#55ffff", gameMap.x + 56, 240));
         break;
@@ -820,7 +820,7 @@ function generateGameMap ()
         player.heading = gameMap.player.heading;
         player.jump = 0;
         player.jumping = false;
-        player.springboard = false;
+        player.spring_board = false;
         player.elevator = false;
         player.state = null;
         player.dead = 0;
@@ -895,9 +895,9 @@ function updateGameArea ()
                 gameMap.elevatorFloor -= gameMap.elevatorSpeed;
                 if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
             }
-            /*console.clear ();
+            console.clear ();
             console.log ("player:", player);
-            console.log ("gameMap:", gameMap);
+            /*console.log ("gameMap:", gameMap);
             console.log ("gameEnemies:", gameEnemies);
             console.log ("gameItems:", gameItems);
             console.log ("gameFront:", gameFront);
@@ -1509,7 +1509,7 @@ function bell (color, color2, color3, x, y)
     }
 }
 
-function springboard (color, color2, color3, x, y)
+function spring_board (color, color2, color3, x, y)
 {
     this.color = color;
     this.color2 = color2;
@@ -2613,7 +2613,7 @@ function mack (type, color, color2, color3, x, y, heading)
     this.moveY = 0;
     this.jump = 0;
     this.jumping = false;
-    this.springboard = false;
+    this.spring_board = false;
     this.elevator = false;
     this.girder = false;
     this.conveyor_belt = false;
@@ -2641,8 +2641,6 @@ function mack (type, color, color2, color3, x, y, heading)
     {
         if (gameScreen == "game" && !levelCompleted)
         {
-            /*if (this.type == 6) this.height = 28;
-            else this.height = 30;*/
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
             if (this.dead == 0)
@@ -2739,7 +2737,7 @@ function mack (type, color, color2, color3, x, y, heading)
             }
             else
             {
-                if (this.dead == 0 && this.state == "ground" && !this.springboard && !this.elevator) this.speedX = this.moveX;
+                if (this.dead == 0 && this.state == "ground" && !this.spring_board && !this.elevator) this.speedX = this.moveX;
                 if (this.state != "chain") this.state = "air";
                 for (let front = 0; front < gameFront.length; front++)
                 {
@@ -2747,7 +2745,11 @@ function mack (type, color, color2, color3, x, y, heading)
                     {
                         if (this.state != "chain")
                         {
-                            if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                            if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0)
+                            {
+                                this.height = 30;
+                                this.y = gameFront [front].y - this.height;
+                            }
                             else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
                         }
                         if (this.y == gameFront [front].y - this.height)
@@ -2755,9 +2757,9 @@ function mack (type, color, color2, color3, x, y, heading)
                             this.state = "ground";
                             this.girder = false;
                             this.conveyor_belt = false;
-                            if (gameFront [front].constructor.name == "springboard" && !this.springboard)
+                            if (gameFront [front].constructor.name == "spring_board" && !this.spring_board)
                             {
-                                this.springboard = true;
+                                this.spring_board = true;
                                 gameFront [front].type = 1;
                             }
                             else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
@@ -2865,22 +2867,30 @@ function mack (type, color, color2, color3, x, y, heading)
                             this.gravity = gravity;
                         }
                     }
-                    if (this.springboard)
+                    if (this.spring_board)
                     {
                         if (this.floor > 0 && this.y <= 50 + this.floor * 64 - 66 || this.floor == 0 && this.y <= 306)
                         {
                             this.jumping = this.x;
-                            this.springboard = false;
+                            this.spring_board = false;
                             this.speedX = -1;
                             this.speedY = -1;
                             this.gravity = 0.03;
                         }
                     }
-                    if (!this.girder || !this.springboard || this.springboard && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
+                    if (!this.girder || !this.spring_board || this.spring_board && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
                     if (this.dead == 0)
                     {
-                        if (this.speedX == 0) this.type = 4;
-                        else this.type = 6;
+                        if (this.speedX == 0)
+                        {
+                            this.height = 30;
+                            this.type = 4;
+                        }
+                        else
+                        {
+                            this.height = 28;
+                            this.type = 6;
+                        }
                     }
                 }
                 else if (this.dead == 0)
@@ -2934,7 +2944,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             this.jumping = false;
                             this.gravity = gravity;
                         }
-                        if (this.type > 3 && this.type < 14 && !this.springboard) this.type = 1;
+                        if (this.type > 3 && this.type < 14 && !this.spring_board) this.type = 1;
                         if (!this.conveyor_belt && this.speedX != 0 && gameArea.frame % 5 == 0)
                         {
                             if (this.type < 3) this.type++;
@@ -2992,7 +3002,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         this.heading = gameMap.player.heading;
                         this.jump = 0;
                         this.jumping = false;
-                        this.springboard = false;
+                        this.spring_board = false;
                         this.elevator = false;
                         this.girder = false;
                         this.conveyor_belt = false;
