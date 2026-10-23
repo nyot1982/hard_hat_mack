@@ -895,9 +895,9 @@ function updateGameArea ()
                 gameMap.elevatorFloor -= gameMap.elevatorSpeed;
                 if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
             }
-            /*console.clear ();
+            console.clear ();
             console.log ("player:", player);
-            console.log ("gameMap:", gameMap);
+            /*console.log ("gameMap:", gameMap);
             console.log ("gameEnemies:", gameEnemies);
             console.log ("gameItems:", gameItems);
             console.log ("gameFront:", gameFront);
@@ -2641,6 +2641,8 @@ function mack (type, color, color2, color3, x, y, heading)
     {
         if (gameScreen == "game" && !levelCompleted)
         {
+            /*if (this.type == 6) this.height = 28;
+            else this.height = 30;*/
             this.x = Number ((this.x + this.speedX).toFixed (2));
             this.y = Number ((this.y + this.speedY).toFixed (2));
             if (this.dead == 0)
