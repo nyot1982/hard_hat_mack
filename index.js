@@ -560,7 +560,7 @@ function gameLoadScreen (screen)
         gameText = [];
         score = 0;
         if (screen == "menu") level = 0;
-        else if (screen == "game") level = 2;
+        else if (screen == "game") level = 1;
     }
     gameBack = [];
     gameFront = [];
@@ -809,7 +809,7 @@ function generateGameMap ()
         gameText.push (new component ("text", "Level", "#ffffff", gameMap.x + 546, 128, "vertical"));
         gameText.push (new component ("value", "level", "#ffffff", gameMap.x + 532, 224, "left", 2));
         gameText.push (new component ("text", "Mack", "#ffffff", gameMap.x + 546, 288, "vertical"));
-        gameText.push (new component ("value", "player.ups", "#ffffff", gameMap.x + 546, 368, "left", 1));
+        gameText.push (new component ("value", "player.lifes", "#ffffff", gameMap.x + 546, 368, "left", 1));
         player = new mack (gameMap.player.type, "#ffffff", "#ff55ff", "#55ffff", gameMap.player.x, gameMap.player.y, gameMap.player.heading);
     }
     else
@@ -2620,7 +2620,7 @@ function mack (type, color, color2, color3, x, y, heading)
     this.state = null;
     this.dead = 0;
     this.deadFrame = 0;
-    this.ups = 3;
+    this.lifes = 3;
     this.floor = 0;
     this.enemyKill = null;
     this.item = null;
@@ -2860,7 +2860,7 @@ function mack (type, color, color2, color3, x, y, heading)
                 {
                     if (this.speedX != 0)
                     {
-                        if (!this.jumping || this.speedX < 0 && this.x == this.jumping - 62 || this.speedX > 0 && this.x == this.jumping + 62)
+                        if (!this.jumping || this.speedX < 0 && this.x == this.jumping - 68 || this.speedX > 0 && this.x == this.jumping + 68)
                         {
                             this.speedX = 0;
                             this.jumping = false;
@@ -2984,15 +2984,15 @@ function mack (type, color, color2, color3, x, y, heading)
                     }
                     else this.type = 4; 
                 }
-                else if (this.ups > 0 && this.type == 8 && gameArea.frame - gameMap.startFrame == 120)
+                else if (this.lifes > 0 && this.type == 8 && gameArea.frame - gameMap.startFrame == 120)
                 {
                     if (this.enemyKill != null && gameEnemies [this.enemyKill].constructor.name == "bolt")
                     {
                         gameEnemies.splice (this.enemyKill, 1);
                         this.enemyKill = null;
                     }
-                    this.ups--;
-                    if (this.ups > 0)
+                    this.lifes--;
+                    if (this.lifes > 0)
                     {
                         bonus = 5000;
                         gameMap.startFrame = gameArea.frame;
@@ -3057,7 +3057,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         gameMap.startFrame = gameArea.frame;
                     }
                 }
-                else if (this.ups == 0 && gameArea.frame - gameMap.startFrame == 180) gameLoadScreen ("menu");
+                else if (this.lifes == 0 && gameArea.frame - gameMap.startFrame == 180) gameLoadScreen ("menu");
             }
             else if (this.speedX > 0) this.heading = 1;
             else if (this.speedX < 0) this.heading = -1;
