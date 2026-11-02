@@ -1022,6 +1022,9 @@ async function loadAudio (dir)
         let color = "#00FF00";
         try
         {
+            /*const sound = audio (dir + "/" + gameAudios [gameAudio]);
+            await sound.ready;
+            gameAudios [gameAudio] = sound;*/
             gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
         }
         catch (error)
