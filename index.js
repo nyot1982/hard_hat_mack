@@ -4,8 +4,8 @@ import { PNG } from 'pngjs';
 import { createCanvas, loadImage } from 'canvas';
 import audio from 'audio';
 
-let windowWidth = 640,//sdl.video.displays [0].geometry.width,//640,
-    windowHeight = 400,//sdl.video.displays [0].geometry.height,//400,
+let windowWidth = sdl.video.displays [0].geometry.width,//640,
+    windowHeight = sdl.video.displays [0].geometry.height,//400,
     window = sdl.video.createWindow
     (
         {
@@ -895,9 +895,9 @@ function updateGameArea ()
                 gameMap.elevatorFloor -= gameMap.elevatorSpeed;
                 if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
             }
-            console.clear ();
+            /*console.clear ();
             console.log ("player:", player);
-            /*console.log ("gameMap:", gameMap);
+            console.log ("gameMap:", gameMap);
             console.log ("gameEnemies:", gameEnemies);
             console.log ("gameItems:", gameItems);
             console.log ("gameFront:", gameFront);
