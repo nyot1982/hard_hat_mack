@@ -11,8 +11,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         {
             title: "Hard Hat Mack",
             width: windowWidth,
-            height: windowHeight,
-            fullscreen: false
+            height: windowHeight
         }
     ),
     canvasWidth = windowWidth,
