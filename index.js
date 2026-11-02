@@ -3024,12 +3024,21 @@ function mack (type, color, color2, color3, x, y, heading)
                             gameFront [1].shotFrame = gameArea.frame + 500;
                             gameMap.elevatorFloor = 0;
                             gameMap.elevatorSpeed = 0;
-                            for (let front = 0; front < gameFront.length; front++) if (gameFront [front].constructor.name == "girder_piece" && gameFront [front].type < 3)
+                            for (let girderBreak = 0; girderBreak < gameMap.girderBreaks.length; girderBreak++)
                             {
-                                gameMap.girderBreaks [(gameFront [front].y - 144) / 64].girderPiece = null;
-                                gameItems.push (gameFront [front]);
-                                gameFront.splice (front, 1);
-                                front--;
+                                let front = gameMap.girderBreaks [girderBreak].girderPiece;
+                                if (front != null && gameFront [front].type < 3)
+                                {
+                                    gameMap.girderBreaks [girderBreak].girderPiece = null;
+                                    gameItems.push (gameFront [front]);
+                                    gameFront.splice (front, 1);
+                                    for (let girderBreak2 = 0; girderBreak2 < gameMap.girderBreaks.length; girderBreak2++)
+                                    {
+                                        let front2 = gameMap.girderBreaks [girderBreak2].girderPiece;
+                                        if (girderBreak != girderBreak2 && front2 != null && front2 > front) gameMap.girderBreaks [girderBreak2].girderPiece--;
+                                    }
+                                    girderBreak--;
+                                }
                             }
                             for (let item = 0; item < gameItems.length; item++)
                             {
