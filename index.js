@@ -64,6 +64,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
     },
     gravity = 0.12,
     player = null,
+    gameController = null,
     gameScreen = null,
     gameTitle = null,
     gameMap = {},
@@ -4072,6 +4073,53 @@ function component (type, src, color, x, y, width, height)
         }
     }
 }
+
+function gameDevice (device)
+{
+    gameController = sdl.controller.openDevice (device);
+
+    gameController.on
+    (
+        'buttonDown',
+        (btnEvent) =>
+        {
+            console.log (`Botón presionado: ${btnEvent.button}`);
+            if (gameController.hasRumble)
+            {
+                gameController.rumble (0.5, 0.5, 200);
+            }
+        }
+    );
+
+    gameController.on
+    (
+        'axisMotion',
+        (axisEvent) =>
+        {
+            console.log (`Eje ${axisEvent.axis} movido a: ${axisEvent.value}`);
+        }
+    );
+}
+
+if (sdl.controller.devices.length > 0) gameDevice (sdl.controller.devices [0]);
+
+sdl.controller.on
+(
+    'deviceAdd',
+    (event) =>
+    {
+        gameDevice (event.device);
+    }
+);
+
+sdl.controller.on
+(
+    'deviceRemove',
+    (event) =>
+    {
+        gameController = null;
+    }
+);
 
 window.on
 (
