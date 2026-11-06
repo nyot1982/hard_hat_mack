@@ -895,13 +895,13 @@ function updateGameArea ()
                 gameMap.elevatorFloor -= gameMap.elevatorSpeed;
                 if (gameMap.elevatorSpeed < 0 && gameMap.elevatorFloor == 192 || gameMap.elevatorSpeed > 0 && gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = 0;
             }
-            /*console.clear ();
-            console.log ("player:", player);
-            console.log ("gameMap:", gameMap);
-            console.log ("gameEnemies:", gameEnemies);
-            console.log ("gameItems:", gameItems);
-            console.log ("gameFront:", gameFront);
-            console.log ("gameBack:", gameBack);*/
+            //console.clear ();
+            //console.log ("player:", player);
+            //console.log ("gameMap:", gameMap);
+            //console.log ("gameEnemies:", gameEnemies);
+            //console.log ("gameItems:", gameItems);
+            //console.log ("gameFront:", gameFront);
+            //console.log ("gameBack:", gameBack);
         }
     }
     if (gameTitle) gameTitle.update ();
@@ -1023,9 +1023,9 @@ async function loadAudio (dir)
         let color = "#00FF00";
         try
         {
-            /*const sound = audio (dir + "/" + gameAudios [gameAudio]);
-            await sound.ready;
-            gameAudios [gameAudio] = sound;*/
+            //const sound = audio (dir + "/" + gameAudios [gameAudio]);
+            //await sound.ready;
+            //gameAudios [gameAudio] = sound;
             gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
         }
         catch (error)
