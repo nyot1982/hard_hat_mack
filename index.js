@@ -2,7 +2,8 @@ import sdl from '@kmamal/sdl';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 import { createCanvas, loadImage } from 'canvas';
-import audio from 'audio';
+import pkg from 'wavefile';
+const { WaveFile } = pkg;
 
 let windowWidth = sdl.video.displays [0].geometry.width,//640,
     windowHeight = sdl.video.displays [0].geometry.height,//400,
@@ -828,7 +829,7 @@ function generateGameMap ()
         player.item = null;
         player.gravity = gravity;
     }
-    //gameAudios [8].play ();
+    gameAudios [8].play ();
 }
 
 function updateGameArea ()
@@ -866,8 +867,8 @@ function updateGameArea ()
                 {
                     score += 100;
                     bonus -= 100;
-                    //if (bonus == 0) gameAudios [7].play ();
-                    //else gameAudios [2].play ();
+                    if (bonus == 0) gameAudios [7].play ();
+                    else gameAudios [2].play ();
                     gameMap.startFrame = gameArea.frame;
                 }
                 if (bonus == 0 && gameArea.frame - gameMap.startFrame == 160)
@@ -1023,10 +1024,7 @@ async function loadAudio (dir)
         let color = "#00FF00";
         try
         {
-            //const sound = audio (dir + "/" + gameAudios [gameAudio]);
-            //await sound.ready;
-            //gameAudios [gameAudio] = sound;
-            gameAudios [gameAudio] = await audio (dir + "/" + gameAudios [gameAudio]);
+            gameAudios [gameAudio] = new audio (dir + "/" + gameAudios [gameAudio]);
         }
         catch (error)
         {
@@ -1055,6 +1053,74 @@ async function loadImages (dir)
         gameText.push (new component ("text", gameImages [gameImage].src, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
         loading--;
     }
+}
+
+function audio (source)
+{
+    this.source = source;
+    const fileBuffer = fs.readFileSync(this.source);
+    const wav = new WaveFile(fileBuffer);
+    wav.toBitDepth('32f');
+
+    this.sampleRate = wav.fmt.sampleRate;
+    this.channels = wav.fmt.numChannels;
+
+    // Preparamos las muestras entrelazadas (Estéreo) y su versión Mono de respaldo
+    const stereoSamples = wav.getSamples(true, Float32Array);
+    this.stereoBuffer = Buffer.from(
+        stereoSamples.buffer,
+        stereoSamples.byteOffset,
+        stereoSamples.byteLength
+    );
+
+    // Calculamos la duración exacta en milisegundos
+    const totalFrames = stereoSamples.length / this.channels;
+    this.durationMs = (totalFrames / this.sampleRate) * 1000;
+
+    // Preparamos el búfer mono solo si el archivo original es estéreo
+    this.monoBuffer = null;
+    if (this.channels === 2) {
+        const [left, right] = wav.getSamples(false, Float32Array);
+        const monoSamples = new Float32Array(left.length);
+        for (let i = 0; i < left.length; i++) {
+            monoSamples[i] = (left[i] + right[i]) * 0.5;
+        }
+        this.monoBuffer = Buffer.from(
+            monoSamples.buffer,
+            monoSamples.byteOffset,
+            monoSamples.byteLength
+        );
+    }
+
+    this.play = function () {
+        // 1er argumento: dispositivo ({ type: 'playback' } o null)
+        // 2do argumento: configuración de audio deseada
+        const playbackDevice = sdl.audio.openDevice(
+            { type: 'playback' },
+            {
+                frequency: this.sampleRate,
+                format: 'f32',
+                channels: this.channels,
+            }
+        );
+
+        // Si el hardware real abrió 2 canales, usa estéreo; si forzó 1 canal, usa el respaldo mono
+        const bufferToPlay = (this.channels === 2 && playbackDevice.channels === 1)
+            ? this.monoBuffer
+            : this.stereoBuffer;
+
+        playbackDevice.enqueue(bufferToPlay);
+        playbackDevice.play();
+
+        // Cerrar el dispositivo de forma segura al terminar el sonido (+100ms de margen)
+        setTimeout(() => {
+            if (!playbackDevice.closed) {
+                playbackDevice.close();
+            }
+        }, this.durationMs + 100);
+
+        return playbackDevice; // Lo devolvemos por si quieres pausarlo o detenerlo manualmente
+    };
 }
 
 function back (color, x, y, width, height)
@@ -1724,7 +1790,7 @@ function bolt (color, x, y, bounce)
                         {
                             this.speedY = -(this.speedY * this.bounce);
                             this.bounced = gameFront [front].y;
-                            //gameAudios [1].play ();
+                            gameAudios [1].play ();
                         }
                     }
                 }
@@ -2704,7 +2770,7 @@ function mack (type, color, color2, color3, x, y, heading)
                             gameFront.push (gameItems [this.item]);
                             gameItems.splice (this.item, 1);
                             this.item = null;
-                            //gameAudios [0].play ();
+                            gameAudios [0].play ();
                         }
                     }
                     else if (this.floor > 0 && gameItems [this.item].constructor.name == "rivet_gun" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
@@ -2712,7 +2778,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         score += 50;
                         gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type = 3;
                         gameMap.items--;
-                        //gameAudios [3].play ();
+                        gameAudios [3].play ();
                         if (gameMap.items == 0)
                         {
                             levelCompleted = true;
@@ -2933,7 +2999,7 @@ function mack (type, color, color2, color3, x, y, heading)
                         }
                         if (this.jump != 0)
                         {
-                            //gameAudios [6].play ();
+                            gameAudios [6].play ();
                             this.jumping = this.x;
                             if (this.moveX == 0) this.speedY -= 2;
                             else
@@ -2982,7 +3048,7 @@ function mack (type, color, color2, color3, x, y, heading)
                     else if (this.type == 7)
                     {
                         this.type = 8;
-                        //gameAudios [9].play ();
+                        gameAudios [9].play ();
                         gameMap.startFrame = gameArea.frame; 
                     }
                     else this.type = 4; 
