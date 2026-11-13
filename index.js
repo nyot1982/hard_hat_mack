@@ -1119,7 +1119,7 @@ function audio (source)
             {
                 if (!playbackDevice.closed) playbackDevice.close ();
             },
-            this.durationMs + 100
+            this.durationMs
         );
         return playbackDevice;
     };
