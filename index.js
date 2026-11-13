@@ -3133,6 +3133,7 @@ class mack
                 }
                 if (this.dead > 0)
                 {
+                    if (gameController != null && gameController.hasRumble) gameController.rumble (1, 1, 200);
                     this.speedX = 0;
                     if (this.state != "air" && !this.elevator && !this.girder) this.speedY = 0;
                     if (this.type != 8 && gameArea.frame % 5 == 0)
@@ -4281,10 +4282,6 @@ function gameDevice (device)
         {
             startControl (device, "gamepad", "buttons", btnEvent.button);
             console.log (`Botón presionado: ${btnEvent.button}`);
-            /*if (gameController.hasRumble)
-            {
-                gameController.rumble (0.5, 0.5, 200);
-            }*/
         }
     );
 
@@ -4334,7 +4331,7 @@ window.on
     'keyDown',
     (event) =>
     {
-        startControl (99, "keyboard", "keys", event.scancode, event.key);
+        startControl (99, "keyboard", "keys", event.scancode);
     }
 );
 
