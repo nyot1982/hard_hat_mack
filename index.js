@@ -12,7 +12,8 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
         {
             title: "Hard Hat Mack",
             width: windowWidth,
-            height: windowHeight
+            height: windowHeight,
+            fullscreen: true
         }
     ),
     canvasWidth = windowWidth,
@@ -1039,54 +1040,64 @@ async function loadImages (dir)
 
 async function loadAudios (dir)
 {
-    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
-    {
-        let color = "#00FF00";
-        try
-        {
-            gameAudios [gameAudio] = new audio (dir + "/" + gameAudios [gameAudio]);
-        }
-        catch (error)
-        {
-            console.error ('Error loading audio:', error.message + '.');
-            color = "red";
-            loadingErrors++;
-        }
-        gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
-        loading--;
-    }
+    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++) gameAudios [gameAudio] = new audio (dir + "/" + gameAudios [gameAudio]);
 }
 
 function audio (source)
 {
     this.source = source;
-    const fileBuffer = fs.readFileSync (this.source);
-    const wav = new WaveFile (fileBuffer);
-    wav.toBitDepth ('32f');
-    this.sampleRate = wav.fmt.sampleRate;
-    this.channels = wav.fmt.numChannels;
-    const stereoSamples = wav.getSamples (true, Float32Array);
-    this.stereoBuffer = Buffer.from
+    let color = "red";
+    fs.readFile
     (
-        stereoSamples.buffer,
-        stereoSamples.byteOffset,
-        stereoSamples.byteLength
+        this.source,
+        (error, data) =>
+        {
+            if (error)
+            {
+                console.error ('Error reading file:', error.message + '.');
+                loadingErrors++;
+            }
+            else
+            {
+                const fileBuffer = data;
+                const wav = new WaveFile (fileBuffer);
+                wav.toBitDepth ('32f');
+                this.sampleRate = wav.fmt.sampleRate;
+                this.channels = wav.fmt.numChannels;
+                const stereoSamples = wav.getSamples (true, Float32Array);
+                this.stereoBuffer = Buffer.from
+                (
+                    stereoSamples.buffer,
+                    stereoSamples.byteOffset,
+                    stereoSamples.byteLength
+                );
+                const totalFrames = stereoSamples.length / this.channels;
+                this.durationMs = (totalFrames / this.sampleRate) * 1000;
+                this.monoBuffer = null;
+                if (this.channels === 2)
+                {
+                    const [left, right] = wav.getSamples (false, Float32Array);
+                    const monoSamples = new Float32Array (left.length);
+                    for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
+                    this.monoBuffer = Buffer.from
+                    (
+                        monoSamples.buffer,
+                        monoSamples.byteOffset,
+                        monoSamples.byteLength
+                    );
+                }
+                color = "#00FF00";
+                if (this.stereoBuffer.length === 0 || (this.channels === 2 && this.monoBuffer.length === 0)) 
+                {
+                    console.error ('Error loading audio:', this.source + '.');
+                    color = "red";
+                    loadingErrors++;
+                }
+            }
+            gameText.push (new component ("text", this.source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
+            loading--;
+        }
     );
-    const totalFrames = stereoSamples.length / this.channels;
-    this.durationMs = (totalFrames / this.sampleRate) * 1000;
-    this.monoBuffer = null;
-    if (this.channels === 2)
-    {
-        const [left, right] = wav.getSamples (false, Float32Array);
-        const monoSamples = new Float32Array (left.length);
-        for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
-        this.monoBuffer = Buffer.from
-        (
-            monoSamples.buffer,
-            monoSamples.byteOffset,
-            monoSamples.byteLength
-        );
-    }
     
     this.play = function ()
     {
