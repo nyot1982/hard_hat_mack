@@ -1046,6 +1046,7 @@ async function loadAudios (dir)
 function audio (source)
 {
     this.source = source;
+    this.loaded = false;
     let color = "red";
     fs.readFile
     (
@@ -1059,37 +1060,47 @@ function audio (source)
             }
             else
             {
-                const fileBuffer = data;
-                const wav = new WaveFile (fileBuffer);
-                wav.toBitDepth ('32f');
-                this.sampleRate = wav.fmt.sampleRate;
-                this.channels = wav.fmt.numChannels;
-                const stereoSamples = wav.getSamples (true, Float32Array);
-                this.stereoBuffer = Buffer.from
-                (
-                    stereoSamples.buffer,
-                    stereoSamples.byteOffset,
-                    stereoSamples.byteLength
-                );
-                const totalFrames = stereoSamples.length / this.channels;
-                this.durationMs = (totalFrames / this.sampleRate) * 1000;
-                this.monoBuffer = null;
-                if (this.channels === 2)
+                try
                 {
-                    const [left, right] = wav.getSamples (false, Float32Array);
-                    const monoSamples = new Float32Array (left.length);
-                    for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
-                    this.monoBuffer = Buffer.from
+                    const fileBuffer = data;
+                    const wav = new WaveFile (fileBuffer);
+                    wav.toBitDepth ('32f');
+                    this.sampleRate = wav.fmt.sampleRate;
+                    this.channels = wav.fmt.numChannels;
+                    const stereoSamples = wav.getSamples (true, Float32Array);
+                    this.stereoBuffer = Buffer.from
                     (
-                        monoSamples.buffer,
-                        monoSamples.byteOffset,
-                        monoSamples.byteLength
+                        stereoSamples.buffer,
+                        stereoSamples.byteOffset,
+                        stereoSamples.byteLength
                     );
+                    const totalFrames = stereoSamples.length / this.channels;
+                    this.durationMs = (totalFrames / this.sampleRate) * 1000;
+                    this.monoBuffer = null;
+                    if (this.channels === 2)
+                    {
+                        const [left, right] = wav.getSamples (false, Float32Array);
+                        const monoSamples = new Float32Array (left.length);
+                        for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
+                        this.monoBuffer = Buffer.from
+                        (
+                            monoSamples.buffer,
+                            monoSamples.byteOffset,
+                            monoSamples.byteLength
+                        );
+                    }
+                    color = "#00FF00";
+                    if (this.stereoBuffer.length === 0 || (this.channels === 2 && this.monoBuffer.length === 0)) 
+                    {
+                        console.error ('Error loading audio:', this.source + '.');
+                        color = "red";
+                        loadingErrors++;
+                    }
+                    else this.loaded = true;
                 }
-                color = "#00FF00";
-                if (this.stereoBuffer.length === 0 || (this.channels === 2 && this.monoBuffer.length === 0)) 
+                catch (error)
                 {
-                    console.error ('Error loading audio:', this.source + '.');
+                    console.error ('Error parsing WAV:', this.source, error.message);
                     color = "red";
                     loadingErrors++;
                 }
@@ -1101,6 +1112,11 @@ function audio (source)
     
     this.play = function ()
     {
+        if (!this.loaded)
+        {
+            console.warn ('Audio not loaded yet:', this.source);
+            return null;
+        }
         const playbackDevice = sdl.audio.openDevice
         (
             { type: 'playback' },
@@ -1119,7 +1135,7 @@ function audio (source)
             {
                 if (!playbackDevice.closed) playbackDevice.close ();
             },
-            this.durationMs
+            this.durationMs + 100
         );
         return playbackDevice;
     };
