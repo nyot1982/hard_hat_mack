@@ -1043,1863 +1043,1938 @@ async function loadAudios (dir)
     for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++) gameAudios [gameAudio] = new audio (dir + "/" + gameAudios [gameAudio]);
 }
 
-function audio (source)
+class audio
 {
-    this.source = source;
-    this.loaded = false;
-    let color = "red";
-    fs.readFile
-    (
-        this.source,
-        (error, data) =>
-        {
-            if (error)
+    constructor (source)
+    {
+        this.source = source;
+        this.loaded = false;
+        let color = "red";
+        fs.readFile
+        (
+            this.source,
+            (error, data) =>
             {
-                console.error ('Error reading file:', error.message + '.');
-                loadingErrors++;
-            }
-            else
-            {
-                try
+                if (error)
                 {
-                    const fileBuffer = data;
-                    const wav = new WaveFile (fileBuffer);
-                    wav.toBitDepth ('32f');
-                    this.sampleRate = wav.fmt.sampleRate;
-                    this.channels = wav.fmt.numChannels;
-                    const stereoSamples = wav.getSamples (true, Float32Array);
-                    this.stereoBuffer = Buffer.from
-                    (
-                        stereoSamples.buffer,
-                        stereoSamples.byteOffset,
-                        stereoSamples.byteLength
-                    );
-                    const totalFrames = stereoSamples.length / this.channels;
-                    this.durationMs = (totalFrames / this.sampleRate) * 1000;
-                    this.monoBuffer = null;
-                    if (this.channels === 2)
-                    {
-                        const [left, right] = wav.getSamples (false, Float32Array);
-                        const monoSamples = new Float32Array (left.length);
-                        for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
-                        this.monoBuffer = Buffer.from
-                        (
-                            monoSamples.buffer,
-                            monoSamples.byteOffset,
-                            monoSamples.byteLength
-                        );
-                    }
-                    color = "#00FF00";
-                    if (this.stereoBuffer.length === 0 || (this.channels === 2 && this.monoBuffer.length === 0)) 
-                    {
-                        console.error ('Error loading audio:', this.source + '.');
-                        color = "red";
-                        loadingErrors++;
-                    }
-                    else this.loaded = true;
-                }
-                catch (error)
-                {
-                    console.error ('Error parsing WAV:', this.source, error.message);
-                    color = "red";
+                    console.error ('Error reading file:', error.message + '.');
                     loadingErrors++;
-                }
-            }
-            gameText.push (new component ("text", this.source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
-            loading--;
-        }
-    );
-    
-    this.play = function ()
-    {
-        if (!this.loaded)
-        {
-            console.warn ('Audio not loaded yet:', this.source);
-            return null;
-        }
-        const playbackDevice = sdl.audio.openDevice
-        (
-            { type: 'playback' },
-            {
-                frequency: this.sampleRate,
-                format: 'f32',
-                channels: this.channels
-            }
-        );
-        const bufferToPlay = (this.channels === 2 && playbackDevice.channels === 1) ? this.monoBuffer : this.stereoBuffer;
-        playbackDevice.enqueue (bufferToPlay);
-        playbackDevice.play ();
-        setTimeout
-        (
-            () =>
-            {
-                if (!playbackDevice.closed) playbackDevice.close ();
-            },
-            this.durationMs + 100
-        );
-        return playbackDevice;
-    };
-}
-
-function back (color, x, y, width, height)
-{
-    this.color = color;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.color;
-        ctx.fillRect (this.x, this.y, this.width, this.height);
-    }
-}
-
-function floor (color, x, y, width, height)
-{
-    this.color = color;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        const canvasAux = createCanvas (4, 6);
-        canvasAux.width = 4;
-        canvasAux.height = 6;
-        const ctxAux = canvasAux.getContext ("2d");
-        ctxAux.lineWidth = 0;
-        ctxAux.fillStyle = this.color;
-        ctxAux.fillRect (0, 0, 2, 2);
-        ctxAux.fillRect (2, 2, 2, 4);
-        const pattern = ctx.createPattern (canvasAux);
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = pattern;
-        ctx.fillRect (0, 0, this.width, this.height);
-        ctx.restore ();
-    }
-}
-
-function girder_h (type, color, color2, color3, x, y, width)
-{
-    this.type = (type != null ? type : 0);
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = 16;
-    this.speedY = 0;
-
-    this.update = function ()
-    {
-        if (this.width - 12 > 0)
-        {
-            if (this.y == 144 && this.speedY < 0)
-            {
-                this.speedY = 0.5;
-                if (player.girder) player.speedY = 0.5;
-            }
-            else if (this.y == 322 && this.speedY > 0)
-            {
-                this.speedY = -0.5;
-                if (player.girder) player.speedY = -0.5;
-            }
-            this.y += this.speedY;
-            let ctx = gameArea.ctx;
-            ctx.lineWidth = 0;
-            ctx.save ();
-            ctx.translate (Math.round (this.x), Math.round (this.y));
-            ctx.fillStyle = this.color;
-            ctx.fillRect (0, 0, this.width, 4);
-            ctx.fillRect (0, 12, this.width, 4);
-            ctx.fillStyle = this.color2;
-            switch (this.type)
-            {
-                case 0:
-                    ctx.fillRect (6, 4, this.width - 12, 8);
-                    for (let x = 30; x + 30 < this.width; x += 84)
-                    {
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (x, 6, 6, 4);
-                        ctx.fillRect (x + 16, 6, 6, 4);
-                        if (level == 0 && (x == 114 || x == 254)) x -= 28;
-                        else if (level == 1 && (x == 30 || x == 226)) x += 28;
-                        else if (level == 2 && x == 30) x -= 56;
-                    }
-                break;
-                case 1:
-                    ctx.fillRect (6, 4, this.width - 6, 8);
-                    for (let x = 30; x + 22 < this.width; x += 84)
-                    {
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (x, 6, 6, 4);
-                        ctx.fillRect (x + 16, 6, 6, 4);
-                        if (level == 1 && x == 30) x += 28;
-                    }
-                break;
-                case 2:
-                    ctx.fillRect (0, 4, this.width - 6, 8);
-                    for (let x = 52; this.width - x > 0; x += 84)
-                    {
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (this.width - x, 6, 6, 4);
-                        ctx.fillRect (this.width - x + 16, 6, 6, 4);
-                        if (level == 1 && x == 52) x += 28;
-                    }
-                break;
-                case 3:
-                    ctx.fillRect (0, 4, this.width, 8);
-                    for (let x = 30; x + 22 < this.width; x += 84)
-                    {
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (x, 6, 6, 4);
-                        ctx.fillRect (x + 16, 6, 6, 4);
-                    }
-            }
-            ctx.restore ();
-        }
-    }
-}
-
-function girder_v (color, color2, color3, x, y, height)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.y = y;
-    this.width = 22;
-    this.height = height;
-
-    this.update = function ()
-    {
-        if (this.width - 11 > 0)
-        {
-            let ctx = gameArea.ctx;
-            ctx.lineWidth = 0;
-            ctx.save ();
-            ctx.translate (Math.round (this.x), Math.round (this.y));
-            ctx.fillStyle = this.color;
-            ctx.fillRect (0, 0, 4, this.height);
-            ctx.fillRect (18, 0, 4, this.height);
-            ctx.fillStyle = this.color2;
-            ctx.fillRect (4, 0, 14, this.height);
-            for (let y = 24; y + 5 < this.height; y += 64)
-            {
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (8, y, 6, 4);
-                ctx.fillRect (8, y + 14, 6, 4);
-            }
-            ctx.restore ();
-        }
-    }
-}
-
-function girder_piece (color, color2, color3, color4, x, y, turn)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.color4 = color4;
-    this.x = x;
-    this.startX = this.x;
-    this.y = y;
-    this.startY = this.y;
-    this.turn = (turn != null ? turn : 0);
-    this.startTurn = this.turn;
-    this.width = 28;
-    this.height = 16;
-    this.type = 0;
-
-    this.update = function (idItem)
-    {
-        if (this.type == 0)
-        {
-            this.x = this.startX;
-            this.y = this.startY;
-            this.turn = this.startTurn;
-        }
-        this.radians = this.turn * Math.PI / 180;
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.rotate (this.radians);
-        ctx.fillStyle = this.color;
-        switch (this.type)
-        {
-            case 0:
-                ctx.fillRect (0, 0, this.width, 4);
-                ctx.fillRect (0, this.height - 4, this.width, 4);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (2, 4, this.width - 4, this.height - 8);
-                ctx.fillStyle = this.color4;
-                ctx.fillRect (3, 6, 6, 4);
-                ctx.fillRect (19, 6, 6, 4);
-            break;
-            case 1:
-                ctx.fillRect (0, 0, this.width, this.height);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (0, 4, this.width, this.height - 8);
-            break;
-            case 2:
-                ctx.fillRect (0, 0, this.width, this.height);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (0, 4, this.width, this.height - 8);
-            break;
-            case 3:
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (0, 0, this.width, this.height);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (0, 4, this.width, this.height - 8);
-                if (gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 1 || gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 4)
-                {
-                    ctx.fillStyle = this.color4;
-                    ctx.fillRect (3, 6, 6, 4);
-                    ctx.fillRect (19, 6, 6, 4);
-                }
-        }
-        ctx.restore ();
-    }
-}
-
-function column (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.y = y;
-    this.width = 18;
-    this.height = 26;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        ctx.fillRect (2, 0, 14, 4);
-        ctx.fillRect (2, 16, 14, 4);
-        ctx.fillRect (0, 20, 18, 6);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (4, 4, 10, 4);
-        ctx.fillRect (4, 12, 10, 4);
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (6, 8, 6, 4);
-        ctx.restore ();
-    }
-}
-
-function chain (color, x, y, steps)
-{
-    this.color = color;
-    this.x = x;
-    this.y = y;
-    this.steps = steps;
-    this.width = 8;
-    this.height = 8 * this.steps;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        for (let y = 0; y < this.steps * 8; y += 8)
-        {
-            ctx.fillRect (0, y, 2, 6);
-            ctx.fillRect (6, y, 2, 6);
-            ctx.fillRect (2, y + 6, 4, 2);
-        }
-        ctx.restore ();
-    }
-}
-
-function elevator (type, color, color2, x, y, width, height)
-{
-    this.type = (type != null ? type : 0);
-    this.color = color;
-    this.color2 = color2;
-    this.x = x;
-    this.y = y;
-    this.startY = this.y;
-    this.width = width;
-    this.height = height;
-
-    this.update = function ()
-    {
-        this.y = this.startY - gameMap.elevatorFloor;
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.color;
-        ctx.fillRect (this.x, this.y, this.width, this.height);
-        ctx.fillStyle = this.color2;
-        switch (this.type)
-        {
-            case 0:
-                ctx.fillRect (this.x + 6, this.y + 2, 42, 4);
-            break;
-            case 1:
-                ctx.fillRect (this.x + 2, this.y, 2, 48);
-            break;
-            case 3:
-                ctx.fillRect (this.x + 8, this.y + 2, 38, 4);
-        }
-    }
-}
-
-function support (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.y = y;
-    this.startY = this.y;
-    this.width = 12;
-    this.height = 32;
-    this.startHeight = this.height;
-
-    this.update = function ()
-    {
-        this.y = this.startY - gameMap.elevatorFloor;
-        this.height = this.startHeight + gameMap.elevatorFloor;
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        const canvasAux = createCanvas (12, 16);
-        canvasAux.width = 12;
-        canvasAux.height = 16;
-        const ctxAux = canvasAux.getContext ("2d");
-        ctxAux.lineWidth = 0;
-        ctxAux.fillStyle = this.color;
-        ctxAux.fillRect (0, 0, canvasAux.width, canvasAux.height);
-        ctxAux.clearRect (4, 0, 2, 2);
-        ctxAux.clearRect (6, 2, 2, 2);
-        ctxAux.clearRect (8, 4, 2, 2);
-        ctxAux.clearRect (10, 6, 2, 2);
-        ctxAux.clearRect (2, 6, 2, 2);
-        ctxAux.clearRect (4, 8, 2, 2);
-        ctxAux.clearRect (6, 10, 2, 2);
-        ctxAux.clearRect (8, 12, 2, 2);
-        ctxAux.clearRect (10, 14, 2, 2);
-        ctxAux.fillStyle = this.color2;
-        ctxAux.fillRect (0, 6, 2, 2);
-        ctxAux.fillStyle = this.color3;
-        ctxAux.fillRect (10, 4, 2, 2);
-        ctxAux.fillRect (10, 12, 2, 2);
-        const pattern = ctx.createPattern (canvasAux);
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = pattern;
-        ctx.fillRect (0, 0, this.width, this.height);
-        ctx.restore ();
-    }
-}
-
-function bell (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.startX = this.x;
-    this.y = y;
-    this.width = 18;
-    this.startWidth = this.width;
-    this.height = 20;
-    this.type = 0;
-    this.rings = 0;
-
-    this.update = function ()
-    {
-        if (this.type == 1) this.x = this.startX - 2;
-        else this.x = this.startX;
-        if (this.type == 0 || this.type == 2) this.width = this.startWidth;
-        else this.width = this.startWidth + 2;
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        if (gameArea.frame % 5 == 0 && this.rings > 0)
-        {
-            this.type++;
-            if (this.type == 4)
-            {
-                this.type = 0;
-                this.rings++;
-                if (this.rings == 6) this.rings = 0;
-            }
-        }
-        switch (this.type)
-        {
-            case 0:
-            case 2:
-                ctx.fillRect (6, 6, 6, 2);
-                ctx.fillRect (4, 8, 10, 4);
-                ctx.fillRect (2, 12, 14, 4);
-                ctx.fillRect (0, 16, 18, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (4, 0, 2, 6);
-                ctx.fillRect (12, 0, 2, 6);
-                ctx.fillRect (8, 18, 2, 2);
-            break;
-            case 1:
-                ctx.fillRect (8, 6, 8, 2);
-                ctx.fillRect (4, 8, 14, 2);
-                ctx.fillRect (0, 10, 18, 2);
-                ctx.fillRect (2, 12, 14, 2);
-                ctx.fillRect (6, 14, 10, 2);
-                ctx.fillRect (8, 16, 6, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 2, 2, 2);
-                ctx.fillRect (16, 2, 2, 4);
-                ctx.fillRect (12, 18, 2, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 0, 2, 2);
-                ctx.fillRect (14, 0, 2, 2);
-                ctx.fillRect (10, 4, 2, 2);
-                ctx.fillRect (18, 6, 2, 2);
-                ctx.fillRect (6, 18, 2, 2);
-            break;
-            case 3:
-                ctx.fillRect (4, 6, 8, 2);
-                ctx.fillRect (2, 8, 14, 2);
-                ctx.fillRect (2, 10, 18, 2);
-                ctx.fillRect (4, 12, 14, 2);
-                ctx.fillRect (4, 14, 10, 2);
-                ctx.fillRect (6, 16, 6, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (4, 0, 2, 2);
-                ctx.fillRect (12, 0, 2, 2);
-                ctx.fillRect (8, 4, 2, 2);
-                ctx.fillRect (0, 6, 2, 2);
-                ctx.fillRect (12, 18, 2, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (2, 2, 2, 4);
-                ctx.fillRect (10, 2, 2, 2);
-                ctx.fillRect (6, 18, 2, 2);
-        }
-        ctx.restore ();
-    }
-}
-
-function spring_board (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.y = y;
-    this.startY = this.y;
-    this.width = 26;
-    this.height = 24;
-    this.type = 0;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.fillStyle = this.color;
-        if (gameArea.frame % 5 == 0 && this.type > 0 && this.type < 4) this.type++;
-        switch (this.type)
-        {
-            case 0:
-            case 4:
-                if (this.height != 24)
-                {
-                    this.y = this.startY;
-                    this.height = 24;
-                    if (this.type == 4)
-                    {
-                        player.y = this.y - player.height;
-                        player.gravity = 0;
-                        player.speedY = -3;
-                        //if (player.dead > 0) player.speedY = Number ((player.speedY * 0.8).toFixed (2));
-                        this.type = 0;
-                    }
-                }
-                ctx.translate (Math.round (this.x), Math.round (this.y));
-                ctx.fillRect (2, 0, 22, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 6, 10, 14);
-                ctx.fillRect (6, 10, 14, 6);
-                ctx.fillRect (2, 20, 22, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (0, 2, 26, 4);
-                ctx.fillRect (10, 6, 2, 4);
-                ctx.fillRect (14, 6, 2, 4);
-                ctx.fillRect (8, 10, 2, 4);
-                ctx.fillRect (12, 10, 2, 4);
-                ctx.fillRect (16, 10, 2, 4);
-                ctx.fillRect (10, 14, 2, 4);
-                ctx.fillRect (14, 14, 2, 4);
-                ctx.fillRect (8, 18, 2, 2);
-                ctx.fillRect (12, 18, 2, 2);
-                ctx.fillRect (16, 18, 2, 2);
-            break;
-            case 1:
-            case 3:
-                if (this.height != 20)
-                {
-                    this.y = this.startY + 4;
-                    this.height = 20;
-                    player.y = this.y - player.height;
-                }
-                ctx.translate (Math.round (this.x), Math.round (this.y));
-                ctx.fillRect (2, 0, 22, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (6, 6, 14, 10);
-                ctx.fillRect (2, 10, 22, 2);
-                ctx.fillRect (2, 16, 22, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (0, 2, 26, 4);
-                ctx.fillRect (8, 6, 2, 2);
-                ctx.fillRect (12, 6, 2, 2);
-                ctx.fillRect (16, 6, 2, 2);
-                ctx.fillRect (4, 8, 4, 6);
-                ctx.fillRect (10, 8, 2, 6);
-                ctx.fillRect (14, 8, 2, 6);
-                ctx.fillRect (18, 8, 4, 6);
-                ctx.fillRect (8, 14, 2, 2);
-                ctx.fillRect (12, 14, 2, 2);
-                ctx.fillRect (16, 14, 2, 2);
-            break;
-            case 2:
-                if (this.height != 10)
-                {
-                    this.y = this.startY + 14;
-                    this.height = 10;
-                    player.y = this.y - player.height;
-                }
-                ctx.translate (Math.round (this.x), Math.round (this.y));
-                ctx.fillRect (2, 0, 22, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (2, 6, 22, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (0, 2, 26, 4);
-        }
-        ctx.restore ();
-    }
-}
-
-function machine (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = x;
-    this.y = y;
-    this.width = 26;
-    this.height = 32;
-    this.type = 0;
-    this.shotFrame = gameArea.frame + 500;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        switch (this.type)
-        {
-            case 0:
-                ctx.fillRect (14, 0, 6, 2);
-                ctx.fillRect (12, 2, 10, 2);
-                ctx.fillRect (16, 4, 4, 4);
-                ctx.fillRect (8, 8, 14, 18);
-                ctx.fillRect (22, 10, 4, 16);
-                ctx.fillRect (4, 30, 20, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 6, 4);
-                ctx.fillRect (0, 10, 8, 6);
-                ctx.fillRect (4, 16, 8, 10);
-                ctx.fillRect (16, 14, 2, 2);
-                ctx.fillRect (12, 16, 14, 2);
-                ctx.fillRect (6, 26, 20, 4);
-                ctx.fillRect (4, 28, 2, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (14, 8, 2, 10);
-                ctx.fillRect (18, 14, 2, 4);
-                ctx.fillRect (16, 18, 6, 8);
-            break;
-            case 1:
-                ctx.fillRect (14, 2, 6, 2);
-                ctx.fillRect (12, 4, 10, 2);
-                ctx.fillRect (16, 6, 4, 4);
-                ctx.fillRect (0, 10, 24, 2);
-                ctx.fillRect (8, 12, 18, 14);
-                ctx.fillRect (4, 30, 22, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (0, 8, 2, 2);
-                ctx.fillRect (4, 8, 2, 2);
-                ctx.fillRect (0, 12, 2, 2);
-                ctx.fillRect (6, 10, 8, 4);
-                ctx.fillRect (4, 12, 4, 6);
-                ctx.fillRect (16, 16, 4, 2);
-                ctx.fillRect (12, 18, 14, 2);
-                ctx.fillRect (4, 18, 8, 6);
-                ctx.fillRect (0, 20, 4, 2);
-                ctx.fillRect (6, 24, 6, 4);
-                ctx.fillRect (12, 26, 14, 4);
-                ctx.fillRect (0, 28, 12, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (14, 10, 2, 10);
-                ctx.fillRect (16, 20, 6, 6);
-        }
-        ctx.restore ();
-        if (!levelCompleted)
-        {
-            if (this.type == 0 && gameArea.frame == this.shotFrame)
-            {
-                this.type = 1;
-                gameEnemies.push (new bolt ("#ffffff", this.x, this.y));
-            }
-            else if (this.type == 1 && gameArea.frame - this.shotFrame == 120)
-            {
-                this.type = 0;
-                this.shotFrame += 500;
-            }
-        }
-    }
-}
-
-function bolt (color, x, y, bounce)
-{
-    this.color = color;
-    this.x = x;
-    this.y = y;
-    this.bounce = (bounce != null ? bounce : 0.6);
-    this.bounced = 0;
-    this.width = 10;
-    this.height = 10;
-    this.speedX = -(Math.floor (Math.random () * 6 + 1));
-    this.speedY = -(Math.floor (Math.random () * 4 - 2));
-    this.gravity = gravity;
-
-    this.update = function (idEnemy)
-    {
-        if (!levelCompleted)
-        {
-            this.x = Number ((this.x + this.speedX).toFixed (2));
-            this.y = Number ((this.y + this.speedY).toFixed (2));
-            for (let front = 0; front < gameFront.length; front++)
-            {
-                if ((gameFront [front].constructor.name == "girder_piece" || gameFront [front].constructor.name == "girder_h") && gameFront [front].y > this.bounced)
-                {
-                    if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
-                    {
-                        if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
-                        if (this.y == gameFront [front].y - this.height)
-                        {
-                            this.speedY = -(this.speedY * this.bounce);
-                            this.bounced = gameFront [front].y;
-                            gameAudios [1].play ();
-                        }
-                    }
-                }
-            }
-            this.speedY = this.speedY + this.gravity;
-            if (this.y > gameMap.height || this.x + this.width < 0) gameEnemies.splice (idEnemy, 1);
-        }
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        ctx.fillRect (0, 0, 10, 4);
-        ctx.fillRect (2, 4, 6, 6);
-        ctx.restore ();
-    }
-}
-
-function rivet_gun (color, color2, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.x = x;
-    this.y = y;
-    this.width = 28;
-    this.height = 30;
-    this.speedX = 0;
-    this.speedY = 0;
-    this.type = 0;
-    this.direction = 0;
-
-    this.update = function (idItem)
-    {
-        if (!levelCompleted)
-        {
-            if (idItem == player.item)
-            {
-                this.speedX = player.speedX;
-                this.speedY = player.speedY;
-            }
-            else
-            {
-                if (this.direction == 0)
-                {
-                    if (this.x == gameMap.x + 151 && this.y == 306)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 306)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 242 && this.speedX == 0)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 418 && this.y == 242)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 81 && this.y == 242)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 81 && this.y == 178)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 141 && this.y == 178 && this.speedY == 0)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 141 && this.y == 114 && this.speedX == 0)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 201 && this.y == 114 && this.speedX > 0)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 201 && this.y == 50)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                        this.direction = 1
-                    }
                 }
                 else
                 {
-                    if (this.x == gameMap.x + 418 && this.y == 50)
+                    try
                     {
-                        this.speedX = 0;
-                        this.speedY = 1;
+                        const fileBuffer = data;
+                        const wav = new WaveFile (fileBuffer);
+                        wav.toBitDepth ('32f');
+                        this.sampleRate = wav.fmt.sampleRate;
+                        this.channels = wav.fmt.numChannels;
+                        const stereoSamples = wav.getSamples (true, Float32Array);
+                        this.stereoBuffer = Buffer.from
+                        (
+                            stereoSamples.buffer,
+                            stereoSamples.byteOffset,
+                            stereoSamples.byteLength
+                        );
+                        const totalFrames = stereoSamples.length / this.channels;
+                        this.durationMs = (totalFrames / this.sampleRate) * 1000;
+                        this.monoBuffer = null;
+                        if (this.channels === 2)
+                        {
+                            const [left, right] = wav.getSamples (false, Float32Array);
+                            const monoSamples = new Float32Array (left.length);
+                            for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
+                            this.monoBuffer = Buffer.from
+                            (
+                                monoSamples.buffer,
+                                monoSamples.byteOffset,
+                                monoSamples.byteLength
+                            );
+                        }
+                        color = "#00FF00";
+                        if (this.stereoBuffer.length === 0 || (this.channels === 2 && this.monoBuffer.length === 0)) 
+                        {
+                            console.error ('Error loading audio:', this.source + '.');
+                            color = "red";
+                            loadingErrors++;
+                        }
+                        else this.loaded = true;
                     }
-                    else if (this.x == gameMap.x + 418 && this.y == 114)
+                    catch (error)
                     {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 81 && this.y == 114)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == gameMap.x + 81 && this.y == 178)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 393 && this.y == 178)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == gameMap.x + 393 && this.y == 242)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 242)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 306)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                        this.direction = 0;
+                        console.error ('Error parsing WAV:', this.source, error.message);
+                        color = "red";
+                        loadingErrors++;
                     }
                 }
-                this.x += this.speedX; 
-                this.y += this.speedY;
+                gameText.push (new component ("text", this.source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
+                loading--;
             }
-            if (this.speedX != 0 && this.speedY == 0 && gameArea.frame % 5 == 0)
+        );
+        
+        this.play = function ()
+        {
+            if (!this.loaded)
             {
-                if (this.type == 0) this.type = 1;
-                else this.type = 0;
+                console.warn ('Audio not loaded yet:', this.source);
+                return null;
             }
-        }
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y + (this.type == 1 ? 6 : 0)));
-        ctx.fillStyle = this.color;
-        ctx.fillRect (10, 0, 6, 2);
-        ctx.fillRect (0, 2, 28, 2);
-        ctx.fillRect (2, 4, 24, 2);
-        ctx.fillRect (8, 10, 10, 6);
-        ctx.fillRect (10, 20, 8, 2);
-        ctx.fillRect (12, 22, 4, (this.type == 0 ? 8 : 2));
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (8, 6, 10, 4);
-        ctx.fillRect (8, 12, 10, 2);
-        ctx.fillRect (8, 16, 10, 6);
-        ctx.restore ();
+            const playbackDevice = sdl.audio.openDevice
+            (
+                { type: 'playback' },
+                {
+                    frequency: this.sampleRate,
+                    format: 'f32',
+                    channels: this.channels
+                }
+            );
+            const bufferToPlay = (this.channels === 2 && playbackDevice.channels === 1) ? this.monoBuffer : this.stereoBuffer;
+            playbackDevice.enqueue (bufferToPlay);
+            playbackDevice.play ();
+            setTimeout
+            (
+                () =>
+                {
+                    if (!playbackDevice.closed) playbackDevice.close ();
+                },
+                this.durationMs + 100
+            );
+            return playbackDevice;
+        };
     }
 }
 
-function toolbox (color, color2, color3, color4, x, y)
+class back
 {
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.color4 = color4;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 28;
-    this.height = 22;
-
-    this.update = function ()
+    constructor (color, x, y, width, height)
     {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        ctx.fillRect (4, 6, 20, 2);
-        ctx.fillRect (2, 8, 24, 2);
-        ctx.fillRect (0, 10, 28, 12);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (2, 14, 8, 6);
-        ctx.fillRect (16, 14, 12, 6);
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (10, 0, 8, 2);
-        ctx.fillRect (8, 2, 2, 4);
-        ctx.fillRect (18, 2, 2, 4);
-        ctx.fillStyle = this.color4;
-        ctx.fillRect (10, 6, 2, 2);
-        ctx.fillRect (12, 8, 2, 2);
-        ctx.fillRect (14, 10, 2, 4);  
-        ctx.restore ();
-    }
-}
+        this.color = color;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
 
-function duct (color, color2, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 78;
-    this.height = 14;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        ctx.fillRect (0, 4, 76, 2);
-        ctx.fillRect (0, 8, 78, 2);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (0, 0, 70, 2);
-        ctx.fillRect (0, 2, 74, 2);
-        ctx.fillRect (0, 6, 78, 2);
-        ctx.fillRect (0, 10, 78, 4);
-        ctx.restore ();
-    }
-}
-
-function spigot (color, color2, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 18;
-    this.height = 12;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (0, 0, this.width, this.height);
-        ctx.fillStyle = this.color;
-        ctx.fillRect (0, 4, this.width, 2);
-        ctx.fillRect (0, 8, this.width, 2);
-        ctx.restore ();
-    }
-}
-
-function tool (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.type = Math.floor (Math.random () * 4);
-    if (this.type == 0) this.width = 28;
-    else if (this.type == 1)
-    {
-        this.x += 4;
-        this.width = 20;
-    }
-    else this.width = 26;
-    if (this.type == 1)
-    {
-        this.y -= 4;
-        this.height = 32;
-    }
-    else this.height = 28;
-    this.width = 26;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        switch (this.type)
+        this.update = function ()
         {
-            case 0:
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.color;
+            ctx.fillRect (this.x, this.y, this.width, this.height);
+        };
+    }
+}
+
+class floor
+{
+    constructor (color, x, y, width, height)
+    {
+        this.color = color;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            const canvasAux = createCanvas (4, 6);
+            canvasAux.width = 4;
+            canvasAux.height = 6;
+            const ctxAux = canvasAux.getContext ("2d");
+            ctxAux.lineWidth = 0;
+            ctxAux.fillStyle = this.color;
+            ctxAux.fillRect (0, 0, 2, 2);
+            ctxAux.fillRect (2, 2, 2, 4);
+            const pattern = ctx.createPattern (canvasAux);
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = pattern;
+            ctx.fillRect (0, 0, this.width, this.height);
+            ctx.restore ();
+        };
+    }
+}
+
+class girder_h
+{
+    constructor (type, color, color2, color3, x, y, width)
+    {
+        this.type = (type != null ? type : 0);
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = 16;
+        this.speedY = 0;
+
+        this.update = function ()
+        {
+            if (this.width - 12 > 0)
+            {
+                if (this.y == 144 && this.speedY < 0)
+                {
+                    this.speedY = 0.5;
+                    if (player.girder) player.speedY = 0.5;
+                }
+                else if (this.y == 322 && this.speedY > 0)
+                {
+                    this.speedY = -0.5;
+                    if (player.girder) player.speedY = -0.5;
+                }
+                this.y += this.speedY;
+                let ctx = gameArea.ctx;
+                ctx.lineWidth = 0;
+                ctx.save ();
+                ctx.translate (Math.round (this.x), Math.round (this.y));
                 ctx.fillStyle = this.color;
-                ctx.fillRect (16, 0, 6, 4);
-                ctx.fillRect (14, 2, 4, 8);
-                ctx.fillRect (24, 4, 4, 6);
-                ctx.fillRect (18, 8, 8, 4);
-                ctx.fillRect (12, 10, 8, 4);
-                ctx.fillRect (10, 12, 8, 4);
-                ctx.fillRect (8, 14, 8, 4);
-                ctx.fillRect (2, 16, 8, 4);
-                ctx.fillRect (0, 18, 4, 4);
-                ctx.fillRect (10, 18, 4, 8);
-                ctx.fillRect (4, 24, 8, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (18, 2, 2, 2);
-                ctx.fillRect (24, 4, 2, 2);
-                ctx.fillRect (2, 20, 2, 2);
-                ctx.fillRect (10, 22, 2, 2);
-            break;
-            case 1:
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (0, 2, 10, 14);
-                ctx.fillRect (4, 22, 2, 2);
-                ctx.fillRect (4, 28, 2, 2);
-                ctx.fillStyle = this.color;
-                ctx.fillRect (0, 0, 10, 2);
-                ctx.fillRect (8, 2, 4, 6);
-                ctx.fillRect (0, 6, 6, 2);
-                ctx.fillRect (0, 10, 6, 2);
-                ctx.fillRect (2, 16, 6, 2);
-                ctx.fillRect (2, 20, 4, 2);
-                ctx.fillRect (2, 26, 4, 2);
+                ctx.fillRect (0, 0, this.width, 4);
+                ctx.fillRect (0, 12, this.width, 4);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (12, 2, 4, 6);
-                ctx.fillRect (16, 6, 2, 2);
-                ctx.fillRect (18, 2, 2, 6);
-                ctx.fillRect (2, 18, 2, 2);
-                ctx.fillRect (2, 24, 2, 2);
-                ctx.fillRect (2, 30, 2, 2);
-            break;
-            case 2:
+                switch (this.type)
+                {
+                    case 0:
+                        ctx.fillRect (6, 4, this.width - 12, 8);
+                        for (let x = 30; x + 30 < this.width; x += 84)
+                        {
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (x, 6, 6, 4);
+                            ctx.fillRect (x + 16, 6, 6, 4);
+                            if (level == 0 && (x == 114 || x == 254)) x -= 28;
+                            else if (level == 1 && (x == 30 || x == 226)) x += 28;
+                            else if (level == 2 && x == 30) x -= 56;
+                        }
+                    break;
+                    case 1:
+                        ctx.fillRect (6, 4, this.width - 6, 8);
+                        for (let x = 30; x + 22 < this.width; x += 84)
+                        {
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (x, 6, 6, 4);
+                            ctx.fillRect (x + 16, 6, 6, 4);
+                            if (level == 1 && x == 30) x += 28;
+                        }
+                    break;
+                    case 2:
+                        ctx.fillRect (0, 4, this.width - 6, 8);
+                        for (let x = 52; this.width - x > 0; x += 84)
+                        {
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (this.width - x, 6, 6, 4);
+                            ctx.fillRect (this.width - x + 16, 6, 6, 4);
+                            if (level == 1 && x == 52) x += 28;
+                        }
+                    break;
+                    case 3:
+                        ctx.fillRect (0, 4, this.width, 8);
+                        for (let x = 30; x + 22 < this.width; x += 84)
+                        {
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (x, 6, 6, 4);
+                            ctx.fillRect (x + 16, 6, 6, 4);
+                        }
+                }
+                ctx.restore ();
+            }
+        };
+    }
+}
+
+class girder_v
+{
+    constructor (color, color2, color3, x, y, height)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.y = y;
+        this.width = 22;
+        this.height = height;
+
+        this.update = function ()
+        {
+            if (this.width - 11 > 0)
+            {
+                let ctx = gameArea.ctx;
+                ctx.lineWidth = 0;
+                ctx.save ();
+                ctx.translate (Math.round (this.x), Math.round (this.y));
+                ctx.fillStyle = this.color;
+                ctx.fillRect (0, 0, 4, this.height);
+                ctx.fillRect (18, 0, 4, this.height);
                 ctx.fillStyle = this.color2;
-                ctx.fillRect (12, 6, 6, 22);
-                ctx.fillStyle = this.color;
-                ctx.fillRect (20, 0, 6, 8);
-                ctx.fillRect (6, 2, 14, 4);
-                ctx.fillRect (4, 4, 4, 4);
-                ctx.fillRect (2, 6, 2, 2);
-                ctx.fillRect (0, 8, 2, 2);
-                ctx.fillRect (12, 20, 6, 6);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (2, 8, 2, 2);
-            break;
-            case 3:
-                ctx.fillStyle = this.color;
-                ctx.fillRect (16, 0, 6, 2);
-                ctx.fillRect (12, 2, 6, 2);
-                ctx.fillRect (8, 4, 18, 6);
-                ctx.fillRect (6, 6, 18, 6);
-                ctx.fillRect (4, 8, 18, 6);
-                ctx.fillRect (6, 14, 14, 2);
-                ctx.fillRect (8, 16, 10, 2);
-                ctx.fillRect (6, 20, 14, 2);
-                ctx.fillRect (0, 26, 26, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (18, 2, 6, 6);
-                ctx.fillRect (10, 12, 6, 2);
-                ctx.fillRect (12, 14, 2, 8);
-                ctx.fillRect (10, 18, 6, 2);
-                ctx.fillRect (6, 22, 14, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (0, 24, 26, 2);
-        }
-        ctx.restore ();
+                ctx.fillRect (4, 0, 14, this.height);
+                for (let y = 24; y + 5 < this.height; y += 64)
+                {
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (8, y, 6, 4);
+                    ctx.fillRect (8, y + 14, 6, 4);
+                }
+                ctx.restore ();
+            }
+        };
     }
 }
 
-function magnet (color, color2, color3, x, y)
+class girder_piece
 {
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 26;
-    this.height = 32;
-
-    this.update = function ()
+    constructor (color, color2, color3, color4, x, y, turn)
     {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (10, 0, 6, 22);
-        ctx.fillStyle = this.color;
-        ctx.fillRect (4, 22, 18, 2);
-        ctx.fillRect (2, 24, 22, 2);
-        ctx.fillRect (0, 28, 26, 2);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (2, 26, 22, 2);
-        ctx.fillRect (2, 30, 22, 2);
-        ctx.restore ();
-    }
-}
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.color4 = color4;
+        this.x = x;
+        this.startX = this.x;
+        this.y = y;
+        this.startY = this.y;
+        this.turn = (turn != null ? turn : 0);
+        this.startTurn = this.turn;
+        this.width = 28;
+        this.height = 16;
+        this.type = 0;
 
-function crane (color, color2, color3, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 28;
-    this.height = 28;
-    this.type = 0;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        if (gameArea.frame % 25 == 0)
+        this.update = function (idItem)
         {
-            if (this.type == 0) this.type = 1;
-            else this.type = 0;
-        }
-        switch (this.type)
-        {
-            case 0:
-                ctx.fillRect (4, 2, 10, 2);
-                ctx.fillRect (2, 4, 14, 2);
-                ctx.fillRect (4, 12, 20, 2);
-                ctx.fillRect (2, 14, 24, 12);
-                ctx.fillRect (4, 26, 20, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 0, 2, 2);
-                ctx.fillRect (10, 14, 10, 12);
-                ctx.fillRect (8, 16, 2, 8);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 6, 6, 6);
-                ctx.fillRect (6, 16, 2, 8);
-                ctx.fillRect (12, 16, 4, 2);
-                ctx.fillRect (8, 18, 14, 4);
-            break;
-            case 1:
-                ctx.fillRect (4, 6, 10, 2);
-                ctx.fillRect (2, 8, 14, 2);
-                ctx.fillRect (2, 12, 24, 2);
-                ctx.fillRect (0, 14, 28, 12);
-                ctx.fillRect (2, 26, 24, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 4, 2, 2);
-                ctx.fillRect (6, 14, 18, 12);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 10, 6, 2);
-                ctx.fillRect (12, 16, 6, 2);
-                ctx.fillRect (10, 18, 10, 4);
-                ctx.fillRect (12, 22, 6, 2);
-        }
-        ctx.restore ();
-    }
-}
-
-function wire (color, thick, points)
-{
-    this.color = color;
-    this.thick = (thick != null ? thick : 1);
-    this.points = (points != null ? points : []);
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.beginPath ();
-        ctx.moveTo (Math.round (this.points [0].x), Math.round (this.points [0].y));
-        for (let i = 1; i < this.points.length; i++) ctx.lineTo (this.points [i].x, (i + 1 == this.points.length ? gameFront [52].y + gameFront [52].speedY : this.points [i].y));
-        ctx.lineWidth = this.thick;
-        ctx.strokeStyle = this.color;
-        ctx.stroke ();
-    }
-}
-
-function incinerator (color, color2, color3, color4, x, y)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.color4 = color4;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 28;
-    this.height = 50;
-    this.type = 0;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (4, 4, 22, 26);
-        ctx.fillRect (0, 6, 4, 10);
-        ctx.fillRect (0, 34, 28, 4);
-        ctx.fillRect (0, 46, 28, 4);
-        ctx.fillStyle = this.color;
-        ctx.fillRect (4, 8, 22, 8);
-        ctx.fillStyle = this.color4;
-        ctx.fillRect (8, 10, 14, 4);
-        ctx.fillStyle = this.color;
-        ctx.fillRect (14, 12, 4, 2);
-        ctx.fillRect (8, 18, 14, 2);
-        ctx.fillRect (8, 24, 6, 4);
-        ctx.fillRect (16, 24, 6, 4);
-        ctx.fillRect (0, 30, 26, 2);
-        ctx.fillStyle = this.color3;
-        ctx.fillRect (6, 0, 6, 4);
-        ctx.fillRect (18, 0, 6, 4);
-        ctx.fillRect (6, 38, 22, 8);
-        ctx.fillStyle = this.color2;
-        if (gameArea.frame % 25 == 0)
-        {
-            if (this.type == 3) this.type = 0;
-            else this.type++;
-        }
-        switch (this.type)
-        {
-            case 1:
-                ctx.fillRect (-18, 14, 2, 2);
-                ctx.fillRect (-10, 16, 2, 2);
-                ctx.fillRect (-2, 16, 2, 2);
-                ctx.fillRect (-18, 20, 2, 4);
-                ctx.fillRect (-16, 24, 4, 2);
-                ctx.fillRect (-14, 26, 2, 2);
-                ctx.fillRect (-10, 24, 2, 2);
-                ctx.fillRect (-6, 28, 2, 2);
-                ctx.fillRect (-2, 28, 2, 4);
-                ctx.fillRect (-16, 18, 6, 6);
-                ctx.fillRect (-8, 20, 8, 8);
-                ctx.fillStyle = this.color;
-                ctx.fillRect (-16, 16, 4, 2);
-                ctx.fillRect (-14, 18, 6, 2);
-                ctx.fillRect (-4, 18, 4, 2);
-                ctx.fillRect (-10, 20, 6, 2);
-                ctx.fillRect (-14, 22, 6, 2);
-                ctx.fillRect (-6, 26, 6, 2);
-            break;
-            case 2:
-                ctx.fillRect (-18, 0, 4, 8);
-                ctx.fillRect (-14, 6, 6, 22);
-                ctx.fillRect (-10, 12, 6, 18);
-                ctx.fillRect (-2, 16, 2, 2);
-                ctx.fillRect (-4, 20, 4, 12);
-                ctx.fillRect (-26, 18, 8, 2);
-                ctx.fillRect (-18, 18, 4, 8);
-                ctx.fillRect (-22, 24, 2, 2);
-                ctx.fillStyle = this.color;
-                ctx.fillRect (-20, 2, 4, 6);
-                ctx.fillRect (-10, 10, 4, 2);
-                ctx.fillRect (-26, 14, 4, 2);
-                ctx.fillRect (-10, 14, 2, 2);
-                ctx.fillRect (-24, 16, 4, 2);
-                ctx.fillRect (-18, 16, 6, 2);
-                ctx.fillRect (-14, 18, 6, 2);
-                ctx.fillRect (-6, 18, 6, 2);
-                ctx.fillRect (-26, 20, 10, 2);
-                ctx.fillRect (-22, 22, 6, 2);
-                ctx.fillRect (-14, 22, 6, 2);
-                ctx.fillRect (-6, 24, 2, 2);
-            break;
-            case 3:
-                ctx.fillRect (-14, 0, 4, 8);
-                ctx.fillRect (-26, 6, 2, 4);
-                ctx.fillRect (-10, 6, 2, 8);
-                ctx.fillRect (-26, 10, 4, 10);
-                ctx.fillRect (-18, 10, 4, 2);
-                ctx.fillRect (-22, 12, 2, 2);
-                ctx.fillRect (-16, 12, 4, 2);
-                ctx.fillRect (-8, 12, 4, 4);
-                ctx.fillRect (-18, 14, 6, 2);
-                ctx.fillRect (-22, 16, 2, 2);
-                ctx.fillRect (-10, 16, 10, 14);
-                ctx.fillRect (-22, 18, 8, 8);
-                ctx.fillRect (-14, 20, 4, 8);
-                ctx.fillStyle = this.color;
-                ctx.fillRect (-26, 2, 4, 4);
-                ctx.fillRect (-16, 2, 4, 6);
-                ctx.fillRect (-28, 4, 2, 6);
-                ctx.fillRect (-22, 8, 4, 2);
-                ctx.fillRect (-10, 10, 4, 2);
-                ctx.fillRect (-18, 16, 6, 2);
-                ctx.fillRect (-14, 18, 6, 2);
-                ctx.fillRect (-26, 20, 10, 2);
-                ctx.fillRect (-22, 22, 6, 2);
-                ctx.fillRect (-14, 22, 6, 2);
-        }
-        ctx.restore ();
-    }
-}
-
-function trap (color, color2, x, y, width, height)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = width;
-    this.height = height;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        const canvasAux = createCanvas (1, this.height);
-        canvasAux.width = 1;
-        canvasAux.height = this.height;
-        const ctxAux = canvasAux.getContext ("2d");
-        ctxAux.lineWidth = 0;
-        for (let y = 0; y + 2 <= this.height; y += 2)
-        {
-            if (ctxAux.fillStyle == this.color) ctxAux.fillStyle = this.color2;
-            else ctxAux.fillStyle = this.color;
-            ctxAux.fillRect (0, y, 1, 2);
-        }
-        const pattern = ctx.createPattern (canvasAux);
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = pattern;
-        ctx.fillRect (0, 0, this.width, this.height);
-        ctx.restore ();
-    }
-}
-
-function vice (color, x, y, width, height, heading)
-{
-    this.color = color;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = width;
-    this.height = height;
-    this.heading = (heading != null ? heading : 1);
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.color;
-        ctx.save ();
-        ctx.scale (this.heading, 1);
-        ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
-        ctx.fillRect (10, 0, 4, 8);
-        ctx.fillRect (6, 4, 2, 2);
-        ctx.fillRect (4, 6, 4, 2);
-        ctx.fillRect (2, 8, 4, 2);
-        ctx.fillRect (0, 10, 6, 2);
-        ctx.fillRect (8, 10, 2, 2);
-        ctx.restore ();
-    }
-}
-
-function hydraulic (color, x, y, width, height)
-{
-    this.color = color;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = width;
-    this.height = height;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.color;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillRect (0, 0, 2, 2);
-        ctx.fillRect (4, 0, 2, 2);
-        ctx.restore ();
-    }
-}
-
-function stamper (color, color2, x, y, width, height)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = width;
-    this.height = height;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.color;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillRect (2, 0, this.width - 4, 2);
-        ctx.fillRect (0, 2, this.width, this.height - 2);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (6, 2, 14, 2);
-        ctx.fillRect (6, 4, 2, 2);
-        ctx.fillRect (14, 4, 2, 2);
-        ctx.fillRect (10, 6, 2, 2);
-        ctx.fillRect (18, 6, 2, 2);
-        ctx.fillRect (6, 8, 14, 2);
-        ctx.restore ();
-    }
-}
-
-function tnt (color, color2, x, y, width, height)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = width;
-    this.height = height;
-    this.type = 0;
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.color;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillRect (0, 0, this.width, this.height);
-        ctx.fillStyle = this.color2;
-        ctx.fillRect (0, 8, this.width, 2);
-        ctx.restore ();
-        if (gameArea.frame % 10 == 0)
-        {
-            if (this.type == 0) this.type = 1;
-            else this.type = 0;
-        }
-        switch (this.type)
-        {
-            case 0:
-                gameBack [gameBack.length - 3].color = this.color2;
-                gameBack [gameBack.length - 3].x = this.x + 10;
-                gameBack [gameBack.length - 3].y = this.y - 6;
-                gameBack [gameBack.length - 2].color = this.color2;
-                gameBack [gameBack.length - 2].x = this.x + 10;
-                gameBack [gameBack.length - 2].y = this.y - 10;
-                gameBack [gameBack.length - 1].color = this.color2;
-                gameBack [gameBack.length - 1].x = this.x + 14;
-                gameBack [gameBack.length - 1].y = this.y - 8;
-            break;
-            case 1:
-                gameBack [gameBack.length - 3].color = this.color;
-                gameBack [gameBack.length - 3].x = this.x + 12;
-                gameBack [gameBack.length - 3].y = this.y - 6;
-                gameBack [gameBack.length - 2].color = this.color2;
-                gameBack [gameBack.length - 2].x = this.x + 10;
-                gameBack [gameBack.length - 2].y = this.y - 8;
-                gameBack [gameBack.length - 1].color = this.color2;
-                gameBack [gameBack.length - 1].x = this.x + 14;
-                gameBack [gameBack.length - 1].y = this.y - 10;
-        }
-    }
-}
-
-function conveyor_belt (color, color2, color3, color4, x, y, width, height)
-{
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.color4 = color4;
-    this.x = (x != null ? x : 0);
-    this.startX = this.x;
-    this.y = (y != null ? y : 0);
-    this.startY = this.y;
-    this.width = (width != null ? width : 6);
-    this.height = (height != null ? height : 32);
-    this.turn = 0;
-       
-    this.update = function ()
-    {
-        if (this.color != null && this.color2 != null && this.color3 != null && this.color4 != null)
-        {
-            this.x = this.startX + 102;
-            this.y = this.startY + 12;
+            if (this.type == 0)
+            {
+                this.x = this.startX;
+                this.y = this.startY;
+                this.turn = this.startTurn;
+            }
             this.radians = this.turn * Math.PI / 180;
             let ctx = gameArea.ctx;
             ctx.lineWidth = 0;
             ctx.save ();
-            ctx.translate (Math.round (this.startX), Math.round (this.startY));
-            ctx.fillStyle = this.color;
-            ctx.fillRect (0, 34, 2, 8);
-            for (let i = 0; i < 17; i++) ctx.fillRect (2 + i * 6, 32 - i * 2, 12, 12);
-            ctx.fillRect (110, 2, 2, 8);
-            ctx.fillRect (102, 12, 6, 32);
-            ctx.fillRect (88, 36, 14, 8);
-            ctx.fillRect (86, 38, 2, 2);
-            ctx.fillRect (84, 42, 4, 2);
-            ctx.fillStyle = this.color2;
-            ctx.translate (8, 38);
+            ctx.translate (Math.round (this.x), Math.round (this.y));
             ctx.rotate (this.radians);
-            ctx.fillRect (-2, -6, 4, 12);
-            ctx.rotate (-this.radians);
-            ctx.translate (96, -32);
-            ctx.rotate (this.radians);
-            ctx.fillRect (-2, -6, 4, 12);
-            ctx.rotate (-this.radians);
-            ctx.translate (-104, -6);
-            for (let i = 0; i < 13; i++) ctx.fillRect (16 + i * 6, 30 - i * 2, 8, 8);
-            ctx.fillRect (14, 32, 2, 2);
-            ctx.fillRect (16, 38, 2, 2);
-            ctx.fillRect (94, 4, 2, 2);
-            ctx.fillRect (96, 10, 2, 2);
             ctx.fillStyle = this.color;
-            for (let i = 0; i < 6; i++) ctx.fillRect (23 + i * 12, 30 - i * 4, 6, 4);
-            ctx.fillStyle = this.color3;
-            ctx.fillRect (7, 34, 2, 2);
-            ctx.fillRect (7, 40, 2, 2);
-            ctx.fillRect (84, 40, 6, 2);
-            ctx.fillRect (90, 38, 10, 4);
-            ctx.fillStyle = this.color4;
-            ctx.fillRect (7, 36, 2, 4);
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillRect (0, 0, this.width, 4);
+                    ctx.fillRect (0, this.height - 4, this.width, 4);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (2, 4, this.width - 4, this.height - 8);
+                    ctx.fillStyle = this.color4;
+                    ctx.fillRect (3, 6, 6, 4);
+                    ctx.fillRect (19, 6, 6, 4);
+                break;
+                case 1:
+                    ctx.fillRect (0, 0, this.width, this.height);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (0, 4, this.width, this.height - 8);
+                break;
+                case 2:
+                    ctx.fillRect (0, 0, this.width, this.height);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (0, 4, this.width, this.height - 8);
+                break;
+                case 3:
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (0, 0, this.width, this.height);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (0, 4, this.width, this.height - 8);
+                    if (gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 1 || gameMap.girderBreaks [(this.y - 144) / 64].girderBreak == 4)
+                    {
+                        ctx.fillStyle = this.color4;
+                        ctx.fillRect (3, 6, 6, 4);
+                        ctx.fillRect (19, 6, 6, 4);
+                    }
+            }
             ctx.restore ();
-            this.turn += 10;
-            if (this.turn == 360) this.turn = 0;
-        }
+        };
     }
 }
 
-function concrete_mixer (type, color, color2, color3, color4, x, y)
+class column
 {
-    this.type = type;
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.color4 = color4;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    if (this.type == 0)
+    constructor (color, color2, color3, x, y)
     {
-        this.width = 34;
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.y = y;
+        this.width = 18;
+        this.height = 26;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (2, 0, 14, 4);
+            ctx.fillRect (2, 16, 14, 4);
+            ctx.fillRect (0, 20, 18, 6);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (4, 4, 10, 4);
+            ctx.fillRect (4, 12, 10, 4);
+            ctx.fillStyle = this.color3;
+            ctx.fillRect (6, 8, 6, 4);
+            ctx.restore ();
+        };
+    }
+}
+
+class chain
+{
+    constructor (color, x, y, steps)
+    {
+        this.color = color;
+        this.x = x;
+        this.y = y;
+        this.steps = steps;
+        this.width = 8;
+        this.height = 8 * this.steps;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            for (let y = 0; y < this.steps * 8; y += 8)
+            {
+                ctx.fillRect (0, y, 2, 6);
+                ctx.fillRect (6, y, 2, 6);
+                ctx.fillRect (2, y + 6, 4, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class elevator
+{
+    constructor (type, color, color2, x, y, width, height)
+    {
+        this.type = (type != null ? type : 0);
+        this.color = color;
+        this.color2 = color2;
+        this.x = x;
+        this.y = y;
+        this.startY = this.y;
+        this.width = width;
+        this.height = height;
+
+        this.update = function ()
+        {
+            this.y = this.startY - gameMap.elevatorFloor;
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.color;
+            ctx.fillRect (this.x, this.y, this.width, this.height);
+            ctx.fillStyle = this.color2;
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillRect (this.x + 6, this.y + 2, 42, 4);
+                break;
+                case 1:
+                    ctx.fillRect (this.x + 2, this.y, 2, 48);
+                break;
+                case 3:
+                    ctx.fillRect (this.x + 8, this.y + 2, 38, 4);
+            }
+        };
+    }
+}
+
+class support
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.y = y;
+        this.startY = this.y;
+        this.width = 12;
+        this.height = 32;
+        this.startHeight = this.height;
+
+        this.update = function ()
+        {
+            this.y = this.startY - gameMap.elevatorFloor;
+            this.height = this.startHeight + gameMap.elevatorFloor;
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            const canvasAux = createCanvas (12, 16);
+            canvasAux.width = 12;
+            canvasAux.height = 16;
+            const ctxAux = canvasAux.getContext ("2d");
+            ctxAux.lineWidth = 0;
+            ctxAux.fillStyle = this.color;
+            ctxAux.fillRect (0, 0, canvasAux.width, canvasAux.height);
+            ctxAux.clearRect (4, 0, 2, 2);
+            ctxAux.clearRect (6, 2, 2, 2);
+            ctxAux.clearRect (8, 4, 2, 2);
+            ctxAux.clearRect (10, 6, 2, 2);
+            ctxAux.clearRect (2, 6, 2, 2);
+            ctxAux.clearRect (4, 8, 2, 2);
+            ctxAux.clearRect (6, 10, 2, 2);
+            ctxAux.clearRect (8, 12, 2, 2);
+            ctxAux.clearRect (10, 14, 2, 2);
+            ctxAux.fillStyle = this.color2;
+            ctxAux.fillRect (0, 6, 2, 2);
+            ctxAux.fillStyle = this.color3;
+            ctxAux.fillRect (10, 4, 2, 2);
+            ctxAux.fillRect (10, 12, 2, 2);
+            const pattern = ctx.createPattern (canvasAux);
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = pattern;
+            ctx.fillRect (0, 0, this.width, this.height);
+            ctx.restore ();
+        };
+    }
+}
+
+class bell
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.startX = this.x;
+        this.y = y;
+        this.width = 18;
+        this.startWidth = this.width;
+        this.height = 20;
+        this.type = 0;
+        this.rings = 0;
+
+        this.update = function ()
+        {
+            if (this.type == 1) this.x = this.startX - 2;
+            else this.x = this.startX;
+            if (this.type == 0 || this.type == 2) this.width = this.startWidth;
+            else this.width = this.startWidth + 2;
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            if (gameArea.frame % 5 == 0 && this.rings > 0)
+            {
+                this.type++;
+                if (this.type == 4)
+                {
+                    this.type = 0;
+                    this.rings++;
+                    if (this.rings == 6) this.rings = 0;
+                }
+            }
+            switch (this.type)
+            {
+                case 0:
+                case 2:
+                    ctx.fillRect (6, 6, 6, 2);
+                    ctx.fillRect (4, 8, 10, 4);
+                    ctx.fillRect (2, 12, 14, 4);
+                    ctx.fillRect (0, 16, 18, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (4, 0, 2, 6);
+                    ctx.fillRect (12, 0, 2, 6);
+                    ctx.fillRect (8, 18, 2, 2);
+                break;
+                case 1:
+                    ctx.fillRect (8, 6, 8, 2);
+                    ctx.fillRect (4, 8, 14, 2);
+                    ctx.fillRect (0, 10, 18, 2);
+                    ctx.fillRect (2, 12, 14, 2);
+                    ctx.fillRect (6, 14, 10, 2);
+                    ctx.fillRect (8, 16, 6, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 2, 2, 2);
+                    ctx.fillRect (16, 2, 2, 4);
+                    ctx.fillRect (12, 18, 2, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 0, 2, 2);
+                    ctx.fillRect (14, 0, 2, 2);
+                    ctx.fillRect (10, 4, 2, 2);
+                    ctx.fillRect (18, 6, 2, 2);
+                    ctx.fillRect (6, 18, 2, 2);
+                break;
+                case 3:
+                    ctx.fillRect (4, 6, 8, 2);
+                    ctx.fillRect (2, 8, 14, 2);
+                    ctx.fillRect (2, 10, 18, 2);
+                    ctx.fillRect (4, 12, 14, 2);
+                    ctx.fillRect (4, 14, 10, 2);
+                    ctx.fillRect (6, 16, 6, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (4, 0, 2, 2);
+                    ctx.fillRect (12, 0, 2, 2);
+                    ctx.fillRect (8, 4, 2, 2);
+                    ctx.fillRect (0, 6, 2, 2);
+                    ctx.fillRect (12, 18, 2, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (2, 2, 2, 4);
+                    ctx.fillRect (10, 2, 2, 2);
+                    ctx.fillRect (6, 18, 2, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class spring_board
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.y = y;
+        this.startY = this.y;
+        this.width = 26;
+        this.height = 24;
+        this.type = 0;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.fillStyle = this.color;
+            if (gameArea.frame % 5 == 0 && this.type > 0 && this.type < 4) this.type++;
+            switch (this.type)
+            {
+                case 0:
+                case 4:
+                    if (this.height != 24)
+                    {
+                        this.y = this.startY;
+                        this.height = 24;
+                        if (this.type == 4)
+                        {
+                            player.y = this.y - player.height;
+                            player.gravity = 0;
+                            player.speedY = -3;
+                            //if (player.dead > 0) player.speedY = Number ((player.speedY * 0.8).toFixed (2));
+                            this.type = 0;
+                        }
+                    }
+                    ctx.translate (Math.round (this.x), Math.round (this.y));
+                    ctx.fillRect (2, 0, 22, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 6, 10, 14);
+                    ctx.fillRect (6, 10, 14, 6);
+                    ctx.fillRect (2, 20, 22, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (0, 2, 26, 4);
+                    ctx.fillRect (10, 6, 2, 4);
+                    ctx.fillRect (14, 6, 2, 4);
+                    ctx.fillRect (8, 10, 2, 4);
+                    ctx.fillRect (12, 10, 2, 4);
+                    ctx.fillRect (16, 10, 2, 4);
+                    ctx.fillRect (10, 14, 2, 4);
+                    ctx.fillRect (14, 14, 2, 4);
+                    ctx.fillRect (8, 18, 2, 2);
+                    ctx.fillRect (12, 18, 2, 2);
+                    ctx.fillRect (16, 18, 2, 2);
+                break;
+                case 1:
+                case 3:
+                    if (this.height != 20)
+                    {
+                        this.y = this.startY + 4;
+                        this.height = 20;
+                        player.y = this.y - player.height;
+                    }
+                    ctx.translate (Math.round (this.x), Math.round (this.y));
+                    ctx.fillRect (2, 0, 22, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (6, 6, 14, 10);
+                    ctx.fillRect (2, 10, 22, 2);
+                    ctx.fillRect (2, 16, 22, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (0, 2, 26, 4);
+                    ctx.fillRect (8, 6, 2, 2);
+                    ctx.fillRect (12, 6, 2, 2);
+                    ctx.fillRect (16, 6, 2, 2);
+                    ctx.fillRect (4, 8, 4, 6);
+                    ctx.fillRect (10, 8, 2, 6);
+                    ctx.fillRect (14, 8, 2, 6);
+                    ctx.fillRect (18, 8, 4, 6);
+                    ctx.fillRect (8, 14, 2, 2);
+                    ctx.fillRect (12, 14, 2, 2);
+                    ctx.fillRect (16, 14, 2, 2);
+                break;
+                case 2:
+                    if (this.height != 10)
+                    {
+                        this.y = this.startY + 14;
+                        this.height = 10;
+                        player.y = this.y - player.height;
+                    }
+                    ctx.translate (Math.round (this.x), Math.round (this.y));
+                    ctx.fillRect (2, 0, 22, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (2, 6, 22, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (0, 2, 26, 4);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class machine
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = x;
+        this.y = y;
+        this.width = 26;
+        this.height = 32;
+        this.type = 0;
+        this.shotFrame = gameArea.frame + 500;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillRect (14, 0, 6, 2);
+                    ctx.fillRect (12, 2, 10, 2);
+                    ctx.fillRect (16, 4, 4, 4);
+                    ctx.fillRect (8, 8, 14, 18);
+                    ctx.fillRect (22, 10, 4, 16);
+                    ctx.fillRect (4, 30, 20, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 6, 4);
+                    ctx.fillRect (0, 10, 8, 6);
+                    ctx.fillRect (4, 16, 8, 10);
+                    ctx.fillRect (16, 14, 2, 2);
+                    ctx.fillRect (12, 16, 14, 2);
+                    ctx.fillRect (6, 26, 20, 4);
+                    ctx.fillRect (4, 28, 2, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (14, 8, 2, 10);
+                    ctx.fillRect (18, 14, 2, 4);
+                    ctx.fillRect (16, 18, 6, 8);
+                break;
+                case 1:
+                    ctx.fillRect (14, 2, 6, 2);
+                    ctx.fillRect (12, 4, 10, 2);
+                    ctx.fillRect (16, 6, 4, 4);
+                    ctx.fillRect (0, 10, 24, 2);
+                    ctx.fillRect (8, 12, 18, 14);
+                    ctx.fillRect (4, 30, 22, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (0, 8, 2, 2);
+                    ctx.fillRect (4, 8, 2, 2);
+                    ctx.fillRect (0, 12, 2, 2);
+                    ctx.fillRect (6, 10, 8, 4);
+                    ctx.fillRect (4, 12, 4, 6);
+                    ctx.fillRect (16, 16, 4, 2);
+                    ctx.fillRect (12, 18, 14, 2);
+                    ctx.fillRect (4, 18, 8, 6);
+                    ctx.fillRect (0, 20, 4, 2);
+                    ctx.fillRect (6, 24, 6, 4);
+                    ctx.fillRect (12, 26, 14, 4);
+                    ctx.fillRect (0, 28, 12, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (14, 10, 2, 10);
+                    ctx.fillRect (16, 20, 6, 6);
+            }
+            ctx.restore ();
+            if (!levelCompleted)
+            {
+                if (this.type == 0 && gameArea.frame == this.shotFrame)
+                {
+                    this.type = 1;
+                    gameEnemies.push (new bolt ("#ffffff", this.x, this.y));
+                }
+                else if (this.type == 1 && gameArea.frame - this.shotFrame == 120)
+                {
+                    this.type = 0;
+                    this.shotFrame += 500;
+                }
+            }
+        };
+    }
+}
+
+class bolt
+{
+    constructor (color, x, y, bounce)
+    {
+        this.color = color;
+        this.x = x;
+        this.y = y;
+        this.bounce = (bounce != null ? bounce : 0.6);
+        this.bounced = 0;
+        this.width = 10;
         this.height = 10;
-    }
-    else
-    {
-        this.width = 44;
-        this.height = 22;
-    }
-    
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        switch (this.type)
-        {
-            case 0:
-                ctx.fillRect (6, 0, 22, 2);
-                ctx.fillRect (2, 2, 30, 4);
-                ctx.fillRect (0, 6, 34, 4);
-                ctx.fillStyle = this.color4;
-                ctx.fillRect (8, 2, 18, 2);
-                ctx.fillRect (6, 4, 22, 4);
-                ctx.fillRect (8, 8, 18, 2);
-            break;
-            case 1:
-                ctx.fillRect (0, 0, 34, 10);
-                ctx.fillRect (2, 10, 30, 2);
-                ctx.fillRect (4, 12, 26, 2);
-                ctx.fillRect (38, 0, 6, 2);
-                ctx.fillRect (34, 4, 10, 2);
-                ctx.fillRect (36, 8, 6, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (38, 2, 6, 2);
-                ctx.fillRect (10, 14, 14, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (36, 6, 6, 2);
-                ctx.fillRect (0, 18, 34, 4);
-                ctx.fillStyle = this.color4;
-                ctx.fillRect (4, 2, 4, 8);
-                ctx.fillRect (6, 10, 6, 2);
-        }
-        ctx.restore ();
-    }
-}
+        this.speedX = -(Math.floor (Math.random () * 6 + 1));
+        this.speedY = -(Math.floor (Math.random () * 4 - 2));
+        this.gravity = gravity;
 
-function mack (type, color, color2, color3, x, y, heading)
-{
-    this.type = (type != null ? type : 0);
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.heading = (heading != null ? heading : 1);
-    this.width = 26;
-    this.height = 30;
-    this.speedX = 0;
-    this.speedY = 0;
-    this.moveX = 0;
-    this.moveY = 0;
-    this.jump = 0;
-    this.jumping = false;
-    this.spring_board = false;
-    this.elevator = false;
-    this.girder = false;
-    this.conveyor_belt = false;
-    this.state = null;
-    this.dead = 0;
-    this.deadFrame = 0;
-    this.lifes = 3;
-    this.floor = 0;
-    this.enemyKill = null;
-    this.item = null;
-    this.gravity = gravity;
-
-    this.dropItem = function ()
-    {
-        if (this.item != null && gameItems [this.item].constructor.name == "rivet_gun")
+        this.update = function (idEnemy)
         {
-            gameItems [this.item].direction = 0;
-            gameItems [this.item].x = gameMap.x + 151;
-            gameItems [this.item].y = 306;
-            this.item = null;
-        }
-    }
-
-    this.update = function ()
-    {
-        if (gameScreen == "game" && !levelCompleted)
-        {
-            this.x = Number ((this.x + this.speedX).toFixed (2));
-            this.y = Number ((this.y + this.speedY).toFixed (2));
-            if (this.dead == 0)
+            if (!levelCompleted)
             {
-                for (let enemy = 0; enemy < gameEnemies.length; enemy++)
-                {
-                    if (this.x < gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width > gameEnemies [enemy].x && this.y < gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height > gameEnemies [enemy].y)
-                    {
-                        this.dead = 2;
-                        gameEnemies [enemy].speedX = 0;
-                        gameEnemies [enemy].speedY = 0;
-                        gameEnemies [enemy].gravity = 0;
-                        this.enemyKill = enemy;
-                    }
-                }
-                for (let item = 0; item < gameItems.length; item++)
-                {
-                    if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y)
-                    {
-                        if (gameItems [item].constructor.name == "tool" || gameItems [item].constructor.name == "toolbox")
-                        {
-                            if (gameItems [item].constructor.name == "tool") score += 200;
-                            else
-                            {
-                                score += 25;
-                                gameMap.items--;
-                            }
-                            gameItems.splice (item, 1);
-                            item--;
-                            if (this.item != null && this.item > item) this.item--;
-                        }
-                        else if (this.item == null)
-                        {
-                            if (gameItems [item].constructor.name == "girder_piece")
-                            {
-                                score += 10;
-                                gameItems [item].type = 1;
-                                gameItems [item].turn = 0;
-                            }
-                            this.item = item;
-                        }
-                    }
-                }
-                if (this.item != null)
-                {
-                    if (this.heading == 1 && this.x < gameMap.x + 506 - this.width || this.x < gameMap.x + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
-                    else gameItems [this.item].x = this.x - gameItems [this.item].width;
-                    gameItems [this.item].y = this.y;
-                    if (gameItems [this.item].constructor.name == "girder_piece")
-                    {
-                        gameItems [this.item].y += 4;
-                        if (this.floor > 0 && gameMap.girderBreaks [this.floor - 1].girderPiece == null && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameItems [this.item].type > 0)
-                        {
-                            score += 25;
-                            gameItems [this.item].type = 2;
-                            gameItems [this.item].y = this.floor * 64 + 80;
-                            gameMap.girderBreaks [this.floor - 1].girderPiece = gameFront.length;
-                            gameFront.push (gameItems [this.item]);
-                            gameItems.splice (this.item, 1);
-                            this.item = null;
-                            gameAudios [0].play ();
-                        }
-                    }
-                    else if (this.floor > 0 && gameItems [this.item].constructor.name == "rivet_gun" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
-                    {
-                        score += 50;
-                        gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type = 3;
-                        gameMap.items--;
-                        gameAudios [3].play ();
-                        if (gameMap.items == 0)
-                        {
-                            levelCompleted = true;
-                            gameMap.startFrame = gameArea.frame;
-                        }
-                    }
-                }
-            }
-            if (this.elevator)
-            {
-                if (gameMap.elevatorSpeed == 0)
-                {
-                    this.speedY = 0;
-                    if (this.dead == 0)
-                    {
-                        if (this.type < 14)
-                        {
-                            if (this.type == 4) this.type = 7;
-                            if (gameArea.frame % 5 == 0) this.type++;
-                        }
-                        else this.elevator = false;
-                    }
-                }
-                else if (this.dead == 0) this.type = 4;
-            }
-            else
-            {
-                if (this.dead == 0 && this.state == "ground" && !this.spring_board && !this.elevator) this.speedX = this.moveX;
-                if (this.state != "chain") this.state = "air";
+                this.x = Number ((this.x + this.speedX).toFixed (2));
+                this.y = Number ((this.y + this.speedY).toFixed (2));
                 for (let front = 0; front < gameFront.length; front++)
                 {
-                    if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
+                    if ((gameFront [front].constructor.name == "girder_piece" || gameFront [front].constructor.name == "girder_h") && gameFront [front].y > this.bounced)
                     {
-                        if (this.state != "chain")
+                        if (this.x < gameFront [front].x + gameFront [front].width && this.x >= gameFront [front].x || this.x + this.width > gameFront [front].x && this.x + this.width <= gameFront [front].x + gameFront [front].width)
                         {
-                            if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0)
+                            if (this.y + this.height > gameFront [front].y && this.y + this.height <= gameFront [front].y + gameFront [front].height && this.speedY > 0) this.y = gameFront [front].y - this.height;
+                            if (this.y == gameFront [front].y - this.height)
                             {
-                                this.height = 30;
-                                this.y = gameFront [front].y - this.height;
+                                this.speedY = -(this.speedY * this.bounce);
+                                this.bounced = gameFront [front].y;
+                                gameAudios [1].play ();
                             }
-                            else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
-                        }
-                        if (this.y == gameFront [front].y - this.height)
-                        {
-                            this.state = "ground";
-                            this.girder = false;
-                            this.conveyor_belt = false;
-                            if (gameFront [front].constructor.name == "spring_board" && !this.spring_board)
-                            {
-                                this.spring_board = true;
-                                gameFront [front].type = 1;
-                            }
-                            else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
-                            {
-                                this.elevator = true;
-                                this.speedX = 0;
-                                if (this.item == null) this.x -= Math.round (gameFront [front].x) / 2 - this.width / 4;
-                                else this.x = gameFront [front].x;
-                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                                this.speedY = gameMap.elevatorSpeed;
-                            }
-                            else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "concrete_mixer" || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0)
-                            {
-                                if (gameFront [front].constructor.name == "girder_h") this.girder = true;
-                                else if (gameFront [front].constructor.name == "conveyor_belt") this.conveyor_belt = true;
-                                this.dead = 1;
-                            }
-                            else if (gameFront [front].constructor.name == "girder_h")
-                            {
-                                if (level != 2) this.floor = (gameFront [front].y - 80) / 64;
-                                else if (gameFront [front].type == 0)
-                                {
-                                    this.girder = true;
-                                    if (gameFront [front].speedY == 0) gameFront [front].speedY = -0.5;
-                                    this.speedY = gameFront [front].speedY;
-                                }
-                            }
-                            else if (gameFront [front].constructor.name == "conveyor_belt")
-                            {
-                                this.speedX = 1;
-                                this.conveyor_belt = true;
-                            }
-                            if (!this.elevator && !this.girder) this.speedY = 0;
-                        }
-                        else if (this.state != "chain" && this.y == gameFront [front].y + gameFront [front].height)
-                        {
-                            if (gameFront [front].constructor.name == "bell")
-                            {
-                                score += 10;
-                                gameFront [front].rings = 1;
-                                if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
-                                else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
-                            }
-                            this.speedY = 0;
                         }
                     }
-                    if (this.state != "chain" && this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
+                }
+                this.speedY = this.speedY + this.gravity;
+                if (this.y > gameMap.height || this.x + this.width < 0) gameEnemies.splice (idEnemy, 1);
+            }
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (0, 0, 10, 4);
+            ctx.fillRect (2, 4, 6, 6);
+            ctx.restore ();
+        };
+    }
+}
+
+class rivet_gun
+{
+    constructor (color, color2, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.x = x;
+        this.y = y;
+        this.width = 28;
+        this.height = 30;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.type = 0;
+        this.direction = 0;
+
+        this.update = function (idItem)
+        {
+            if (!levelCompleted)
+            {
+                if (idItem == player.item)
+                {
+                    this.speedX = player.speedX;
+                    this.speedY = player.speedY;
+                }
+                else
+                {
+                    if (this.direction == 0)
                     {
-                        if (this.x == gameFront [front].x + gameFront [front].width && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                        if (this.x == gameMap.x + 151 && this.y == 306)
                         {
-                            if (this.y + this.height - gameFront [front].y < 4) this.y -= (this.y + this.height - gameFront [front].y);
-                            else
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 306)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 242 && this.speedX == 0)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 418 && this.y == 242)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 81 && this.y == 242)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 81 && this.y == 178)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 141 && this.y == 178 && this.speedY == 0)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 141 && this.y == 114 && this.speedX == 0)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 201 && this.y == 114 && this.speedX > 0)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 201 && this.y == 50)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                            this.direction = 1
+                        }
+                    }
+                    else
+                    {
+                        if (this.x == gameMap.x + 418 && this.y == 50)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 418 && this.y == 114)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 81 && this.y == 114)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 81 && this.y == 178)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 393 && this.y == 178)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 393 && this.y == 242)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 242)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == Math.round (gameMap.width / 2) - Math.round (this.width / 2) && this.y == 306)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                            this.direction = 0;
+                        }
+                    }
+                    this.x += this.speedX; 
+                    this.y += this.speedY;
+                }
+                if (this.speedX != 0 && this.speedY == 0 && gameArea.frame % 5 == 0)
+                {
+                    if (this.type == 0) this.type = 1;
+                    else this.type = 0;
+                }
+            }
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y + (this.type == 1 ? 6 : 0)));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (10, 0, 6, 2);
+            ctx.fillRect (0, 2, 28, 2);
+            ctx.fillRect (2, 4, 24, 2);
+            ctx.fillRect (8, 10, 10, 6);
+            ctx.fillRect (10, 20, 8, 2);
+            ctx.fillRect (12, 22, 4, (this.type == 0 ? 8 : 2));
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (8, 6, 10, 4);
+            ctx.fillRect (8, 12, 10, 2);
+            ctx.fillRect (8, 16, 10, 6);
+            ctx.restore ();
+        };
+    }
+}
+
+class toolbox
+{
+    constructor (color, color2, color3, color4, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.color4 = color4;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 28;
+        this.height = 22;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (4, 6, 20, 2);
+            ctx.fillRect (2, 8, 24, 2);
+            ctx.fillRect (0, 10, 28, 12);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (2, 14, 8, 6);
+            ctx.fillRect (16, 14, 12, 6);
+            ctx.fillStyle = this.color3;
+            ctx.fillRect (10, 0, 8, 2);
+            ctx.fillRect (8, 2, 2, 4);
+            ctx.fillRect (18, 2, 2, 4);
+            ctx.fillStyle = this.color4;
+            ctx.fillRect (10, 6, 2, 2);
+            ctx.fillRect (12, 8, 2, 2);
+            ctx.fillRect (14, 10, 2, 4);  
+            ctx.restore ();
+        };
+    }
+}
+
+class duct
+{
+    constructor (color, color2, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 78;
+        this.height = 14;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            ctx.fillRect (0, 4, 76, 2);
+            ctx.fillRect (0, 8, 78, 2);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (0, 0, 70, 2);
+            ctx.fillRect (0, 2, 74, 2);
+            ctx.fillRect (0, 6, 78, 2);
+            ctx.fillRect (0, 10, 78, 4);
+            ctx.restore ();
+        };
+    }
+}
+
+class spigot
+{
+    constructor (color, color2, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 18;
+        this.height = 12;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (0, 0, this.width, this.height);
+            ctx.fillStyle = this.color;
+            ctx.fillRect (0, 4, this.width, 2);
+            ctx.fillRect (0, 8, this.width, 2);
+            ctx.restore ();
+        };
+    }
+}
+
+class tool
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.type = Math.floor (Math.random () * 4);
+        if (this.type == 0) this.width = 28;
+        else if (this.type == 1)
+        {
+            this.x += 4;
+            this.width = 20;
+        }
+        else this.width = 26;
+        if (this.type == 1)
+        {
+            this.y -= 4;
+            this.height = 32;
+        }
+        else this.height = 28;
+        this.width = 26;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (16, 0, 6, 4);
+                    ctx.fillRect (14, 2, 4, 8);
+                    ctx.fillRect (24, 4, 4, 6);
+                    ctx.fillRect (18, 8, 8, 4);
+                    ctx.fillRect (12, 10, 8, 4);
+                    ctx.fillRect (10, 12, 8, 4);
+                    ctx.fillRect (8, 14, 8, 4);
+                    ctx.fillRect (2, 16, 8, 4);
+                    ctx.fillRect (0, 18, 4, 4);
+                    ctx.fillRect (10, 18, 4, 8);
+                    ctx.fillRect (4, 24, 8, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (18, 2, 2, 2);
+                    ctx.fillRect (24, 4, 2, 2);
+                    ctx.fillRect (2, 20, 2, 2);
+                    ctx.fillRect (10, 22, 2, 2);
+                break;
+                case 1:
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (0, 2, 10, 14);
+                    ctx.fillRect (4, 22, 2, 2);
+                    ctx.fillRect (4, 28, 2, 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (0, 0, 10, 2);
+                    ctx.fillRect (8, 2, 4, 6);
+                    ctx.fillRect (0, 6, 6, 2);
+                    ctx.fillRect (0, 10, 6, 2);
+                    ctx.fillRect (2, 16, 6, 2);
+                    ctx.fillRect (2, 20, 4, 2);
+                    ctx.fillRect (2, 26, 4, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (12, 2, 4, 6);
+                    ctx.fillRect (16, 6, 2, 2);
+                    ctx.fillRect (18, 2, 2, 6);
+                    ctx.fillRect (2, 18, 2, 2);
+                    ctx.fillRect (2, 24, 2, 2);
+                    ctx.fillRect (2, 30, 2, 2);
+                break;
+                case 2:
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (12, 6, 6, 22);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (20, 0, 6, 8);
+                    ctx.fillRect (6, 2, 14, 4);
+                    ctx.fillRect (4, 4, 4, 4);
+                    ctx.fillRect (2, 6, 2, 2);
+                    ctx.fillRect (0, 8, 2, 2);
+                    ctx.fillRect (12, 20, 6, 6);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (2, 8, 2, 2);
+                break;
+                case 3:
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (16, 0, 6, 2);
+                    ctx.fillRect (12, 2, 6, 2);
+                    ctx.fillRect (8, 4, 18, 6);
+                    ctx.fillRect (6, 6, 18, 6);
+                    ctx.fillRect (4, 8, 18, 6);
+                    ctx.fillRect (6, 14, 14, 2);
+                    ctx.fillRect (8, 16, 10, 2);
+                    ctx.fillRect (6, 20, 14, 2);
+                    ctx.fillRect (0, 26, 26, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (18, 2, 6, 6);
+                    ctx.fillRect (10, 12, 6, 2);
+                    ctx.fillRect (12, 14, 2, 8);
+                    ctx.fillRect (10, 18, 6, 2);
+                    ctx.fillRect (6, 22, 14, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (0, 24, 26, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class magnet
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 26;
+        this.height = 32;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color3;
+            ctx.fillRect (10, 0, 6, 22);
+            ctx.fillStyle = this.color;
+            ctx.fillRect (4, 22, 18, 2);
+            ctx.fillRect (2, 24, 22, 2);
+            ctx.fillRect (0, 28, 26, 2);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (2, 26, 22, 2);
+            ctx.fillRect (2, 30, 22, 2);
+            ctx.restore ();
+        };
+    }
+}
+
+class crane
+{
+    constructor (color, color2, color3, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 28;
+        this.height = 28;
+        this.type = 0;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            if (gameArea.frame % 25 == 0)
+            {
+                if (this.type == 0) this.type = 1;
+                else this.type = 0;
+            }
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillRect (4, 2, 10, 2);
+                    ctx.fillRect (2, 4, 14, 2);
+                    ctx.fillRect (4, 12, 20, 2);
+                    ctx.fillRect (2, 14, 24, 12);
+                    ctx.fillRect (4, 26, 20, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 0, 2, 2);
+                    ctx.fillRect (10, 14, 10, 12);
+                    ctx.fillRect (8, 16, 2, 8);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 6, 6, 6);
+                    ctx.fillRect (6, 16, 2, 8);
+                    ctx.fillRect (12, 16, 4, 2);
+                    ctx.fillRect (8, 18, 14, 4);
+                break;
+                case 1:
+                    ctx.fillRect (4, 6, 10, 2);
+                    ctx.fillRect (2, 8, 14, 2);
+                    ctx.fillRect (2, 12, 24, 2);
+                    ctx.fillRect (0, 14, 28, 12);
+                    ctx.fillRect (2, 26, 24, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 4, 2, 2);
+                    ctx.fillRect (6, 14, 18, 12);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 10, 6, 2);
+                    ctx.fillRect (12, 16, 6, 2);
+                    ctx.fillRect (10, 18, 10, 4);
+                    ctx.fillRect (12, 22, 6, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class wire
+{
+    constructor (color, thick, points)
+    {
+        this.color = color;
+        this.thick = (thick != null ? thick : 1);
+        this.points = (points != null ? points : []);
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.beginPath ();
+            ctx.moveTo (Math.round (this.points [0].x), Math.round (this.points [0].y));
+            for (let i = 1; i < this.points.length; i++) ctx.lineTo (this.points [i].x, (i + 1 == this.points.length ? gameFront [52].y + gameFront [52].speedY : this.points [i].y));
+            ctx.lineWidth = this.thick;
+            ctx.strokeStyle = this.color;
+            ctx.stroke ();
+        };
+    }
+}
+
+class incinerator
+{
+    constructor (color, color2, color3, color4, x, y)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.color4 = color4;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 28;
+        this.height = 50;
+        this.type = 0;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (4, 4, 22, 26);
+            ctx.fillRect (0, 6, 4, 10);
+            ctx.fillRect (0, 34, 28, 4);
+            ctx.fillRect (0, 46, 28, 4);
+            ctx.fillStyle = this.color;
+            ctx.fillRect (4, 8, 22, 8);
+            ctx.fillStyle = this.color4;
+            ctx.fillRect (8, 10, 14, 4);
+            ctx.fillStyle = this.color;
+            ctx.fillRect (14, 12, 4, 2);
+            ctx.fillRect (8, 18, 14, 2);
+            ctx.fillRect (8, 24, 6, 4);
+            ctx.fillRect (16, 24, 6, 4);
+            ctx.fillRect (0, 30, 26, 2);
+            ctx.fillStyle = this.color3;
+            ctx.fillRect (6, 0, 6, 4);
+            ctx.fillRect (18, 0, 6, 4);
+            ctx.fillRect (6, 38, 22, 8);
+            ctx.fillStyle = this.color2;
+            if (gameArea.frame % 25 == 0)
+            {
+                if (this.type == 3) this.type = 0;
+                else this.type++;
+            }
+            switch (this.type)
+            {
+                case 1:
+                    ctx.fillRect (-18, 14, 2, 2);
+                    ctx.fillRect (-10, 16, 2, 2);
+                    ctx.fillRect (-2, 16, 2, 2);
+                    ctx.fillRect (-18, 20, 2, 4);
+                    ctx.fillRect (-16, 24, 4, 2);
+                    ctx.fillRect (-14, 26, 2, 2);
+                    ctx.fillRect (-10, 24, 2, 2);
+                    ctx.fillRect (-6, 28, 2, 2);
+                    ctx.fillRect (-2, 28, 2, 4);
+                    ctx.fillRect (-16, 18, 6, 6);
+                    ctx.fillRect (-8, 20, 8, 8);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (-16, 16, 4, 2);
+                    ctx.fillRect (-14, 18, 6, 2);
+                    ctx.fillRect (-4, 18, 4, 2);
+                    ctx.fillRect (-10, 20, 6, 2);
+                    ctx.fillRect (-14, 22, 6, 2);
+                    ctx.fillRect (-6, 26, 6, 2);
+                break;
+                case 2:
+                    ctx.fillRect (-18, 0, 4, 8);
+                    ctx.fillRect (-14, 6, 6, 22);
+                    ctx.fillRect (-10, 12, 6, 18);
+                    ctx.fillRect (-2, 16, 2, 2);
+                    ctx.fillRect (-4, 20, 4, 12);
+                    ctx.fillRect (-26, 18, 8, 2);
+                    ctx.fillRect (-18, 18, 4, 8);
+                    ctx.fillRect (-22, 24, 2, 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (-20, 2, 4, 6);
+                    ctx.fillRect (-10, 10, 4, 2);
+                    ctx.fillRect (-26, 14, 4, 2);
+                    ctx.fillRect (-10, 14, 2, 2);
+                    ctx.fillRect (-24, 16, 4, 2);
+                    ctx.fillRect (-18, 16, 6, 2);
+                    ctx.fillRect (-14, 18, 6, 2);
+                    ctx.fillRect (-6, 18, 6, 2);
+                    ctx.fillRect (-26, 20, 10, 2);
+                    ctx.fillRect (-22, 22, 6, 2);
+                    ctx.fillRect (-14, 22, 6, 2);
+                    ctx.fillRect (-6, 24, 2, 2);
+                break;
+                case 3:
+                    ctx.fillRect (-14, 0, 4, 8);
+                    ctx.fillRect (-26, 6, 2, 4);
+                    ctx.fillRect (-10, 6, 2, 8);
+                    ctx.fillRect (-26, 10, 4, 10);
+                    ctx.fillRect (-18, 10, 4, 2);
+                    ctx.fillRect (-22, 12, 2, 2);
+                    ctx.fillRect (-16, 12, 4, 2);
+                    ctx.fillRect (-8, 12, 4, 4);
+                    ctx.fillRect (-18, 14, 6, 2);
+                    ctx.fillRect (-22, 16, 2, 2);
+                    ctx.fillRect (-10, 16, 10, 14);
+                    ctx.fillRect (-22, 18, 8, 8);
+                    ctx.fillRect (-14, 20, 4, 8);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (-26, 2, 4, 4);
+                    ctx.fillRect (-16, 2, 4, 6);
+                    ctx.fillRect (-28, 4, 2, 6);
+                    ctx.fillRect (-22, 8, 4, 2);
+                    ctx.fillRect (-10, 10, 4, 2);
+                    ctx.fillRect (-18, 16, 6, 2);
+                    ctx.fillRect (-14, 18, 6, 2);
+                    ctx.fillRect (-26, 20, 10, 2);
+                    ctx.fillRect (-22, 22, 6, 2);
+                    ctx.fillRect (-14, 22, 6, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class trap
+{
+    constructor (color, color2, x, y, width, height)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = width;
+        this.height = height;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            const canvasAux = createCanvas (1, this.height);
+            canvasAux.width = 1;
+            canvasAux.height = this.height;
+            const ctxAux = canvasAux.getContext ("2d");
+            ctxAux.lineWidth = 0;
+            for (let y = 0; y + 2 <= this.height; y += 2)
+            {
+                if (ctxAux.fillStyle == this.color) ctxAux.fillStyle = this.color2;
+                else ctxAux.fillStyle = this.color;
+                ctxAux.fillRect (0, y, 1, 2);
+            }
+            const pattern = ctx.createPattern (canvasAux);
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = pattern;
+            ctx.fillRect (0, 0, this.width, this.height);
+            ctx.restore ();
+        };
+    }
+}
+
+class vice
+{
+    constructor (color, x, y, width, height, heading)
+    {
+        this.color = color;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = width;
+        this.height = height;
+        this.heading = (heading != null ? heading : 1);
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.color;
+            ctx.save ();
+            ctx.scale (this.heading, 1);
+            ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
+            ctx.fillRect (10, 0, 4, 8);
+            ctx.fillRect (6, 4, 2, 2);
+            ctx.fillRect (4, 6, 4, 2);
+            ctx.fillRect (2, 8, 4, 2);
+            ctx.fillRect (0, 10, 6, 2);
+            ctx.fillRect (8, 10, 2, 2);
+            ctx.restore ();
+        };
+    }
+}
+
+class hydraulic
+{
+    constructor (color, x, y, width, height)
+    {
+        this.color = color;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = width;
+        this.height = height;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.color;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillRect (0, 0, 2, 2);
+            ctx.fillRect (4, 0, 2, 2);
+            ctx.restore ();
+        };
+    }
+}
+
+class stamper
+{
+    constructor (color, color2, x, y, width, height)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = width;
+        this.height = height;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.color;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillRect (2, 0, this.width - 4, 2);
+            ctx.fillRect (0, 2, this.width, this.height - 2);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (6, 2, 14, 2);
+            ctx.fillRect (6, 4, 2, 2);
+            ctx.fillRect (14, 4, 2, 2);
+            ctx.fillRect (10, 6, 2, 2);
+            ctx.fillRect (18, 6, 2, 2);
+            ctx.fillRect (6, 8, 14, 2);
+            ctx.restore ();
+        };
+    }
+}
+
+class tnt
+{
+    constructor (color, color2, x, y, width, height)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = width;
+        this.height = height;
+        this.type = 0;
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.color;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillRect (0, 0, this.width, this.height);
+            ctx.fillStyle = this.color2;
+            ctx.fillRect (0, 8, this.width, 2);
+            ctx.restore ();
+            if (gameArea.frame % 10 == 0)
+            {
+                if (this.type == 0) this.type = 1;
+                else this.type = 0;
+            }
+            switch (this.type)
+            {
+                case 0:
+                    gameBack [gameBack.length - 3].color = this.color2;
+                    gameBack [gameBack.length - 3].x = this.x + 10;
+                    gameBack [gameBack.length - 3].y = this.y - 6;
+                    gameBack [gameBack.length - 2].color = this.color2;
+                    gameBack [gameBack.length - 2].x = this.x + 10;
+                    gameBack [gameBack.length - 2].y = this.y - 10;
+                    gameBack [gameBack.length - 1].color = this.color2;
+                    gameBack [gameBack.length - 1].x = this.x + 14;
+                    gameBack [gameBack.length - 1].y = this.y - 8;
+                break;
+                case 1:
+                    gameBack [gameBack.length - 3].color = this.color;
+                    gameBack [gameBack.length - 3].x = this.x + 12;
+                    gameBack [gameBack.length - 3].y = this.y - 6;
+                    gameBack [gameBack.length - 2].color = this.color2;
+                    gameBack [gameBack.length - 2].x = this.x + 10;
+                    gameBack [gameBack.length - 2].y = this.y - 8;
+                    gameBack [gameBack.length - 1].color = this.color2;
+                    gameBack [gameBack.length - 1].x = this.x + 14;
+                    gameBack [gameBack.length - 1].y = this.y - 10;
+            }
+        };
+    }
+}
+
+class conveyor_belt
+{
+    constructor (color, color2, color3, color4, x, y, width, height)
+    {
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.color4 = color4;
+        this.x = (x != null ? x : 0);
+        this.startX = this.x;
+        this.y = (y != null ? y : 0);
+        this.startY = this.y;
+        this.width = (width != null ? width : 6);
+        this.height = (height != null ? height : 32);
+        this.turn = 0;
+        
+        this.update = function ()
+        {
+            if (this.color != null && this.color2 != null && this.color3 != null && this.color4 != null)
+            {
+                this.x = this.startX + 102;
+                this.y = this.startY + 12;
+                this.radians = this.turn * Math.PI / 180;
+                let ctx = gameArea.ctx;
+                ctx.lineWidth = 0;
+                ctx.save ();
+                ctx.translate (Math.round (this.startX), Math.round (this.startY));
+                ctx.fillStyle = this.color;
+                ctx.fillRect (0, 34, 2, 8);
+                for (let i = 0; i < 17; i++) ctx.fillRect (2 + i * 6, 32 - i * 2, 12, 12);
+                ctx.fillRect (110, 2, 2, 8);
+                ctx.fillRect (102, 12, 6, 32);
+                ctx.fillRect (88, 36, 14, 8);
+                ctx.fillRect (86, 38, 2, 2);
+                ctx.fillRect (84, 42, 4, 2);
+                ctx.fillStyle = this.color2;
+                ctx.translate (8, 38);
+                ctx.rotate (this.radians);
+                ctx.fillRect (-2, -6, 4, 12);
+                ctx.rotate (-this.radians);
+                ctx.translate (96, -32);
+                ctx.rotate (this.radians);
+                ctx.fillRect (-2, -6, 4, 12);
+                ctx.rotate (-this.radians);
+                ctx.translate (-104, -6);
+                for (let i = 0; i < 13; i++) ctx.fillRect (16 + i * 6, 30 - i * 2, 8, 8);
+                ctx.fillRect (14, 32, 2, 2);
+                ctx.fillRect (16, 38, 2, 2);
+                ctx.fillRect (94, 4, 2, 2);
+                ctx.fillRect (96, 10, 2, 2);
+                ctx.fillStyle = this.color;
+                for (let i = 0; i < 6; i++) ctx.fillRect (23 + i * 12, 30 - i * 4, 6, 4);
+                ctx.fillStyle = this.color3;
+                ctx.fillRect (7, 34, 2, 2);
+                ctx.fillRect (7, 40, 2, 2);
+                ctx.fillRect (84, 40, 6, 2);
+                ctx.fillRect (90, 38, 10, 4);
+                ctx.fillStyle = this.color4;
+                ctx.fillRect (7, 36, 2, 4);
+                ctx.restore ();
+                this.turn += 10;
+                if (this.turn == 360) this.turn = 0;
+            }
+        };
+    }
+}
+
+class concrete_mixer
+{
+    constructor (type, color, color2, color3, color4, x, y)
+    {
+        this.type = type;
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.color4 = color4;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        if (this.type == 0)
+        {
+            this.width = 34;
+            this.height = 10;
+        }
+        else
+        {
+            this.width = 44;
+            this.height = 22;
+        }
+        
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.translate (Math.round (this.x), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillRect (6, 0, 22, 2);
+                    ctx.fillRect (2, 2, 30, 4);
+                    ctx.fillRect (0, 6, 34, 4);
+                    ctx.fillStyle = this.color4;
+                    ctx.fillRect (8, 2, 18, 2);
+                    ctx.fillRect (6, 4, 22, 4);
+                    ctx.fillRect (8, 8, 18, 2);
+                break;
+                case 1:
+                    ctx.fillRect (0, 0, 34, 10);
+                    ctx.fillRect (2, 10, 30, 2);
+                    ctx.fillRect (4, 12, 26, 2);
+                    ctx.fillRect (38, 0, 6, 2);
+                    ctx.fillRect (34, 4, 10, 2);
+                    ctx.fillRect (36, 8, 6, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (38, 2, 6, 2);
+                    ctx.fillRect (10, 14, 14, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (36, 6, 6, 2);
+                    ctx.fillRect (0, 18, 34, 4);
+                    ctx.fillStyle = this.color4;
+                    ctx.fillRect (4, 2, 4, 8);
+                    ctx.fillRect (6, 10, 6, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class mack
+{
+    constructor (type, color, color2, color3, x, y, heading)
+    {
+        this.type = (type != null ? type : 0);
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.heading = (heading != null ? heading : 1);
+        this.width = 26;
+        this.height = 30;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.moveX = 0;
+        this.moveY = 0;
+        this.jump = 0;
+        this.jumping = false;
+        this.spring_board = false;
+        this.elevator = false;
+        this.girder = false;
+        this.conveyor_belt = false;
+        this.state = null;
+        this.dead = 0;
+        this.deadFrame = 0;
+        this.lifes = 3;
+        this.floor = 0;
+        this.enemyKill = null;
+        this.item = null;
+        this.gravity = gravity;
+
+        this.dropItem = function ()
+        {
+            if (this.item != null && gameItems [this.item].constructor.name == "rivet_gun")
+            {
+                gameItems [this.item].direction = 0;
+                gameItems [this.item].x = gameMap.x + 151;
+                gameItems [this.item].y = 306;
+                this.item = null;
+            }
+        };
+
+        this.update = function ()
+        {
+            if (gameScreen == "game" && !levelCompleted)
+            {
+                this.x = Number ((this.x + this.speedX).toFixed (2));
+                this.y = Number ((this.y + this.speedY).toFixed (2));
+                if (this.dead == 0)
+                {
+                    for (let enemy = 0; enemy < gameEnemies.length; enemy++)
+                    {
+                        if (this.x < gameEnemies [enemy].x + gameEnemies [enemy].width && this.x + this.width > gameEnemies [enemy].x && this.y < gameEnemies [enemy].y + gameEnemies [enemy].height && this.y + this.height > gameEnemies [enemy].y)
+                        {
+                            this.dead = 2;
+                            gameEnemies [enemy].speedX = 0;
+                            gameEnemies [enemy].speedY = 0;
+                            gameEnemies [enemy].gravity = 0;
+                            this.enemyKill = enemy;
+                        }
+                    }
+                    for (let item = 0; item < gameItems.length; item++)
+                    {
+                        if (this.x <= gameItems [item].x + gameItems [item].width && this.x + this.width >= gameItems [item].x && this.y <= gameItems [item].y + gameItems [item].height && this.y + this.height >= gameItems [item].y)
+                        {
+                            if (gameItems [item].constructor.name == "tool" || gameItems [item].constructor.name == "toolbox")
+                            {
+                                if (gameItems [item].constructor.name == "tool") score += 200;
+                                else
+                                {
+                                    score += 25;
+                                    gameMap.items--;
+                                }
+                                gameItems.splice (item, 1);
+                                item--;
+                                if (this.item != null && this.item > item) this.item--;
+                            }
+                            else if (this.item == null)
+                            {
+                                if (gameItems [item].constructor.name == "girder_piece")
+                                {
+                                    score += 10;
+                                    gameItems [item].type = 1;
+                                    gameItems [item].turn = 0;
+                                }
+                                this.item = item;
+                            }
+                        }
+                    }
+                    if (this.item != null)
+                    {
+                        if (this.heading == 1 && this.x < gameMap.x + 506 - this.width || this.x < gameMap.x + gameItems [this.item].width) gameItems [this.item].x = this.x + this.width;
+                        else gameItems [this.item].x = this.x - gameItems [this.item].width;
+                        gameItems [this.item].y = this.y;
+                        if (gameItems [this.item].constructor.name == "girder_piece")
+                        {
+                            gameItems [this.item].y += 4;
+                            if (this.floor > 0 && gameMap.girderBreaks [this.floor - 1].girderPiece == null && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameItems [this.item].type > 0)
+                            {
+                                score += 25;
+                                gameItems [this.item].type = 2;
+                                gameItems [this.item].y = this.floor * 64 + 80;
+                                gameMap.girderBreaks [this.floor - 1].girderPiece = gameFront.length;
+                                gameFront.push (gameItems [this.item]);
+                                gameItems.splice (this.item, 1);
+                                this.item = null;
+                                gameAudios [0].play ();
+                            }
+                        }
+                        else if (this.floor > 0 && gameItems [this.item].constructor.name == "rivet_gun" && gameItems [this.item].x == gameMap.x + 167 + gameMap.girderBreaks [this.floor - 1].girderBreak * 28 && gameMap.girderBreaks [this.floor - 1].girderPiece != null && gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type < 3)
+                        {
+                            score += 50;
+                            gameFront [gameMap.girderBreaks [this.floor - 1].girderPiece].type = 3;
+                            gameMap.items--;
+                            gameAudios [3].play ();
+                            if (gameMap.items == 0)
+                            {
+                                levelCompleted = true;
+                                gameMap.startFrame = gameArea.frame;
+                            }
+                        }
+                    }
+                }
+                if (this.elevator)
+                {
+                    if (gameMap.elevatorSpeed == 0)
+                    {
+                        this.speedY = 0;
+                        if (this.dead == 0)
+                        {
+                            if (this.type < 14)
+                            {
+                                if (this.type == 4) this.type = 7;
+                                if (gameArea.frame % 5 == 0) this.type++;
+                            }
+                            else this.elevator = false;
+                        }
+                    }
+                    else if (this.dead == 0) this.type = 4;
+                }
+                else
+                {
+                    if (this.dead == 0 && this.state == "ground" && !this.spring_board && !this.elevator) this.speedX = this.moveX;
+                    if (this.state != "chain") this.state = "air";
+                    for (let front = 0; front < gameFront.length; front++)
+                    {
+                        if (this.x < gameFront [front].x + gameFront [front].width && this.x + this.width > gameFront [front].x)
+                        {
+                            if (this.state != "chain")
+                            {
+                                if (this.y + this.height > gameFront [front].y && this.y <= gameFront [front].y && this.speedY > 0)
+                                {
+                                    this.height = 30;
+                                    this.y = gameFront [front].y - this.height;
+                                }
+                                else if (this.y < gameFront [front].y + gameFront [front].height && this.y + this.height >= gameFront [front].y + gameFront [front].height && this.speedY < 0) this.y = gameFront [front].y + gameFront [front].height;
+                            }
+                            if (this.y == gameFront [front].y - this.height)
+                            {
+                                this.state = "ground";
+                                this.girder = false;
+                                this.conveyor_belt = false;
+                                if (gameFront [front].constructor.name == "spring_board" && !this.spring_board)
+                                {
+                                    this.spring_board = true;
+                                    gameFront [front].type = 1;
+                                }
+                                else if (gameFront [front].constructor.name == "elevator" && gameFront [front].type == 3 && !this.elevator && this.speedX < 0 && this.x + this.width == gameFront [front].x + gameFront [front].width)
+                                {
+                                    this.elevator = true;
+                                    this.speedX = 0;
+                                    if (this.item == null) this.x -= Math.round (gameFront [front].x) / 2 - this.width / 4;
+                                    else this.x = gameFront [front].x;
+                                    if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                    else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                    this.speedY = gameMap.elevatorSpeed;
+                                }
+                                else if ((this.speedY > 2.8 || gameFront [front].constructor.name == "concrete_mixer" || gameFront [front].constructor.name == "elevator" && gameFront [front].type == 0) && this.dead == 0)
+                                {
+                                    if (gameFront [front].constructor.name == "girder_h") this.girder = true;
+                                    else if (gameFront [front].constructor.name == "conveyor_belt") this.conveyor_belt = true;
+                                    this.dead = 1;
+                                }
+                                else if (gameFront [front].constructor.name == "girder_h")
+                                {
+                                    if (level != 2) this.floor = (gameFront [front].y - 80) / 64;
+                                    else if (gameFront [front].type == 0)
+                                    {
+                                        this.girder = true;
+                                        if (gameFront [front].speedY == 0) gameFront [front].speedY = -0.5;
+                                        this.speedY = gameFront [front].speedY;
+                                    }
+                                }
+                                else if (gameFront [front].constructor.name == "conveyor_belt")
+                                {
+                                    this.speedX = 1;
+                                    this.conveyor_belt = true;
+                                }
+                                if (!this.elevator && !this.girder) this.speedY = 0;
+                            }
+                            else if (this.state != "chain" && this.y == gameFront [front].y + gameFront [front].height)
                             {
                                 if (gameFront [front].constructor.name == "bell")
                                 {
@@ -2908,1253 +2983,1291 @@ function mack (type, color, color2, color3, x, y, heading)
                                     if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
                                     else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
                                 }
-                                else if (gameFront [front].constructor.name == "conveyor_belt") this.dead = 1;
+                                this.speedY = 0;
+                            }
+                        }
+                        if (this.state != "chain" && this.y < gameFront [front].y + gameFront [front].height && this.y + this.height > gameFront [front].y)
+                        {
+                            if (this.x == gameFront [front].x + gameFront [front].width && this.speedX < 0 || this.x + this.width == gameFront [front].x && this.speedX > 0)
+                            {
+                                if (this.y + this.height - gameFront [front].y < 4) this.y -= (this.y + this.height - gameFront [front].y);
+                                else
+                                {
+                                    if (gameFront [front].constructor.name == "bell")
+                                    {
+                                        score += 10;
+                                        gameFront [front].rings = 1;
+                                        if (gameMap.elevatorFloor == 0) gameMap.elevatorSpeed = -4;
+                                        else if (gameMap.elevatorFloor == 192) gameMap.elevatorSpeed = 4;
+                                    }
+                                    else if (gameFront [front].constructor.name == "conveyor_belt") this.dead = 1;
+                                    this.speedX = 0;
+                                    this.gravity = gravity;
+                                }
+                            }
+                        }
+                    }
+                    if (level == 1)
+                    {
+                        if (this.x < 0) this.x = 0;
+                        else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
+                        if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0)
+                        {
+                            this.speedX = 0;
+                            this.gravity = gravity;
+                        }
+                        if (this.y < 0) this.y = 0;
+                        else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
+                        if (this.y == gameMap.height - this.height)
+                        {
+                            this.state = "ground";
+                            if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
+                        }
+                        if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
+                    }
+                    else
+                    {
+                        if (this.x < gameMap.x) this.x = gameMap.x;
+                        else if (this.x > gameMap.x + 502 - this.width) this.x = gameMap.x + 502 - this.width;
+                        if (this.x == gameMap.x && this.speedX < 0 || this.x == gameMap.x + 502 - this.width && this.speedX > 0)
+                        {
+                            this.speedX = 0;
+                            this.gravity = gravity;
+                        }
+                    }
+                    if (this.state == "air")
+                    {
+                        if (this.speedX != 0)
+                        {
+                            if (!this.jumping || this.speedX < 0 && this.x == this.jumping - 68 || this.speedX > 0 && this.x == this.jumping + 68)
+                            {
                                 this.speedX = 0;
+                                this.jumping = false;
                                 this.gravity = gravity;
                             }
                         }
-                    }
-                }
-                if (level == 1)
-                {
-                    if (this.x < 0) this.x = 0;
-                    else if (this.x > gameMap.width - this.width) this.x = gameMap.width - this.width;
-                    if (this.x == 0 && this.speedX < 0 || this.x == gameMap.width - this.width && this.speedX > 0)
-                    {
-                        this.speedX = 0;
-                        this.gravity = gravity;
-                    }
-                    if (this.y < 0) this.y = 0;
-                    else if (this.y > gameMap.height - this.height) this.y = gameMap.height - this.height;
-                    if (this.y == gameMap.height - this.height)
-                    {
-                        this.state = "ground";
-                        if (this.speedY > 2.8 && this.dead == 0) this.dead = 1;
-                    }
-                    if (this.y == 0 && this.speedY < 0 || this.y == gameMap.height - this.height && this.speedY > 0) this.speedY = 0;
-                }
-                else
-                {
-                    if (this.x < gameMap.x) this.x = gameMap.x;
-                    else if (this.x > gameMap.x + 502 - this.width) this.x = gameMap.x + 502 - this.width;
-                    if (this.x == gameMap.x && this.speedX < 0 || this.x == gameMap.x + 502 - this.width && this.speedX > 0)
-                    {
-                        this.speedX = 0;
-                        this.gravity = gravity;
-                    }
-                }
-                if (this.state == "air")
-                {
-                    if (this.speedX != 0)
-                    {
-                        if (!this.jumping || this.speedX < 0 && this.x == this.jumping - 68 || this.speedX > 0 && this.x == this.jumping + 68)
+                        if (this.spring_board)
                         {
-                            this.speedX = 0;
-                            this.jumping = false;
-                            this.gravity = gravity;
-                        }
-                    }
-                    if (this.spring_board)
-                    {
-                        if (this.floor > 0 && this.y <= 50 + this.floor * 64 - 66 || this.floor == 0 && this.y <= 306)
-                        {
-                            this.jumping = this.x;
-                            this.spring_board = false;
-                            this.speedX = -1;
-                            this.speedY = -1;
-                            this.gravity = 0.03;
-                        }
-                    }
-                    if (!this.girder || !this.spring_board || this.spring_board && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
-                    if (this.dead == 0)
-                    {
-                        if (this.speedX == 0)
-                        {
-                            this.height = 30;
-                            this.type = 4;
-                        }
-                        else
-                        {
-                            this.height = 28;
-                            this.type = 6;
-                        }
-                    }
-                }
-                else if (this.dead == 0)
-                {
-                    this.chain_bottom = false;
-                    this.chain_top = false;
-                    if (this.state != "ground") this.state = "air";
-                    for (let back = 0; back < gameBack.length; back++)
-                    {
-                        if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y + this.height + 16 >= gameBack [back].y && this.y <= gameBack [back].y + gameBack [back].height)
-                        {
-                            if (this.state == "ground")
-                            {                                
-                                if (this.y + this.height + 16 == gameBack [back].y) this.chain_top = true;
-                                else if (this.y <= gameBack [back].y + gameBack [back].height) this.chain_bottom = true;
+                            if (this.floor > 0 && this.y <= 50 + this.floor * 64 - 66 || this.floor == 0 && this.y <= 306)
+                            {
+                                this.jumping = this.x;
+                                this.spring_board = false;
+                                this.speedX = -1;
+                                this.speedY = -1;
+                                this.gravity = 0.03;
                             }
-                            else this.state = "chain";
                         }
-                    }
-                    if (this.state == "chain")
-                    {
-                        this.speedX = 0;
-                        this.speedY = this.moveY;
-                        if (this.speedY >= 0) this.type = 4;
-                        else if (gameArea.frame % 5 == 0)
+                        if (!this.girder || !this.spring_board || this.spring_board && this.dead > 0) this.speedY = Number ((this.speedY + this.gravity).toFixed (2));
+                        if (this.dead == 0)
                         {
-                            if (this.type == 4) this.type = 5;
-                            else this.type = 4;
-                        }
-                    }
-                    else if (this.state == "ground")
-                    {
-                        if (this.chain_bottom && this.moveY < 0 || this.chain_top && this.moveY > 0)
-                        {
-                            this.speedY = this.moveY;
-                            this.state = "chain";
-                        }
-                        if (this.jump != 0)
-                        {
-                            gameAudios [6].play ();
-                            this.jumping = this.x;
-                            if (this.moveX == 0) this.speedY -= 2;
+                            if (this.speedX == 0)
+                            {
+                                this.height = 30;
+                                this.type = 4;
+                            }
                             else
                             {
-                                this.gravity = 0.03;
-                                this.speedY += this.jump;
+                                this.height = 28;
+                                this.type = 6;
                             }
                         }
-                        else
+                    }
+                    else if (this.dead == 0)
+                    {
+                        this.chain_bottom = false;
+                        this.chain_top = false;
+                        if (this.state != "ground") this.state = "air";
+                        for (let back = 0; back < gameBack.length; back++)
                         {
+                            if (gameBack [back].constructor.name == "chain" && this.x + this.width >= gameBack [back].x && this.x <= gameBack [back].x + gameBack [back].width && this.y + this.height + 16 >= gameBack [back].y && this.y <= gameBack [back].y + gameBack [back].height)
+                            {
+                                if (this.state == "ground")
+                                {                                
+                                    if (this.y + this.height + 16 == gameBack [back].y) this.chain_top = true;
+                                    else if (this.y <= gameBack [back].y + gameBack [back].height) this.chain_bottom = true;
+                                }
+                                else this.state = "chain";
+                            }
+                        }
+                        if (this.state == "chain")
+                        {
+                            this.speedX = 0;
+                            this.speedY = this.moveY;
+                            if (this.speedY >= 0) this.type = 4;
+                            else if (gameArea.frame % 5 == 0)
+                            {
+                                if (this.type == 4) this.type = 5;
+                                else this.type = 4;
+                            }
+                        }
+                        else if (this.state == "ground")
+                        {
+                            if (this.chain_bottom && this.moveY < 0 || this.chain_top && this.moveY > 0)
+                            {
+                                this.speedY = this.moveY;
+                                this.state = "chain";
+                            }
+                            if (this.jump != 0)
+                            {
+                                gameAudios [6].play ();
+                                this.jumping = this.x;
+                                if (this.moveX == 0) this.speedY -= 2;
+                                else
+                                {
+                                    this.gravity = 0.03;
+                                    this.speedY += this.jump;
+                                }
+                            }
+                            else
+                            {
+                                this.jumping = false;
+                                this.gravity = gravity;
+                            }
+                            if (this.type > 3 && this.type < 14 && !this.spring_board) this.type = 1;
+                            if (!this.conveyor_belt && this.speedX != 0 && gameArea.frame % 5 == 0)
+                            {
+                                if (this.type < 3) this.type++;
+                                else this.type = 0;
+                            }
+                        }
+                    }
+                }
+                if (this.dead > 0)
+                {
+                    this.speedX = 0;
+                    if (this.state != "air" && !this.elevator && !this.girder) this.speedY = 0;
+                    if (this.type != 8 && gameArea.frame % 5 == 0)
+                    {
+                        if (this.dead == 2)
+                        {
+                            this.deadFrame++;
+                            if (this.deadFrame == 14) this.dead = 1;
+                            if (this.deadFrame == 4 || this.deadFrame == 8 || this.deadFrame == 12)
+                            {
+                                this.heading = -1;
+                                this.type = 3;
+                            }
+                            else if (this.deadFrame == 2 || this.deadFrame == 6 || this.deadFrame == 10 || this.deadFrame == 14) this.type = 4;
+                            else
+                            {
+                                this.heading = 1;
+                                this.type = 3;
+                            }
+                        }
+                        else if (this.dead == 1 && this.type == 4) this.type = 7;
+                        else if (this.type == 7)
+                        {
+                            this.type = 8;
+                            gameAudios [9].play ();
+                            gameMap.startFrame = gameArea.frame; 
+                        }
+                        else this.type = 4; 
+                    }
+                    else if (this.lifes > 0 && this.type == 8 && gameArea.frame - gameMap.startFrame == 120)
+                    {
+                        if (this.enemyKill != null && gameEnemies [this.enemyKill].constructor.name == "bolt")
+                        {
+                            gameEnemies.splice (this.enemyKill, 1);
+                            this.enemyKill = null;
+                        }
+                        this.lifes--;
+                        if (this.lifes > 0)
+                        {
+                            bonus = 5000;
+                            gameMap.startFrame = gameArea.frame;
+                            this.type = gameMap.player.type;
+                            this.x = gameMap.player.x;
+                            this.y = gameMap.player.y;
+                            this.heading = gameMap.player.heading;
+                            this.jump = 0;
                             this.jumping = false;
+                            this.spring_board = false;
+                            this.elevator = false;
+                            this.girder = false;
+                            this.conveyor_belt = false;
+                            this.state = null;
+                            this.dead = 0;
+                            this.deadFrame = 0;
+                            this.enemyKill = null;
+                            this.item = null;
                             this.gravity = gravity;
+                            let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
+                            gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
+                            gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
+                            gameEnemies [gameEnemy].x = gameMap.enemies [0].x;
+                            gameEnemies [gameEnemy].y = gameMap.enemies [0].y;
+                            if (level == 1)
+                            {
+                                gameFront [1].shotFrame = gameArea.frame + 500;
+                                gameMap.elevatorFloor = 0;
+                                gameMap.elevatorSpeed = 0;
+                                for (let girderBreak = 0; girderBreak < gameMap.girderBreaks.length; girderBreak++)
+                                {
+                                    let front = gameMap.girderBreaks [girderBreak].girderPiece;
+                                    if (front != null && gameFront [front].type < 3)
+                                    {
+                                        gameMap.girderBreaks [girderBreak].girderPiece = null;
+                                        gameItems.push (gameFront [front]);
+                                        gameFront.splice (front, 1);
+                                        for (let girderBreak2 = 0; girderBreak2 < gameMap.girderBreaks.length; girderBreak2++)
+                                        {
+                                            let front2 = gameMap.girderBreaks [girderBreak2].girderPiece;
+                                            if (girderBreak != girderBreak2 && front2 != null && front2 > front) gameMap.girderBreaks [girderBreak2].girderPiece--;
+                                        }
+                                        girderBreak--;
+                                    }
+                                }
+                                for (let item = 0; item < gameItems.length; item++)
+                                {
+                                    if (gameItems [item].constructor.name == "rivet_gun")
+                                    {
+                                        gameItems [item].direction = 0;
+                                        gameItems [item].x = gameMap.x + 151;
+                                        gameItems [item].y = 306;
+                                    }
+                                    else if (gameItems [item].constructor.name == "girder_piece" && gameItems [item].type > 0) gameItems [item].type = 0;
+                                }
+                            }
+                            else if (level == 2)
+                            {
+                                gameFront [52].speedY = 0;
+                                gameFront [52].y = 322;
+                            }
                         }
-                        if (this.type > 3 && this.type < 14 && !this.spring_board) this.type = 1;
-                        if (!this.conveyor_belt && this.speedX != 0 && gameArea.frame % 5 == 0)
-                        {
-                            if (this.type < 3) this.type++;
-                            else this.type = 0;
-                        }
-                    }
-                }
-            }
-            if (this.dead > 0)
-            {
-                this.speedX = 0;
-                if (this.state != "air" && !this.elevator && !this.girder) this.speedY = 0;
-                if (this.type != 8 && gameArea.frame % 5 == 0)
-                {
-                    if (this.dead == 2)
-                    {
-                        this.deadFrame++;
-                        if (this.deadFrame == 14) this.dead = 1;
-                        if (this.deadFrame == 4 || this.deadFrame == 8 || this.deadFrame == 12)
-                        {
-                            this.heading = -1;
-                            this.type = 3;
-                        }
-                        else if (this.deadFrame == 2 || this.deadFrame == 6 || this.deadFrame == 10 || this.deadFrame == 14) this.type = 4;
                         else
                         {
-                            this.heading = 1;
-                            this.type = 3;
+                            if (score > highscore)
+                            {
+                                highscore = score;
+                                fileWrite ('user.bin');
+                            }
+                            gameText.push (new component ("text", "Game over", "#ffffff", Math.round (gameMap.width / 2), 178, "center"));
+                            gameMap.startFrame = gameArea.frame;
                         }
                     }
-                    else if (this.dead == 1 && this.type == 4) this.type = 7;
-                    else if (this.type == 7)
-                    {
-                        this.type = 8;
-                        gameAudios [9].play ();
-                        gameMap.startFrame = gameArea.frame; 
-                    }
-                    else this.type = 4; 
+                    else if (this.lifes == 0 && gameArea.frame - gameMap.startFrame == 180) gameLoadScreen ("menu");
                 }
-                else if (this.lifes > 0 && this.type == 8 && gameArea.frame - gameMap.startFrame == 120)
+                else if (this.speedX > 0) this.heading = 1;
+                else if (this.speedX < 0) this.heading = -1;
+            }
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
+            ctx.save ();
+            ctx.scale (this.heading, 1);
+            ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
+            ctx.fillStyle = this.color;
+            switch (this.type)
+            {
+                case 0:
+                    ctx.fillRect (8, 0, 8, 2);
+                    ctx.fillRect (6, 2, 12, 2);
+                    ctx.fillRect (4, 4, 16, 2);
+                    ctx.fillRect (4, 6, 20, 2);
+                    ctx.fillRect (12, 8, 6, 2);
+                    ctx.fillRect (22, 16, 4, 4);
+                    ctx.fillRect (2, 22, 4, 2);
+                    ctx.fillRect (0, 24, 10, 2);
+                    ctx.fillRect (0, 26, 6, 4);
+                    ctx.fillRect (16, 24, 6, 2);
+                    ctx.fillRect (18, 26, 4, 2);
+                    ctx.fillRect (18, 28, 6, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 4, 2);
+                    ctx.fillRect (8, 10, 10, 2);
+                    ctx.fillRect (8, 12, 6, 2);
+                    ctx.fillRect (4, 20, 14, 2);
+                    ctx.fillRect (6, 22, 16, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 14, 10, 6);
+                    ctx.fillRect (16, 16, 6, 4);
+                    ctx.fillRect (22, 14, 2, 2);
+                break;
+                case 2:
+                    ctx.fillRect (8, 0, 8, 2);
+                    ctx.fillRect (6, 2, 12, 2);
+                    ctx.fillRect (4, 4, 16, 2);
+                    ctx.fillRect (4, 6, 20, 2);
+                    ctx.fillRect (12, 8, 6, 2);
+                    ctx.fillRect (4, 24, 6, 4);
+                    ctx.fillRect (4, 28, 8, 2);
+                    ctx.fillRect (18, 24, 8, 2);
+                    ctx.fillRect (20, 26, 6, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 4, 2);
+                    ctx.fillRect (8, 10, 10, 2);
+                    ctx.fillRect (8, 12, 6, 2);
+                    ctx.fillRect (4, 20, 18, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 14, 14, 6);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect (10, 16, 6, 2);
+                    ctx.fillRect (10, 18, 10, 2);
+                break;
+                case 1:
+                case 3:
+                    ctx.fillRect (8, 0, 8, 2);
+                    ctx.fillRect (6, 2, 12, 2);
+                    ctx.fillRect (4, 4, 16, 2);
+                    ctx.fillRect (4, 6, 20, 2);
+                    ctx.fillRect (12, 8, 6, 2);
+                    ctx.fillRect (22, 12, 4, 4);
+                    ctx.fillRect (8, 24, 8, 2);
+                    ctx.fillRect (8, 26, 6, 2);
+                    ctx.fillRect (8, 28, 10, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 4, 2);
+                    ctx.fillRect (8, 10, 10, 2);
+                    ctx.fillRect (8, 12, 8, 2);
+                    ctx.fillRect (8, 20, 10, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 14, 10, 6);
+                    ctx.fillRect (16, 14, 4, 4);
+                    ctx.fillRect (18, 12, 4, 4);
+                    ctx.fillRect (22, 10, 2, 2);
+                break;
+                case 4:
+                case 10:
+                case 14:
+                    ctx.fillRect (8, 0, 4, 2);
+                    ctx.fillRect (14, 0, 4, 2);
+                    ctx.fillRect (6, 2, 6, 2);
+                    ctx.fillRect (14, 2, 6, 2);
+                    ctx.fillRect (6, 4, 14, 2);
+                    ctx.fillRect (4, 6, 18, 2);
+                    ctx.fillRect (2, 12, 6, 4);
+                    ctx.fillRect (18, 12, 6, 4);
+                    ctx.fillRect (4, 16, 4, 2);
+                    ctx.fillRect (18, 16, 4, 2);
+                    ctx.fillRect (8, 18, 4, 2);
+                    ctx.fillRect (14, 18, 4, 2);
+                    ctx.fillRect (8, 24, 4, 2);
+                    ctx.fillRect (14, 24, 4, 2);
+                    ctx.fillRect (4, 26, 6, 2);
+                    ctx.fillRect (16, 26, 6, 2);
+                    ctx.fillRect (2, 28, 8, 2);
+                    ctx.fillRect (16, 28, 8, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 10, 4);
+                    ctx.fillRect (8, 20, 10, 4);
+                    ctx.fillRect (4, 22, 4, 4);
+                    ctx.fillRect (18, 22, 4, 4);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (8, 12, 10, 6);
+                    ctx.fillRect (12, 18, 2, 2);
+                break;
+                case 5:
+                    ctx.fillRect (8, 0, 4, 2);
+                    ctx.fillRect (14, 0, 4, 2);
+                    ctx.fillRect (6, 2, 6, 2);
+                    ctx.fillRect (14, 2, 6, 2);
+                    ctx.fillRect (6, 4, 14, 2);
+                    ctx.fillRect (4, 6, 18, 2);
+                    ctx.fillRect (2, 12, 22, 4);
+                    ctx.fillRect (8, 16, 4, 6);
+                    ctx.fillRect (14, 16, 4, 6);
+                    ctx.fillRect (4, 22, 6, 2);
+                    ctx.fillRect (16, 22, 6, 2);
+                    ctx.fillRect (2, 24, 8, 2);
+                    ctx.fillRect (16, 24, 8, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 10, 4);
+                    ctx.fillRect (8, 18, 10, 2);
+                    ctx.fillRect (4, 20, 2, 2);
+                    ctx.fillRect (20, 20, 2, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (8, 12, 10, 4);
+                    ctx.fillRect (12, 16, 2, 2);
+                break;
+                case 6:
+                    ctx.fillRect (8, 0, 8, 2);
+                    ctx.fillRect (6, 2, 12, 2);
+                    ctx.fillRect (4, 4, 16, 2);
+                    ctx.fillRect (4, 6, 20, 2);
+                    ctx.fillRect (12, 8, 6, 2);
+                    ctx.fillRect (22, 16, 4, 4);
+                    ctx.fillRect (0, 24, 10, 2);
+                    ctx.fillRect (0, 26, 8, 2);
+                    ctx.fillRect (16, 24, 8, 2);
+                    ctx.fillRect (18, 26, 6, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 8, 4, 2);
+                    ctx.fillRect (8, 10, 10, 2);
+                    ctx.fillRect (8, 12, 6, 2);
+                    ctx.fillRect (4, 20, 14, 2);
+                    ctx.fillRect (4, 22, 18, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (6, 14, 10, 6);
+                    ctx.fillRect (16, 16, 6, 4);
+                    ctx.fillRect (22, 14, 2, 2);
+                break;
+                case 7:
+                case 9:
+                case 11:
+                case 13:
+                    ctx.fillRect (8, 10, 4, 2);
+                    ctx.fillRect (14, 10, 4, 2);
+                    ctx.fillRect (6, 12, 14, 2);
+                    ctx.fillRect (4, 14, 18, 2);
+                    ctx.fillRect (0, 18, 26, 2);
+                    ctx.fillRect (8, 22, 10, 2);
+                    ctx.fillRect (4, 26, 6, 2);
+                    ctx.fillRect (16, 26, 6, 2);
+                    ctx.fillRect (2, 28, 8, 2);
+                    ctx.fillRect (16, 28, 8, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 16, 10, 2);
+                    ctx.fillRect (4, 24, 18, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (8, 18, 10, 2);
+                    ctx.fillRect (6, 20, 14, 2);
+                    ctx.fillRect (12, 22, 2, 2);
+                break;
+                case 8:
+                case 12:
+                    ctx.fillRect (8, 16, 4, 2);
+                    ctx.fillRect (14, 16, 4, 2);
+                    ctx.fillRect (4, 18, 18, 2);
+                    ctx.fillRect (2, 22, 22, 2);
+                    ctx.fillRect (8, 24, 4, 4);
+                    ctx.fillRect (14, 24, 4, 4);
+                    ctx.fillRect (2, 28, 8, 2);
+                    ctx.fillRect (16, 28, 8, 2);
+                    ctx.fillStyle = this.color2;
+                    ctx.fillRect (8, 20, 10, 2);
+                    ctx.fillRect (4, 26, 4, 2);
+                    ctx.fillRect (18, 26, 4, 2);
+                    ctx.fillStyle = this.color3;
+                    ctx.fillRect (8, 22, 10, 2);
+            }
+            ctx.restore ();
+        };
+    }
+}
+
+class enemy
+{
+    constructor (name, type, color, color2, color3, x, y)
+    {
+        this.name = (name != null ? name : 0);
+        this.type = (type != null ? type : 0);
+        this.color = color;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.x = (x != null ? x : 0);
+        this.y = (y != null ? y : 0);
+        this.width = 26;
+        this.height = 32;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.direction = Math.floor (Math.random () * 2);
+
+        this.update = function ()
+        {
+            if (gameScreen == "game" && !levelCompleted)
+            {
+                if (level == 1)
                 {
-                    if (this.enemyKill != null && gameEnemies [this.enemyKill].constructor.name == "bolt")
+                    if (this.direction == 0)
                     {
-                        gameEnemies.splice (this.enemyKill, 1);
-                        this.enemyKill = null;
-                    }
-                    this.lifes--;
-                    if (this.lifes > 0)
-                    {
-                        bonus = 5000;
-                        gameMap.startFrame = gameArea.frame;
-                        this.type = gameMap.player.type;
-                        this.x = gameMap.player.x;
-                        this.y = gameMap.player.y;
-                        this.heading = gameMap.player.heading;
-                        this.jump = 0;
-                        this.jumping = false;
-                        this.spring_board = false;
-                        this.elevator = false;
-                        this.girder = false;
-                        this.conveyor_belt = false;
-                        this.state = null;
-                        this.dead = 0;
-                        this.deadFrame = 0;
-                        this.enemyKill = null;
-                        this.item = null;
-                        this.gravity = gravity;
-                        let gameEnemy = gameEnemies.findIndex (enemy => enemy.constructor.name == "enemy");
-                        gameEnemies [gameEnemy].name = Math.floor (Math.random () * 2);
-                        gameEnemies [gameEnemy].direction = Math.floor (Math.random () * 2);
-                        gameEnemies [gameEnemy].x = gameMap.enemies [0].x;
-                        gameEnemies [gameEnemy].y = gameMap.enemies [0].y;
-                        if (level == 1)
+                        if (this.x == gameMap.x + 420 && this.y == 304)
                         {
-                            gameFront [1].shotFrame = gameArea.frame + 500;
-                            gameMap.elevatorFloor = 0;
-                            gameMap.elevatorSpeed = 0;
-                            for (let girderBreak = 0; girderBreak < gameMap.girderBreaks.length; girderBreak++)
-                            {
-                                let front = gameMap.girderBreaks [girderBreak].girderPiece;
-                                if (front != null && gameFront [front].type < 3)
-                                {
-                                    gameMap.girderBreaks [girderBreak].girderPiece = null;
-                                    gameItems.push (gameFront [front]);
-                                    gameFront.splice (front, 1);
-                                    for (let girderBreak2 = 0; girderBreak2 < gameMap.girderBreaks.length; girderBreak2++)
-                                    {
-                                        let front2 = gameMap.girderBreaks [girderBreak2].girderPiece;
-                                        if (girderBreak != girderBreak2 && front2 != null && front2 > front) gameMap.girderBreaks [girderBreak2].girderPiece--;
-                                    }
-                                    girderBreak--;
-                                }
-                            }
-                            for (let item = 0; item < gameItems.length; item++)
-                            {
-                                if (gameItems [item].constructor.name == "rivet_gun")
-                                {
-                                    gameItems [item].direction = 0;
-                                    gameItems [item].x = gameMap.x + 151;
-                                    gameItems [item].y = 306;
-                                }
-                                else if (gameItems [item].constructor.name == "girder_piece" && gameItems [item].type > 0) gameItems [item].type = 0;
-                            }
+                            this.speedX = -1;
+                            this.speedY = 0;
                         }
-                        else if (level == 2)
+                        else if (this.x == gameMap.x + 56 && this.y == 304)
                         {
-                            gameFront [52].speedY = 0;
-                            gameFront [52].y = 322;
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 240)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 420 && this.y == 240)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 420 && this.y == 176)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 176)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 112)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 420 && this.y == 112)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 308 && this.y == 112 && this.speedX == -1)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 308 && this.y == 48 && this.speedY == -1)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 48)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                            this.direction = 1;
                         }
                     }
                     else
                     {
-                        if (score > highscore)
+                        if (this.x == gameMap.x + 420 && this.y == 48)
                         {
-                            highscore = score;
-                            fileWrite ('user.bin');
+                            this.speedX = -1;
+                            this.speedY = 0;
                         }
-                        gameText.push (new component ("text", "Game over", "#ffffff", Math.round (gameMap.width / 2), 178, "center"));
-                        gameMap.startFrame = gameArea.frame;
+                        else if (this.x == gameMap.x + 308 && this.y == 48 && this.speedX == -1)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 308 && this.y == 112 && this.speedY == 1)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 420 && this.y == 112)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 112)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 176)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 420 && this.y == 176)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 420 && this.y == 240)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 240)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                        }
+                        else if (this.x == gameMap.x + 56 && this.y == 304)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                            this.direction = 0;
+                        }
                     }
                 }
-                else if (this.lifes == 0 && gameArea.frame - gameMap.startFrame == 180) gameLoadScreen ("menu");
-            }
-            else if (this.speedX > 0) this.heading = 1;
-            else if (this.speedX < 0) this.heading = -1;
-        }
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.scale (this.heading, 1);
-        ctx.translate (Math.round (this.x) * this.heading - (this.heading == -1 ? this.width : 0), Math.round (this.y));
-        ctx.fillStyle = this.color;
-        switch (this.type)
-        {
-            case 0:
-                ctx.fillRect (8, 0, 8, 2);
-                ctx.fillRect (6, 2, 12, 2);
-                ctx.fillRect (4, 4, 16, 2);
-                ctx.fillRect (4, 6, 20, 2);
-                ctx.fillRect (12, 8, 6, 2);
-                ctx.fillRect (22, 16, 4, 4);
-                ctx.fillRect (2, 22, 4, 2);
-                ctx.fillRect (0, 24, 10, 2);
-                ctx.fillRect (0, 26, 6, 4);
-                ctx.fillRect (16, 24, 6, 2);
-                ctx.fillRect (18, 26, 4, 2);
-                ctx.fillRect (18, 28, 6, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 4, 2);
-                ctx.fillRect (8, 10, 10, 2);
-                ctx.fillRect (8, 12, 6, 2);
-                ctx.fillRect (4, 20, 14, 2);
-                ctx.fillRect (6, 22, 16, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 14, 10, 6);
-                ctx.fillRect (16, 16, 6, 4);
-                ctx.fillRect (22, 14, 2, 2);
-            break;
-            case 2:
-                ctx.fillRect (8, 0, 8, 2);
-                ctx.fillRect (6, 2, 12, 2);
-                ctx.fillRect (4, 4, 16, 2);
-                ctx.fillRect (4, 6, 20, 2);
-                ctx.fillRect (12, 8, 6, 2);
-                ctx.fillRect (4, 24, 6, 4);
-                ctx.fillRect (4, 28, 8, 2);
-                ctx.fillRect (18, 24, 8, 2);
-                ctx.fillRect (20, 26, 6, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 4, 2);
-                ctx.fillRect (8, 10, 10, 2);
-                ctx.fillRect (8, 12, 6, 2);
-                ctx.fillRect (4, 20, 18, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 14, 14, 6);
-                ctx.fillStyle = this.color;
-                ctx.fillRect (10, 16, 6, 2);
-                ctx.fillRect (10, 18, 10, 2);
-            break;
-            case 1:
-            case 3:
-                ctx.fillRect (8, 0, 8, 2);
-                ctx.fillRect (6, 2, 12, 2);
-                ctx.fillRect (4, 4, 16, 2);
-                ctx.fillRect (4, 6, 20, 2);
-                ctx.fillRect (12, 8, 6, 2);
-                ctx.fillRect (22, 12, 4, 4);
-                ctx.fillRect (8, 24, 8, 2);
-                ctx.fillRect (8, 26, 6, 2);
-                ctx.fillRect (8, 28, 10, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 4, 2);
-                ctx.fillRect (8, 10, 10, 2);
-                ctx.fillRect (8, 12, 8, 2);
-                ctx.fillRect (8, 20, 10, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 14, 10, 6);
-                ctx.fillRect (16, 14, 4, 4);
-                ctx.fillRect (18, 12, 4, 4);
-                ctx.fillRect (22, 10, 2, 2);
-            break;
-            case 4:
-            case 10:
-            case 14:
-                ctx.fillRect (8, 0, 4, 2);
-                ctx.fillRect (14, 0, 4, 2);
-                ctx.fillRect (6, 2, 6, 2);
-                ctx.fillRect (14, 2, 6, 2);
-                ctx.fillRect (6, 4, 14, 2);
-                ctx.fillRect (4, 6, 18, 2);
-                ctx.fillRect (2, 12, 6, 4);
-                ctx.fillRect (18, 12, 6, 4);
-                ctx.fillRect (4, 16, 4, 2);
-                ctx.fillRect (18, 16, 4, 2);
-                ctx.fillRect (8, 18, 4, 2);
-                ctx.fillRect (14, 18, 4, 2);
-                ctx.fillRect (8, 24, 4, 2);
-                ctx.fillRect (14, 24, 4, 2);
-                ctx.fillRect (4, 26, 6, 2);
-                ctx.fillRect (16, 26, 6, 2);
-                ctx.fillRect (2, 28, 8, 2);
-                ctx.fillRect (16, 28, 8, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 10, 4);
-                ctx.fillRect (8, 20, 10, 4);
-                ctx.fillRect (4, 22, 4, 4);
-                ctx.fillRect (18, 22, 4, 4);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (8, 12, 10, 6);
-                ctx.fillRect (12, 18, 2, 2);
-            break;
-            case 5:
-                ctx.fillRect (8, 0, 4, 2);
-                ctx.fillRect (14, 0, 4, 2);
-                ctx.fillRect (6, 2, 6, 2);
-                ctx.fillRect (14, 2, 6, 2);
-                ctx.fillRect (6, 4, 14, 2);
-                ctx.fillRect (4, 6, 18, 2);
-                ctx.fillRect (2, 12, 22, 4);
-                ctx.fillRect (8, 16, 4, 6);
-                ctx.fillRect (14, 16, 4, 6);
-                ctx.fillRect (4, 22, 6, 2);
-                ctx.fillRect (16, 22, 6, 2);
-                ctx.fillRect (2, 24, 8, 2);
-                ctx.fillRect (16, 24, 8, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 10, 4);
-                ctx.fillRect (8, 18, 10, 2);
-                ctx.fillRect (4, 20, 2, 2);
-                ctx.fillRect (20, 20, 2, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (8, 12, 10, 4);
-                ctx.fillRect (12, 16, 2, 2);
-            break;
-            case 6:
-                ctx.fillRect (8, 0, 8, 2);
-                ctx.fillRect (6, 2, 12, 2);
-                ctx.fillRect (4, 4, 16, 2);
-                ctx.fillRect (4, 6, 20, 2);
-                ctx.fillRect (12, 8, 6, 2);
-                ctx.fillRect (22, 16, 4, 4);
-                ctx.fillRect (0, 24, 10, 2);
-                ctx.fillRect (0, 26, 8, 2);
-                ctx.fillRect (16, 24, 8, 2);
-                ctx.fillRect (18, 26, 6, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 8, 4, 2);
-                ctx.fillRect (8, 10, 10, 2);
-                ctx.fillRect (8, 12, 6, 2);
-                ctx.fillRect (4, 20, 14, 2);
-                ctx.fillRect (4, 22, 18, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (6, 14, 10, 6);
-                ctx.fillRect (16, 16, 6, 4);
-                ctx.fillRect (22, 14, 2, 2);
-            break;
-            case 7:
-            case 9:
-            case 11:
-            case 13:
-                ctx.fillRect (8, 10, 4, 2);
-                ctx.fillRect (14, 10, 4, 2);
-                ctx.fillRect (6, 12, 14, 2);
-                ctx.fillRect (4, 14, 18, 2);
-                ctx.fillRect (0, 18, 26, 2);
-                ctx.fillRect (8, 22, 10, 2);
-                ctx.fillRect (4, 26, 6, 2);
-                ctx.fillRect (16, 26, 6, 2);
-                ctx.fillRect (2, 28, 8, 2);
-                ctx.fillRect (16, 28, 8, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 16, 10, 2);
-                ctx.fillRect (4, 24, 18, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (8, 18, 10, 2);
-                ctx.fillRect (6, 20, 14, 2);
-                ctx.fillRect (12, 22, 2, 2);
-            break;
-            case 8:
-            case 12:
-                ctx.fillRect (8, 16, 4, 2);
-                ctx.fillRect (14, 16, 4, 2);
-                ctx.fillRect (4, 18, 18, 2);
-                ctx.fillRect (2, 22, 22, 2);
-                ctx.fillRect (8, 24, 4, 4);
-                ctx.fillRect (14, 24, 4, 4);
-                ctx.fillRect (2, 28, 8, 2);
-                ctx.fillRect (16, 28, 8, 2);
-                ctx.fillStyle = this.color2;
-                ctx.fillRect (8, 20, 10, 2);
-                ctx.fillRect (4, 26, 4, 2);
-                ctx.fillRect (18, 26, 4, 2);
-                ctx.fillStyle = this.color3;
-                ctx.fillRect (8, 22, 10, 2);
-        }
-        ctx.restore ();
-    }
-}
-
-function enemy (name, type, color, color2, color3, x, y)
-{
-    this.name = (name != null ? name : 0);
-    this.type = (type != null ? type : 0);
-    this.color = color;
-    this.color2 = color2;
-    this.color3 = color3;
-    this.x = (x != null ? x : 0);
-    this.y = (y != null ? y : 0);
-    this.width = 26;
-    this.height = 32;
-    this.speedX = 0;
-    this.speedY = 0;
-    this.direction = Math.floor (Math.random () * 2);
-
-    this.update = function ()
-    {
-        if (gameScreen == "game" && !levelCompleted)
-        {
-            if (level == 1)
-            {
-                if (this.direction == 0)
+                else if (level == 2)
                 {
-                    if (this.x == gameMap.x + 420 && this.y == 304)
+                    if (this.direction == 0)
                     {
-                        this.speedX = -1;
-                        this.speedY = 0;
+                        if (this.x == gameMap.x + 475 && this.y == 346)
+                        {
+                            this.speedX = -1;
+                            this.speedY = 0;
+                        }
+                        else if (this.x == gameMap.x + 215 && this.y == 346)
+                        {
+                            this.speedX = 1;
+                            this.speedY = 0;
+                            this.direction = 1;
+                        }
                     }
-                    else if (this.x == gameMap.x + 56 && this.y == 304)
+                    else
                     {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 240)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 420 && this.y == 240)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 420 && this.y == 176)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 176)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 112)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 420 && this.y == 112)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 308 && this.y == 112 && this.speedX == -1)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 308 && this.y == 48 && this.speedY == -1)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 48)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                        this.direction = 1;
+                        if (this.x == gameMap.x + 475 && this.y == 346)
+                        {
+                            this.speedX = 0;
+                            this.speedY = -1;
+                        }
+                        else if (this.x == gameMap.x + 475 && this.y == 240)
+                        {
+                            this.speedX = 0;
+                            this.speedY = 1;
+                            this.direction = 0;
+                        }
                     }
                 }
-                else
+                this.x += this.speedX; 
+                this.y += this.speedY;
+                if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 10 == 0)
                 {
-                    if (this.x == gameMap.x + 420 && this.y == 48)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 308 && this.y == 48 && this.speedX == -1)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == gameMap.x + 308 && this.y == 112 && this.speedY == 1)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 420 && this.y == 112)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 112)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 176)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 420 && this.y == 176)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == gameMap.x + 420 && this.y == 240)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 240)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                    }
-                    else if (this.x == gameMap.x + 56 && this.y == 304)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                        this.direction = 0;
-                    }
+                    if (this.type == 0) this.type = 1;
+                    else this.type = 0;
                 }
             }
-            else if (level == 2)
-            {
-                if (this.direction == 0)
-                {
-                    if (this.x == gameMap.x + 475 && this.y == 346)
-                    {
-                        this.speedX = -1;
-                        this.speedY = 0;
-                    }
-                    else if (this.x == gameMap.x + 215 && this.y == 346)
-                    {
-                        this.speedX = 1;
-                        this.speedY = 0;
-                        this.direction = 1;
-                    }
-                }
-                else
-                {
-                    if (this.x == gameMap.x + 475 && this.y == 346)
-                    {
-                        this.speedX = 0;
-                        this.speedY = -1;
-                    }
-                    else if (this.x == gameMap.x + 475 && this.y == 240)
-                    {
-                        this.speedX = 0;
-                        this.speedY = 1;
-                        this.direction = 0;
-                    }
-                }
-            }
-            this.x += this.speedX; 
-            this.y += this.speedY;
-            if ((this.speedX != 0 || this.speedY != 0) && gameArea.frame % 10 == 0)
-            {
-                if (this.type == 0) this.type = 1;
-                else this.type = 0;
-            }
-        }
-        let ctx = gameArea.ctx;
-        ctx.lineWidth = 0;
-        ctx.save ();
-        ctx.translate (Math.round (this.x), Math.round (this.y));
-        switch (this.name)
-        {
-            case 0:
-                switch (this.type)
-                {
-                    case 0:
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (8, 0, 4, 2);
-                        ctx.fillRect (14, 0, 4, 2);
-                        ctx.fillRect (4, 4, 6, 2);
-                        ctx.fillRect (16, 4, 6, 2);
-                        ctx.fillRect (8, 8, 10, 6);
-                        ctx.fillRect (0, 14, 2, 6);
-                        ctx.fillRect (24, 14, 2, 6);
-                        ctx.fillRect (12, 20, 2, 2);
-                        ctx.fillRect (8, 22, 10, 2);
-                        ctx.fillRect (4, 24, 6, 4);
-                        ctx.fillRect (16, 24, 6, 6);
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (2, 2, 2, 2);
-                        ctx.fillRect (10, 2, 6, 2);
-                        ctx.fillRect (22, 2, 2, 2);
-                        ctx.fillRect (12, 4, 2, 2);
-                        ctx.fillRect (6, 6, 14, 2);
-                        ctx.fillRect (6, 14, 14, 6);
-                        ctx.fillStyle = this.color;
-                        ctx.fillRect (8, 10, 10, 2);
-                        ctx.fillRect (2, 12, 4, 2);
-                        ctx.fillRect (20, 12, 4, 2);
-                        ctx.fillRect (10, 14, 6, 2);
-                        ctx.fillRect (8, 24, 4, 2);
-                        ctx.fillRect (14, 24, 4, 2)
-                        ctx.fillRect (2, 28, 8, 2);
-                        ctx.fillRect (16, 30, 8, 2);
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (12, 10, 2, 2);
-                    break;
-                    case 1:
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (8, 0, 2, 2);
-                        ctx.fillRect (4, 2, 16, 2);
-                        ctx.fillRect (16, 4, 6, 2);
-                        ctx.fillRect (20, 6, 2, 2);
-                        ctx.fillRect (8, 8, 10, 6);
-                        ctx.fillRect (0, 18, 2, 4);
-                        ctx.fillRect (24, 18, 2, 4);
-                        ctx.fillRect (12, 20, 2, 2);
-                        ctx.fillRect (8, 22, 10, 2);
-                        ctx.fillRect (4, 24, 6, 6);
-                        ctx.fillRect (16, 24, 6, 4);
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (2, 0, 2, 2);
-                        ctx.fillRect (14, 0, 2, 2);
-                        ctx.fillRect (18, 0, 2, 2);
-                        ctx.fillRect (22, 2, 2, 2);
-                        ctx.fillRect (2, 4, 2, 2);
-                        ctx.fillRect (10, 4, 2, 4);
-                        ctx.fillRect (6, 6, 2, 2);
-                        ctx.fillRect (14, 6, 2, 2);
-                        ctx.fillRect (6, 16, 14, 4);
-                        ctx.fillStyle = this.color;
-                        ctx.fillRect (8, 10, 10, 2);
-                        ctx.fillRect (4, 14, 4, 2);
-                        ctx.fillRect (10, 14, 6, 2);
-                        ctx.fillRect (18, 14, 4, 2);
-                        ctx.fillRect (0, 16, 4, 2);
-                        ctx.fillRect (22, 16, 4, 2);
-                        ctx.fillRect (8, 24, 4, 2);
-                        ctx.fillRect (14, 24, 4, 2)
-                        ctx.fillRect (2, 30, 8, 2);
-                        ctx.fillRect (16, 28, 8, 2);
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (12, 10, 2, 2);
-                }
-            break;
-            case 1:
-                switch (this.type)
-                {
-                    case 0:
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (8, 0, 10, 10);
-                        ctx.fillStyle = this.color;
-                        ctx.fillRect (6, 2, 14, 6);
-                        ctx.fillRect (0, 10, 4, 4);
-                        ctx.fillRect (10, 10, 6, 2);
-                        ctx.fillRect (22, 10, 4, 4);
-                        ctx.fillRect (4, 12, 18, 4);
-                        ctx.fillRect (6, 16, 6, 12);
-                        ctx.fillRect (14, 16, 6, 14);
-                        ctx.fillRect (4, 28, 8, 2);
-                        ctx.fillRect (14, 30, 8, 2);
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (10, 4, 6, 2);
-                        ctx.fillRect (12, 12, 2, 2);
-                        ctx.fillRect (10, 14, 6, 6);
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (2, 10, 2, 2);
-                        ctx.fillRect (6, 20, 6, 6);
-                        ctx.fillRect (14, 20, 6, 8);
-                    break;
-                    case 1:
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (8, 0, 10, 10);
-                        ctx.fillStyle = this.color;
-                        ctx.fillRect (6, 2, 14, 6);
-                        ctx.fillRect (0, 6, 4, 4);
-                        ctx.fillRect (2, 12, 2, 2);
-                        ctx.fillRect (10, 10, 6, 2);
-                        ctx.fillRect (22, 12, 2, 2);
-                        ctx.fillRect (22, 6, 4, 4);
-                        ctx.fillRect (4, 12, 18, 4);
-                        ctx.fillRect (6, 16, 6, 14);
-                        ctx.fillRect (14, 16, 6, 12);
-                        ctx.fillRect (4, 30, 8, 2);
-                        ctx.fillRect (14, 28, 8, 2);
-                        ctx.fillStyle = this.color2;
-                        ctx.fillRect (10, 4, 6, 2);
-                        ctx.fillRect (12, 12, 2, 2);
-                        ctx.fillRect (10, 14, 6, 6);
-                        ctx.fillStyle = this.color3;
-                        ctx.fillRect (2, 6, 2, 6);
-                        ctx.fillRect (22, 10, 2, 2);
-                        ctx.fillRect (6, 20, 6, 8);
-                        ctx.fillRect (14, 20, 6, 6);
-                }
-        }
-        ctx.restore ();
-    }
-}
-
-function component (type, src, color, x, y, width, height)
-{
-    this.type = type;
-    this.src = src;
-    this.color = color;
-    if (this.type == "image")
-    {
-        this.src = "img/" + this.src;
-        this.image = gameImages.findIndex (image => image.src == this.src);
-    }
-    this.x = x;
-    this.y = y;
-    if (this.type == "text" || this.type == "value")
-    {
-        this.direction = (width != null ? width : "left");
-        if (this.direction == "vertical") this.tildeY = 0;
-        else this.tildeY = 6;
-        if (this.type == "value") this.chars = (height != null ? height : 0);
-        else this.size = (height != null ? height : 12);
-    }
-    else
-    {
-        this.width = width;
-        this.height = height;
-    }
-
-    this.update = function ()
-    {
-        let ctx = gameArea.ctx;
-        if (this.type == "image") ctx.drawImage (gameImages [this.image], this.x - Math.round (this.width / 2), this.y - Math.round (this.height / 2), this.width, this.height);
-        else if (this.type == "rect")
-        {
-            ctx.beginPath ();
-            ctx.rect (this.x, this.y, this.width, this.height);
-            ctx.fillStyle = this.color;
-            ctx.fill ();
-        }
-        else if (this.type == "circle")
-        {
-            ctx.beginPath ();
-            ctx.arc (this.x, this.y, this.height, 0, 2 * Math.PI);
-            ctx.fillStyle = this.color;
-            ctx.fill ();
-        }
-        else if (this.type == "text" || this.type == "value")
-        {
-            if (this.type == "text") this.text = this.src;
-            else if (this.type == "value")
-            {
-                eval ('this.text = ' + this.src + ';');
-                this.text = (this.text < 10 ? "0000" : this.text < 100 ? "000" : this.text < 1000 ? "00" : this.text < 10000 ? "0" : "") + this.text + "";
-                this.text = this.text.substr (5 - this.chars, this.chars);
-            }
-            if (this.width) ctx.fillStyle = this.color;
-            else ctx.fillStyle = "transparent";
-            this.width = 0;
-            this.height = 0;
+            let ctx = gameArea.ctx;
+            ctx.lineWidth = 0;
             ctx.save ();
             ctx.translate (Math.round (this.x), Math.round (this.y));
-            ctx.scale (this.size / 12, this.size / 12);
-            for (let i = 0; i < this.text.length; i++)
+            switch (this.name)
             {
-                let char = this.text.substr (i, 1).toUpperCase (),
-                    width = 14,
-                    height = 16;
-
-                if (char == "Á" || char == "É" || char == "Í" || char == "Ó" || char == "Ú")
-                {
-                    ctx.fillRect (6, 0 - this.tildeY, 4, 2);
-                    ctx.fillRect (4, 2 - this.tildeY, 4, 2);
-                }
-                else if (char == "À" || char == "È" || char == "Ì" || char == "Ò" || char == "Ù")
-                {
-                    ctx.fillRect (2, 0 - this.tildeY, 4, 2);
-                    ctx.fillRect (4, 2 - this.tildeY, 4, 2);
-                }
-                switch (char)
-                {
-                    case "0":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 10);
-                        ctx.fillRect (6, 4, 2, 4);
-                        ctx.fillRect (4, 6, 2, 4);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "1":
-                        ctx.fillRect (4, 0, 4, 12);
-                        ctx.fillRect (2, 2, 2, 4);
-                        ctx.fillRect (0, 4, 2, 2);
-                        ctx.fillRect (0, 12, 12, 2);
-                    break;
-                    case "2":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 2);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (6, 6, 4, 2);
-                        ctx.fillRect (4, 8, 4, 2);
-                        ctx.fillRect (2, 10, 4, 2);
-                        ctx.fillRect (0, 12, 12, 2);
-                    break;
-                    case "3":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 2);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (4, 6, 6, 2);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (0, 10, 4, 2);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "4":
-                        ctx.fillRect (6, 0, 2, 2);
-                        ctx.fillRect (8, 0, 4, 14);
-                        ctx.fillRect (4, 2, 4, 2);
-                        ctx.fillRect (2, 4, 4, 2);
-                        ctx.fillRect (0, 6, 4, 2);
-                        ctx.fillRect (0, 8, 8, 2);
-                    break;
-                    case "5":
-                        ctx.fillRect (0, 0, 12, 2);
-                        ctx.fillRect (0, 2, 4, 4);
-                        ctx.fillRect (0, 6, 10, 2);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (0, 10, 4, 2);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "6":
-                        ctx.fillRect (4, 0, 6, 2);
-                        ctx.fillRect (2, 2, 4, 2);
-                        ctx.fillRect (0, 4, 4, 8);
-                        ctx.fillRect (4, 6, 6, 2);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "7":
-                        ctx.fillRect (0, 0, 12, 2);
-                        ctx.fillRect (0, 2, 4, 2);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (6, 4, 4, 2);
-                        ctx.fillRect (4, 6, 4, 8);
-                    break;
-                    case "8":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 4);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (2, 6, 8, 2);
-                        ctx.fillRect (0, 8, 4, 4);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "9":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 4);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (2, 6, 10, 2);
-                        ctx.fillRect (8, 8, 4, 2);
-                        ctx.fillRect (6, 10, 4, 2);
-                        ctx.fillRect (4, 12, 4, 2);
-                    break;
-                    case "A":
-                    case "À":
-                    case "Á":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 12);
-                        ctx.fillRect (8, 2, 4, 12);
-                        ctx.fillRect (4, 6, 4, 2);
-                    break;
-                    case "B":
-                        ctx.fillRect (0, 0, 10, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (4, 6, 6, 2);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (0, 12, 10, 2);
-                    break;
-                    case "C":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (8, 10, 4, 2);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "D":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (4, 0, 4, 2);
-                        ctx.fillRect (6, 2, 4, 2);
-                        ctx.fillRect (8, 4, 4, 6);
-                        ctx.fillRect (6, 10, 4, 2);
-                        ctx.fillRect (4, 12, 4, 2);
-                    break;
-                    case "E":
-                    case "È":
-                    case "É":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (4, 6, 6, 2);
-                        ctx.fillRect (8, 10, 4, 2);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "F":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 12);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (4, 6, 6, 2);
-                    break;
-                    case "G":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (6, 6, 6, 2);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "H":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (8, 0, 4, 14);
-                        ctx.fillRect (4, 6, 4, 2);
-                    break;
-                    case "I":
-                    case "Ì":
-                    case "Í":
-                        ctx.fillRect (0, 0, 12, 2);
-                        ctx.fillRect (4, 2, 4, 10);
-                        ctx.fillRect (0, 12, 12, 2);
-                    break;
-                    case "J":
-                        ctx.fillRect (8, 0, 4, 12);
-                        ctx.fillRect (0, 8, 4, 4);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "K":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (8, 0, 4, 2);
-                        ctx.fillRect (6, 2, 4, 2);
-                        ctx.fillRect (4, 4, 4, 2);
-                        ctx.fillRect (4, 6, 2, 2);
-                        ctx.fillRect (4, 8, 4, 2);
-                        ctx.fillRect (6, 10, 4, 2);
-                        ctx.fillRect (8, 12, 4, 2);
-                    break;
-                    case "L":
-                        ctx.fillRect (0, 0, 4, 12);
-                        ctx.fillRect (0, 12, 12, 2);
-                    break;
-                    case "M":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (8, 0, 4, 14);
-                        ctx.fillRect (4, 2, 4, 2);
-                    break;
-                    case "N":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (8, 0, 4, 14);
-                        ctx.fillRect (4, 4, 2, 2);
-                        ctx.fillRect (6, 6, 2, 2);
-                    break;
-                    case "O":
-                    case "Ò":
-                    case "Ó":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 10);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "P":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (4, 0, 6, 2);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (4, 6, 6, 2);
-                    break;
-                    case "Q":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (8, 2, 4, 8);
-                        ctx.fillRect (2, 12, 6, 2);
-                        ctx.fillRect (4, 6, 2, 2);
-                        ctx.fillRect (6, 8, 2, 2);
-                        ctx.fillRect (8, 10, 2, 2);
-                        ctx.fillRect (10, 12, 2, 2);
-                    break;
-                    case "R":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (4, 0, 6, 2);
-                        ctx.fillRect (8, 2, 4, 4);
-                        ctx.fillRect (4, 6, 6, 2);
-                        ctx.fillRect (4, 8, 4, 2);
-                        ctx.fillRect (6, 10, 4, 2);
-                        ctx.fillRect (8, 12, 4, 2);
-                    break;
-                    case "S":
-                        ctx.fillRect (2, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 4);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (2, 6, 8, 2);
-                        ctx.fillRect (8, 8, 4, 4);
-                        ctx.fillRect (0, 10, 4, 2);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "T":
-                        ctx.fillRect (0, 0, 12, 2);
-                        ctx.fillRect (4, 2, 4, 12);
-                    break;
-                    case "U":
-                    case "Ù":
-                    case "Ú":
-                        ctx.fillRect (0, 0, 4, 12);
-                        ctx.fillRect (8, 0, 4, 12);
-                        ctx.fillRect (2, 12, 8, 2);
-                    break;
-                    case "V":
-                        ctx.fillRect (0, 0, 4, 10);
-                        ctx.fillRect (8, 0, 4, 10);
-                        ctx.fillRect (2, 10, 8, 2);
-                        ctx.fillRect (4, 12, 4, 2);
-                    break;
-                    case "W":
-                        ctx.fillRect (0, 0, 4, 14);
-                        ctx.fillRect (8, 0, 4, 14);
-                        ctx.fillRect (4, 10, 4, 2);
-                    break;
-                    case "X":
-                        ctx.fillRect (0, 0, 4, 4);
-                        ctx.fillRect (8, 0, 4, 4);
-                        ctx.fillRect (2, 4, 8, 2);
-                        ctx.fillRect (4, 6, 4, 2);
-                        ctx.fillRect (2, 8, 8, 2);
-                        ctx.fillRect (0, 10, 4, 4);
-                        ctx.fillRect (8, 10, 4, 4);
-                    break;
-                    case "Y":
-                        ctx.fillRect (0, 0, 4, 6);
-                        ctx.fillRect (8, 0, 4, 6);
-                        ctx.fillRect (2, 6, 8, 2);
-                        ctx.fillRect (4, 8, 4, 6);
-                    break;
-                    case "Z":
-                        ctx.fillRect (0, 0, 12, 2);
-                        ctx.fillRect (8, 2, 4, 2);
-                        ctx.fillRect (6, 4, 4, 2);
-                        ctx.fillRect (4, 6, 4, 2);
-                        ctx.fillRect (2, 8, 4, 2);
-                        ctx.fillRect (0, 10, 4, 2);
-                        ctx.fillRect (0, 12, 12, 2);
-                    break;
-                    case "&":
-                        ctx.fillRect (2, 0, 6, 2);
-                        ctx.fillRect (0, 2, 4, 4);
-                        ctx.fillRect (8, 2, 2, 2);
-                        ctx.fillRect (2, 6, 4, 2);
-                        ctx.fillRect (0, 8, 4, 4);
-                        ctx.fillRect (6, 8, 2, 2);
-                        ctx.fillRect (10, 8, 2, 2);
-                        ctx.fillRect (8, 10, 2, 2);
-                        ctx.fillRect (2, 12, 6, 2);
-                        ctx.fillRect (10, 12, 2, 2);
-                    break;
-                    case "=":
-                        ctx.fillRect (0, 2, 12, 4);
-                        ctx.fillRect (0, 8, 12, 4);
-                    break;
-                    case "-":
-                        ctx.fillRect (0, 5, 12, 4);
-                    break;
-                    case "_":
-                        ctx.fillRect (0, 12, 12, 4);
-                        height = 18;
-                    break;
-                    case "+":
-                        ctx.fillRect (4, 1, 4, 12);
-                        ctx.fillRect (0, 5, 12, 4);
-                        height = 14;
-                    break;
-                    case "·":
-                        ctx.fillRect (0, 5, 4, 4);
-                        width = 6;
-                    break;
-                    case ".":
-                        ctx.fillRect (0, 10, 4, 4);
-                        width = 6;
-                    break;
-                    case ",":
-                        ctx.fillRect (0, 10, 4, 4);
-                        ctx.fillRect (2, 14, 2, 2);
-                        ctx.fillRect (0, 16, 2, 2);
-                        width = 6;
-                        height = 20;
-                    break;
-                    case ":":
-                        ctx.fillRect (0, 2, 4, 4);
-                        ctx.fillRect (0, 8, 4, 4);
-                        width = 6;
-                    break;
-                    case ";":
-                        ctx.fillRect (0, 4, 4, 4);
-                        ctx.fillRect (0, 10, 4, 4);
-                        ctx.fillRect (2, 14, 2, 2);
-                        ctx.fillRect (0, 16, 2, 2);
-                        width = 6;
-                        height = 20;
-                    break;
-                    case "(":
-                        ctx.fillRect (4, 0, 6, 2);
-                        ctx.fillRect (2, 2, 6, 2);
-                        ctx.fillRect (0, 4, 6, 6);
-                        ctx.fillRect (2, 10, 6, 2);
-                        ctx.fillRect (4, 12, 6, 2);
-                        width = 12;
-                    break;
-                    case ")":
-                        ctx.fillRect (0, 0, 6, 2);
-                        ctx.fillRect (2, 2, 6, 2);
-                        ctx.fillRect (4, 4, 6, 6);
-                        ctx.fillRect (2, 10, 6, 2);
-                        ctx.fillRect (0, 12, 6, 2);
-                        width = 12;
-                    break;
-                    case "{":
-                        ctx.fillRect (4, 0, 6, 2);
-                        ctx.fillRect (2, 2, 4, 4);
-                        ctx.fillRect (0, 6, 4, 2);
-                        ctx.fillRect (2, 8, 4, 4);
-                        ctx.fillRect (4, 12, 6, 2);
-                        width = 12;
-                    break;
-                    case "}":
-                        ctx.fillRect (0, 0, 6, 2);
-                        ctx.fillRect (4, 2, 4, 4);
-                        ctx.fillRect (6, 6, 4, 2);
-                        ctx.fillRect (4, 8, 4, 4);
-                        ctx.fillRect (0, 12, 6, 2);
-                        width = 12;
-                    break;
-                    case "<":
-                        ctx.fillRect (6, 0, 4, 2);
-                        ctx.fillRect (4, 2, 4, 2);
-                        ctx.fillRect (2, 4, 4, 2);
-                        ctx.fillRect (0, 6, 4, 2);
-                        ctx.fillRect (2, 8, 4, 2);
-                        ctx.fillRect (4, 10, 4, 2);
-                        ctx.fillRect (6, 12, 4, 2);
-                        width = 12;
-                    break;
-                    case ">":
-                        ctx.fillRect (0, 0, 4, 2);
-                        ctx.fillRect (2, 2, 4, 2);
-                        ctx.fillRect (4, 4, 4, 2);
-                        ctx.fillRect (6, 6, 4, 2);
-                        ctx.fillRect (4, 8, 4, 2);
-                        ctx.fillRect (2, 10, 4, 2);
-                        ctx.fillRect (0, 12, 4, 2);
-                        width = 12;
-                    break;
-                    case "[":
-                        ctx.fillRect (0, 0, 8, 2);
-                        ctx.fillRect (0, 2, 4, 10);
-                        ctx.fillRect (0, 12, 8, 2);
-                        width = 10;
-                    break;
-                    case "]":
-                        ctx.fillRect (0, 0, 8, 2);
-                        ctx.fillRect (4, 2, 4, 10);
-                        ctx.fillRect (0, 12, 8, 2);
-                        width = 10;
-                    break;
-                    case "/":
-                        ctx.fillRect (0, 10, 2, 4);
-                        ctx.fillRect (2, 8, 2, 4);
-                        ctx.fillRect (4, 6, 2, 4);
-                        ctx.fillRect (6, 4, 2, 4);
-                        ctx.fillRect (8, 2, 2, 4);
-                        ctx.fillRect (10, 0, 2, 4);
-                    break;
-                    case "\\":
-                        ctx.fillRect (0, 0, 2, 4);
-                        ctx.fillRect (2, 2, 2, 4);
-                        ctx.fillRect (4, 4, 2, 4);
-                        ctx.fillRect (6, 6, 2, 4);
-                        ctx.fillRect (8, 8, 2, 4);
-                        ctx.fillRect (10, 10, 2, 4);
-                }
-                if (this.direction == "vertical")
-                {
-                    this.height += height;
-                    if (width > this.width) this.width = width;
-                    ctx.translate (0, height);
-                }
-                else
-                {
-                    this.width += width;
-                    if (height > this.height) this.height = height;
-                    ctx.translate (width, 0);
-                }   
+                case 0:
+                    switch (this.type)
+                    {
+                        case 0:
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (8, 0, 4, 2);
+                            ctx.fillRect (14, 0, 4, 2);
+                            ctx.fillRect (4, 4, 6, 2);
+                            ctx.fillRect (16, 4, 6, 2);
+                            ctx.fillRect (8, 8, 10, 6);
+                            ctx.fillRect (0, 14, 2, 6);
+                            ctx.fillRect (24, 14, 2, 6);
+                            ctx.fillRect (12, 20, 2, 2);
+                            ctx.fillRect (8, 22, 10, 2);
+                            ctx.fillRect (4, 24, 6, 4);
+                            ctx.fillRect (16, 24, 6, 6);
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (2, 2, 2, 2);
+                            ctx.fillRect (10, 2, 6, 2);
+                            ctx.fillRect (22, 2, 2, 2);
+                            ctx.fillRect (12, 4, 2, 2);
+                            ctx.fillRect (6, 6, 14, 2);
+                            ctx.fillRect (6, 14, 14, 6);
+                            ctx.fillStyle = this.color;
+                            ctx.fillRect (8, 10, 10, 2);
+                            ctx.fillRect (2, 12, 4, 2);
+                            ctx.fillRect (20, 12, 4, 2);
+                            ctx.fillRect (10, 14, 6, 2);
+                            ctx.fillRect (8, 24, 4, 2);
+                            ctx.fillRect (14, 24, 4, 2)
+                            ctx.fillRect (2, 28, 8, 2);
+                            ctx.fillRect (16, 30, 8, 2);
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (12, 10, 2, 2);
+                        break;
+                        case 1:
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (8, 0, 2, 2);
+                            ctx.fillRect (4, 2, 16, 2);
+                            ctx.fillRect (16, 4, 6, 2);
+                            ctx.fillRect (20, 6, 2, 2);
+                            ctx.fillRect (8, 8, 10, 6);
+                            ctx.fillRect (0, 18, 2, 4);
+                            ctx.fillRect (24, 18, 2, 4);
+                            ctx.fillRect (12, 20, 2, 2);
+                            ctx.fillRect (8, 22, 10, 2);
+                            ctx.fillRect (4, 24, 6, 6);
+                            ctx.fillRect (16, 24, 6, 4);
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (2, 0, 2, 2);
+                            ctx.fillRect (14, 0, 2, 2);
+                            ctx.fillRect (18, 0, 2, 2);
+                            ctx.fillRect (22, 2, 2, 2);
+                            ctx.fillRect (2, 4, 2, 2);
+                            ctx.fillRect (10, 4, 2, 4);
+                            ctx.fillRect (6, 6, 2, 2);
+                            ctx.fillRect (14, 6, 2, 2);
+                            ctx.fillRect (6, 16, 14, 4);
+                            ctx.fillStyle = this.color;
+                            ctx.fillRect (8, 10, 10, 2);
+                            ctx.fillRect (4, 14, 4, 2);
+                            ctx.fillRect (10, 14, 6, 2);
+                            ctx.fillRect (18, 14, 4, 2);
+                            ctx.fillRect (0, 16, 4, 2);
+                            ctx.fillRect (22, 16, 4, 2);
+                            ctx.fillRect (8, 24, 4, 2);
+                            ctx.fillRect (14, 24, 4, 2)
+                            ctx.fillRect (2, 30, 8, 2);
+                            ctx.fillRect (16, 28, 8, 2);
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (12, 10, 2, 2);
+                    }
+                break;
+                case 1:
+                    switch (this.type)
+                    {
+                        case 0:
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (8, 0, 10, 10);
+                            ctx.fillStyle = this.color;
+                            ctx.fillRect (6, 2, 14, 6);
+                            ctx.fillRect (0, 10, 4, 4);
+                            ctx.fillRect (10, 10, 6, 2);
+                            ctx.fillRect (22, 10, 4, 4);
+                            ctx.fillRect (4, 12, 18, 4);
+                            ctx.fillRect (6, 16, 6, 12);
+                            ctx.fillRect (14, 16, 6, 14);
+                            ctx.fillRect (4, 28, 8, 2);
+                            ctx.fillRect (14, 30, 8, 2);
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (10, 4, 6, 2);
+                            ctx.fillRect (12, 12, 2, 2);
+                            ctx.fillRect (10, 14, 6, 6);
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (2, 10, 2, 2);
+                            ctx.fillRect (6, 20, 6, 6);
+                            ctx.fillRect (14, 20, 6, 8);
+                        break;
+                        case 1:
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (8, 0, 10, 10);
+                            ctx.fillStyle = this.color;
+                            ctx.fillRect (6, 2, 14, 6);
+                            ctx.fillRect (0, 6, 4, 4);
+                            ctx.fillRect (2, 12, 2, 2);
+                            ctx.fillRect (10, 10, 6, 2);
+                            ctx.fillRect (22, 12, 2, 2);
+                            ctx.fillRect (22, 6, 4, 4);
+                            ctx.fillRect (4, 12, 18, 4);
+                            ctx.fillRect (6, 16, 6, 14);
+                            ctx.fillRect (14, 16, 6, 12);
+                            ctx.fillRect (4, 30, 8, 2);
+                            ctx.fillRect (14, 28, 8, 2);
+                            ctx.fillStyle = this.color2;
+                            ctx.fillRect (10, 4, 6, 2);
+                            ctx.fillRect (12, 12, 2, 2);
+                            ctx.fillRect (10, 14, 6, 6);
+                            ctx.fillStyle = this.color3;
+                            ctx.fillRect (2, 6, 2, 6);
+                            ctx.fillRect (22, 10, 2, 2);
+                            ctx.fillRect (6, 20, 6, 8);
+                            ctx.fillRect (14, 20, 6, 6);
+                    }
             }
             ctx.restore ();
-            if (this.direction == "center") this.x = Math.round (canvasWidth / 2) - Math.round (this.width / 2 * this.size / 12);
+        };
+    }
+}
+
+class component
+{
+    constructor (type, src, color, x, y, width, height)
+    {
+        this.type = type;
+        this.src = src;
+        this.color = color;
+        if (this.type == "image")
+        {
+            this.src = "img/" + this.src;
+            this.image = gameImages.findIndex (image => image.src == this.src);
         }
+        this.x = x;
+        this.y = y;
+        if (this.type == "text" || this.type == "value")
+        {
+            this.direction = (width != null ? width : "left");
+            if (this.direction == "vertical") this.tildeY = 0;
+            else this.tildeY = 6;
+            if (this.type == "value") this.chars = (height != null ? height : 0);
+            else this.size = (height != null ? height : 12);
+        }
+        else
+        {
+            this.width = width;
+            this.height = height;
+        }
+
+        this.update = function ()
+        {
+            let ctx = gameArea.ctx;
+            if (this.type == "image") ctx.drawImage (gameImages [this.image], this.x - Math.round (this.width / 2), this.y - Math.round (this.height / 2), this.width, this.height);
+            else if (this.type == "rect")
+            {
+                ctx.beginPath ();
+                ctx.rect (this.x, this.y, this.width, this.height);
+                ctx.fillStyle = this.color;
+                ctx.fill ();
+            }
+            else if (this.type == "circle")
+            {
+                ctx.beginPath ();
+                ctx.arc (this.x, this.y, this.height, 0, 2 * Math.PI);
+                ctx.fillStyle = this.color;
+                ctx.fill ();
+            }
+            else if (this.type == "text" || this.type == "value")
+            {
+                if (this.type == "text") this.text = this.src;
+                else if (this.type == "value")
+                {
+                    eval ('this.text = ' + this.src + ';');
+                    this.text = (this.text < 10 ? "0000" : this.text < 100 ? "000" : this.text < 1000 ? "00" : this.text < 10000 ? "0" : "") + this.text + "";
+                    this.text = this.text.substr (5 - this.chars, this.chars);
+                }
+                if (this.width) ctx.fillStyle = this.color;
+                else ctx.fillStyle = "transparent";
+                this.width = 0;
+                this.height = 0;
+                ctx.save ();
+                ctx.translate (Math.round (this.x), Math.round (this.y));
+                ctx.scale (this.size / 12, this.size / 12);
+                for (let i = 0; i < this.text.length; i++)
+                {
+                    let char = this.text.substr (i, 1).toUpperCase (),
+                        width = 14,
+                        height = 16;
+
+                    if (char == "Á" || char == "É" || char == "Í" || char == "Ó" || char == "Ú")
+                    {
+                        ctx.fillRect (6, 0 - this.tildeY, 4, 2);
+                        ctx.fillRect (4, 2 - this.tildeY, 4, 2);
+                    }
+                    else if (char == "À" || char == "È" || char == "Ì" || char == "Ò" || char == "Ù")
+                    {
+                        ctx.fillRect (2, 0 - this.tildeY, 4, 2);
+                        ctx.fillRect (4, 2 - this.tildeY, 4, 2);
+                    }
+                    else if (char == "Ç")
+                    {
+                        ctx.fillRect (2, 8 - this.tildeY, 4, 2);
+                        ctx.fillRect (4, 10 - this.tildeY, 4, 2);
+                    }
+                    else if (char == "Ñ")
+                    {
+                        ctx.fillRect (4, 0 - this.tildeY, 4, 2);
+                        ctx.fillRect (2, 2 - this.tildeY, 4, 2);
+                        ctx.fillRect (4, 0 - this.tildeY, 4, 2);
+                        ctx.fillRect (6, 2 - this.tildeY, 4, 2);
+                    }
+                    switch (char)
+                    {
+                        case "0":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 10);
+                            ctx.fillRect (6, 4, 2, 4);
+                            ctx.fillRect (4, 6, 2, 4);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "1":
+                            ctx.fillRect (4, 0, 4, 12);
+                            ctx.fillRect (2, 2, 2, 4);
+                            ctx.fillRect (0, 4, 2, 2);
+                            ctx.fillRect (0, 12, 12, 2);
+                        break;
+                        case "2":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 2);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (6, 6, 4, 2);
+                            ctx.fillRect (4, 8, 4, 2);
+                            ctx.fillRect (2, 10, 4, 2);
+                            ctx.fillRect (0, 12, 12, 2);
+                        break;
+                        case "3":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 2);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (4, 6, 6, 2);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (0, 10, 4, 2);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "4":
+                            ctx.fillRect (6, 0, 2, 2);
+                            ctx.fillRect (8, 0, 4, 14);
+                            ctx.fillRect (4, 2, 4, 2);
+                            ctx.fillRect (2, 4, 4, 2);
+                            ctx.fillRect (0, 6, 4, 2);
+                            ctx.fillRect (0, 8, 8, 2);
+                        break;
+                        case "5":
+                            ctx.fillRect (0, 0, 12, 2);
+                            ctx.fillRect (0, 2, 4, 4);
+                            ctx.fillRect (0, 6, 10, 2);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (0, 10, 4, 2);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "6":
+                            ctx.fillRect (4, 0, 6, 2);
+                            ctx.fillRect (2, 2, 4, 2);
+                            ctx.fillRect (0, 4, 4, 8);
+                            ctx.fillRect (4, 6, 6, 2);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "7":
+                            ctx.fillRect (0, 0, 12, 2);
+                            ctx.fillRect (0, 2, 4, 2);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (6, 4, 4, 2);
+                            ctx.fillRect (4, 6, 4, 8);
+                        break;
+                        case "8":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 4);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (2, 6, 8, 2);
+                            ctx.fillRect (0, 8, 4, 4);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "9":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 4);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (2, 6, 10, 2);
+                            ctx.fillRect (8, 8, 4, 2);
+                            ctx.fillRect (6, 10, 4, 2);
+                            ctx.fillRect (4, 12, 4, 2);
+                        break;
+                        case "A":
+                        case "À":
+                        case "Á":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 12);
+                            ctx.fillRect (8, 2, 4, 12);
+                            ctx.fillRect (4, 6, 4, 2);
+                        break;
+                        case "B":
+                            ctx.fillRect (0, 0, 10, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (4, 6, 6, 2);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (0, 12, 10, 2);
+                        break;
+                        case "C":
+                        case "Ç":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (8, 10, 4, 2);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "D":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (4, 0, 4, 2);
+                            ctx.fillRect (6, 2, 4, 2);
+                            ctx.fillRect (8, 4, 4, 6);
+                            ctx.fillRect (6, 10, 4, 2);
+                            ctx.fillRect (4, 12, 4, 2);
+                        break;
+                        case "E":
+                        case "È":
+                        case "É":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (4, 6, 6, 2);
+                            ctx.fillRect (8, 10, 4, 2);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "F":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 12);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (4, 6, 6, 2);
+                        break;
+                        case "G":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (6, 6, 6, 2);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "H":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (8, 0, 4, 14);
+                            ctx.fillRect (4, 6, 4, 2);
+                        break;
+                        case "I":
+                        case "Ì":
+                        case "Í":
+                            ctx.fillRect (0, 0, 12, 2);
+                            ctx.fillRect (4, 2, 4, 10);
+                            ctx.fillRect (0, 12, 12, 2);
+                        break;
+                        case "J":
+                            ctx.fillRect (8, 0, 4, 12);
+                            ctx.fillRect (0, 8, 4, 4);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "K":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (8, 0, 4, 2);
+                            ctx.fillRect (6, 2, 4, 2);
+                            ctx.fillRect (4, 4, 4, 2);
+                            ctx.fillRect (4, 6, 2, 2);
+                            ctx.fillRect (4, 8, 4, 2);
+                            ctx.fillRect (6, 10, 4, 2);
+                            ctx.fillRect (8, 12, 4, 2);
+                        break;
+                        case "L":
+                            ctx.fillRect (0, 0, 4, 12);
+                            ctx.fillRect (0, 12, 12, 2);
+                        break;
+                        case "M":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (8, 0, 4, 14);
+                            ctx.fillRect (4, 2, 4, 2);
+                        break;
+                        case "N":
+                        case "Ñ":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (8, 0, 4, 14);
+                            ctx.fillRect (4, 4, 2, 2);
+                            ctx.fillRect (6, 6, 2, 2);
+                        break;
+                        case "O":
+                        case "Ò":
+                        case "Ó":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 10);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "P":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (4, 0, 6, 2);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (4, 6, 6, 2);
+                        break;
+                        case "Q":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (8, 2, 4, 8);
+                            ctx.fillRect (2, 12, 6, 2);
+                            ctx.fillRect (4, 6, 2, 2);
+                            ctx.fillRect (6, 8, 2, 2);
+                            ctx.fillRect (8, 10, 2, 2);
+                            ctx.fillRect (10, 12, 2, 2);
+                        break;
+                        case "R":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (4, 0, 6, 2);
+                            ctx.fillRect (8, 2, 4, 4);
+                            ctx.fillRect (4, 6, 6, 2);
+                            ctx.fillRect (4, 8, 4, 2);
+                            ctx.fillRect (6, 10, 4, 2);
+                            ctx.fillRect (8, 12, 4, 2);
+                        break;
+                        case "S":
+                            ctx.fillRect (2, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 4);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (2, 6, 8, 2);
+                            ctx.fillRect (8, 8, 4, 4);
+                            ctx.fillRect (0, 10, 4, 2);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "T":
+                            ctx.fillRect (0, 0, 12, 2);
+                            ctx.fillRect (4, 2, 4, 12);
+                        break;
+                        case "U":
+                        case "Ù":
+                        case "Ú":
+                            ctx.fillRect (0, 0, 4, 12);
+                            ctx.fillRect (8, 0, 4, 12);
+                            ctx.fillRect (2, 12, 8, 2);
+                        break;
+                        case "V":
+                            ctx.fillRect (0, 0, 4, 10);
+                            ctx.fillRect (8, 0, 4, 10);
+                            ctx.fillRect (2, 10, 8, 2);
+                            ctx.fillRect (4, 12, 4, 2);
+                        break;
+                        case "W":
+                            ctx.fillRect (0, 0, 4, 14);
+                            ctx.fillRect (8, 0, 4, 14);
+                            ctx.fillRect (4, 10, 4, 2);
+                        break;
+                        case "X":
+                            ctx.fillRect (0, 0, 4, 4);
+                            ctx.fillRect (8, 0, 4, 4);
+                            ctx.fillRect (2, 4, 8, 2);
+                            ctx.fillRect (4, 6, 4, 2);
+                            ctx.fillRect (2, 8, 8, 2);
+                            ctx.fillRect (0, 10, 4, 4);
+                            ctx.fillRect (8, 10, 4, 4);
+                        break;
+                        case "Y":
+                            ctx.fillRect (0, 0, 4, 6);
+                            ctx.fillRect (8, 0, 4, 6);
+                            ctx.fillRect (2, 6, 8, 2);
+                            ctx.fillRect (4, 8, 4, 6);
+                        break;
+                        case "Z":
+                            ctx.fillRect (0, 0, 12, 2);
+                            ctx.fillRect (8, 2, 4, 2);
+                            ctx.fillRect (6, 4, 4, 2);
+                            ctx.fillRect (4, 6, 4, 2);
+                            ctx.fillRect (2, 8, 4, 2);
+                            ctx.fillRect (0, 10, 4, 2);
+                            ctx.fillRect (0, 12, 12, 2);
+                        break;
+                        case "&":
+                            ctx.fillRect (2, 0, 6, 2);
+                            ctx.fillRect (0, 2, 4, 4);
+                            ctx.fillRect (8, 2, 2, 2);
+                            ctx.fillRect (2, 6, 4, 2);
+                            ctx.fillRect (0, 8, 4, 4);
+                            ctx.fillRect (6, 8, 2, 2);
+                            ctx.fillRect (10, 8, 2, 2);
+                            ctx.fillRect (8, 10, 2, 2);
+                            ctx.fillRect (2, 12, 6, 2);
+                            ctx.fillRect (10, 12, 2, 2);
+                        break;
+                        case "=":
+                            ctx.fillRect (0, 2, 12, 4);
+                            ctx.fillRect (0, 8, 12, 4);
+                        break;
+                        case "-":
+                            ctx.fillRect (0, 5, 12, 4);
+                        break;
+                        case "_":
+                            ctx.fillRect (0, 12, 12, 4);
+                            height = 18;
+                        break;
+                        case "+":
+                            ctx.fillRect (4, 1, 4, 12);
+                            ctx.fillRect (0, 5, 12, 4);
+                            height = 14;
+                        break;
+                        case "·":
+                            ctx.fillRect (0, 5, 4, 4);
+                            width = 6;
+                        break;
+                        case ".":
+                            ctx.fillRect (0, 10, 4, 4);
+                            width = 6;
+                        break;
+                        case ",":
+                            ctx.fillRect (0, 10, 4, 4);
+                            ctx.fillRect (2, 14, 2, 2);
+                            ctx.fillRect (0, 16, 2, 2);
+                            width = 6;
+                            height = 20;
+                        break;
+                        case ":":
+                            ctx.fillRect (0, 2, 4, 4);
+                            ctx.fillRect (0, 8, 4, 4);
+                            width = 6;
+                        break;
+                        case ";":
+                            ctx.fillRect (0, 4, 4, 4);
+                            ctx.fillRect (0, 10, 4, 4);
+                            ctx.fillRect (2, 14, 2, 2);
+                            ctx.fillRect (0, 16, 2, 2);
+                            width = 6;
+                            height = 20;
+                        break;
+                        case "(":
+                            ctx.fillRect (4, 0, 6, 2);
+                            ctx.fillRect (2, 2, 6, 2);
+                            ctx.fillRect (0, 4, 6, 6);
+                            ctx.fillRect (2, 10, 6, 2);
+                            ctx.fillRect (4, 12, 6, 2);
+                            width = 12;
+                        break;
+                        case ")":
+                            ctx.fillRect (0, 0, 6, 2);
+                            ctx.fillRect (2, 2, 6, 2);
+                            ctx.fillRect (4, 4, 6, 6);
+                            ctx.fillRect (2, 10, 6, 2);
+                            ctx.fillRect (0, 12, 6, 2);
+                            width = 12;
+                        break;
+                        case "{":
+                            ctx.fillRect (4, 0, 6, 2);
+                            ctx.fillRect (2, 2, 4, 4);
+                            ctx.fillRect (0, 6, 4, 2);
+                            ctx.fillRect (2, 8, 4, 4);
+                            ctx.fillRect (4, 12, 6, 2);
+                            width = 12;
+                        break;
+                        case "}":
+                            ctx.fillRect (0, 0, 6, 2);
+                            ctx.fillRect (4, 2, 4, 4);
+                            ctx.fillRect (6, 6, 4, 2);
+                            ctx.fillRect (4, 8, 4, 4);
+                            ctx.fillRect (0, 12, 6, 2);
+                            width = 12;
+                        break;
+                        case "<":
+                            ctx.fillRect (6, 0, 4, 2);
+                            ctx.fillRect (4, 2, 4, 2);
+                            ctx.fillRect (2, 4, 4, 2);
+                            ctx.fillRect (0, 6, 4, 2);
+                            ctx.fillRect (2, 8, 4, 2);
+                            ctx.fillRect (4, 10, 4, 2);
+                            ctx.fillRect (6, 12, 4, 2);
+                            width = 12;
+                        break;
+                        case ">":
+                            ctx.fillRect (0, 0, 4, 2);
+                            ctx.fillRect (2, 2, 4, 2);
+                            ctx.fillRect (4, 4, 4, 2);
+                            ctx.fillRect (6, 6, 4, 2);
+                            ctx.fillRect (4, 8, 4, 2);
+                            ctx.fillRect (2, 10, 4, 2);
+                            ctx.fillRect (0, 12, 4, 2);
+                            width = 12;
+                        break;
+                        case "[":
+                            ctx.fillRect (0, 0, 8, 2);
+                            ctx.fillRect (0, 2, 4, 10);
+                            ctx.fillRect (0, 12, 8, 2);
+                            width = 10;
+                        break;
+                        case "]":
+                            ctx.fillRect (0, 0, 8, 2);
+                            ctx.fillRect (4, 2, 4, 10);
+                            ctx.fillRect (0, 12, 8, 2);
+                            width = 10;
+                        break;
+                        case "/":
+                            ctx.fillRect (0, 10, 2, 4);
+                            ctx.fillRect (2, 8, 2, 4);
+                            ctx.fillRect (4, 6, 2, 4);
+                            ctx.fillRect (6, 4, 2, 4);
+                            ctx.fillRect (8, 2, 2, 4);
+                            ctx.fillRect (10, 0, 2, 4);
+                        break;
+                        case "\\":
+                            ctx.fillRect (0, 0, 2, 4);
+                            ctx.fillRect (2, 2, 2, 4);
+                            ctx.fillRect (4, 4, 2, 4);
+                            ctx.fillRect (6, 6, 2, 4);
+                            ctx.fillRect (8, 8, 2, 4);
+                            ctx.fillRect (10, 10, 2, 4);
+                    }
+                    if (this.direction == "vertical")
+                    {
+                        this.height += height;
+                        if (width > this.width) this.width = width;
+                        ctx.translate (0, height);
+                    }
+                    else
+                    {
+                        this.width += width;
+                        if (height > this.height) this.height = height;
+                        ctx.translate (width, 0);
+                    }   
+                }
+                ctx.restore ();
+                if (this.direction == "center") this.x = Math.round (canvasWidth / 2) - Math.round (this.width / 2 * this.size / 12);
+            }
+        };
     }
 }
 
@@ -4167,11 +4280,22 @@ function gameDevice (device)
         'buttonDown',
         (btnEvent) =>
         {
+            startControl (device, "gamepad", "buttons", btnEvent.button, 1);
             console.log (`Botón presionado: ${btnEvent.button}`);
-            if (gameController.hasRumble)
+            /*if (gameController.hasRumble)
             {
                 gameController.rumble (0.5, 0.5, 200);
-            }
+            }*/
+        }
+    );
+
+    gameController.on
+    (
+        'buttonUp',
+        (btnEvent) =>
+        {
+            stopControl (device, "gamepad", "buttons", btnEvent.button);
+            console.log (`Botón levantado: ${btnEvent.button}`);
         }
     );
 
@@ -4180,6 +4304,7 @@ function gameDevice (device)
         'axisMotion',
         (axisEvent) =>
         {
+            startControl (device, "gamepad", "axis", axisEvent.axis, axisEvent.value);
             console.log (`Eje ${axisEvent.axis} movido a: ${axisEvent.value}`);
         }
     );
