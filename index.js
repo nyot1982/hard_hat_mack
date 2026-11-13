@@ -411,12 +411,11 @@ function JSONstringify (input)
     }
 }
 
-function startControl (id_control, control, bt_type, bt_code, bt_value)
+function startControl (id_control, control, bt_type, bt_code, bt_value = 1)
 {
     if (!pressed [bt_type][id_control].includes (bt_code) || bt_type == "axes")
     {
         if (!pressed [bt_type][id_control].includes (bt_code)) pressed [bt_type][id_control].push (bt_code);
-        if (control == "keyboard") bt_value = 1;
         userActionStart (control, bt_type, bt_code, bt_value);
     }
 }
@@ -4280,7 +4279,7 @@ function gameDevice (device)
         'buttonDown',
         (btnEvent) =>
         {
-            startControl (device, "gamepad", "buttons", btnEvent.button, 1);
+            startControl (device, "gamepad", "buttons", btnEvent.button);
             console.log (`Botón presionado: ${btnEvent.button}`);
             /*if (gameController.hasRumble)
             {
@@ -4304,7 +4303,7 @@ function gameDevice (device)
         'axisMotion',
         (axisEvent) =>
         {
-            startControl (device, "gamepad", "axis", axisEvent.axis, axisEvent.value);
+            startControl (device, "gamepad", "axes", axisEvent.axis, axisEvent.value);
             console.log (`Eje ${axisEvent.axis} movido a: ${axisEvent.value}`);
         }
     );
