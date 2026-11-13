@@ -328,7 +328,7 @@ let windowWidth = sdl.video.displays [0].geometry.width,//640,
             fileRead ('user.bin');
             setIcon ('icon.png');
             loadImages ('img');
-            loadAudio ('audio');
+            loadAudios ('audio');
             this.canvas.id = "hardHatMack";
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
@@ -1017,25 +1017,6 @@ async function setIcon (file)
     loading--;
 }
 
-async function loadAudio (dir)
-{
-    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
-    {
-        let color = "#00FF00";
-        try
-        {
-            gameAudios [gameAudio] = new audio (dir + "/" + gameAudios [gameAudio]);
-        }
-        catch (error)
-        {
-            console.error ('Error loading audio:', error.message + '.');
-            color = "red";
-        }
-        gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
-        loading--;
-    }
-}
-
 async function loadImages (dir)
 {
     for (let gameImage = 0; gameImage < gameImages.length; gameImage++)
@@ -1049,8 +1030,29 @@ async function loadImages (dir)
         {
             console.error ('Error loading picture:', error.message + '.');
             color = "red";
+            loadingErrors++;
         }
         gameText.push (new component ("text", gameImages [gameImage].src, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
+        loading--;
+    }
+}
+
+async function loadAudios (dir)
+{
+    for (let gameAudio = 0; gameAudio < gameAudios.length; gameAudio++)
+    {
+        let color = "#00FF00";
+        try
+        {
+            gameAudios [gameAudio] = new audio (dir + "/" + gameAudios [gameAudio]);
+        }
+        catch (error)
+        {
+            console.error ('Error loading audio:', error.message + '.');
+            color = "red";
+            loadingErrors++;
+        }
+        gameText.push (new component ("text", gameAudios [gameAudio].source, color, Math.round (canvasWidth / 2), gameText [gameText.length - 1].y + 19, "center", 9));
         loading--;
     }
 }
@@ -1058,68 +1060,57 @@ async function loadImages (dir)
 function audio (source)
 {
     this.source = source;
-    const fileBuffer = fs.readFileSync(this.source);
-    const wav = new WaveFile(fileBuffer);
-    wav.toBitDepth('32f');
-
+    const fileBuffer = fs.readFileSync (this.source);
+    const wav = new WaveFile (fileBuffer);
+    wav.toBitDepth ('32f');
     this.sampleRate = wav.fmt.sampleRate;
     this.channels = wav.fmt.numChannels;
-
-    // Preparamos las muestras entrelazadas (Estéreo) y su versión Mono de respaldo
-    const stereoSamples = wav.getSamples(true, Float32Array);
-    this.stereoBuffer = Buffer.from(
+    const stereoSamples = wav.getSamples (true, Float32Array);
+    this.stereoBuffer = Buffer.from
+    (
         stereoSamples.buffer,
         stereoSamples.byteOffset,
         stereoSamples.byteLength
     );
-
-    // Calculamos la duración exacta en milisegundos
     const totalFrames = stereoSamples.length / this.channels;
     this.durationMs = (totalFrames / this.sampleRate) * 1000;
-
-    // Preparamos el búfer mono solo si el archivo original es estéreo
     this.monoBuffer = null;
-    if (this.channels === 2) {
-        const [left, right] = wav.getSamples(false, Float32Array);
-        const monoSamples = new Float32Array(left.length);
-        for (let i = 0; i < left.length; i++) {
-            monoSamples[i] = (left[i] + right[i]) * 0.5;
-        }
-        this.monoBuffer = Buffer.from(
+    if (this.channels === 2)
+    {
+        const [left, right] = wav.getSamples (false, Float32Array);
+        const monoSamples = new Float32Array (left.length);
+        for (let i = 0; i < left.length; i++) monoSamples[i] = (left[i] + right[i]) * 0.5;
+        this.monoBuffer = Buffer.from
+        (
             monoSamples.buffer,
             monoSamples.byteOffset,
             monoSamples.byteLength
         );
     }
-
-    this.play = function () {
-        // 1er argumento: dispositivo ({ type: 'playback' } o null)
-        // 2do argumento: configuración de audio deseada
-        const playbackDevice = sdl.audio.openDevice(
+    
+    this.play = function ()
+    {
+        const playbackDevice = sdl.audio.openDevice
+        (
             { type: 'playback' },
             {
                 frequency: this.sampleRate,
                 format: 'f32',
-                channels: this.channels,
+                channels: this.channels
             }
         );
-
-        // Si el hardware real abrió 2 canales, usa estéreo; si forzó 1 canal, usa el respaldo mono
-        const bufferToPlay = (this.channels === 2 && playbackDevice.channels === 1)
-            ? this.monoBuffer
-            : this.stereoBuffer;
-
-        playbackDevice.enqueue(bufferToPlay);
-        playbackDevice.play();
-
-        // Cerrar el dispositivo de forma segura al terminar el sonido (+100ms de margen)
-        setTimeout(() => {
-            if (!playbackDevice.closed) {
-                playbackDevice.close();
-            }
-        }, this.durationMs + 100);
-
-        return playbackDevice; // Lo devolvemos por si quieres pausarlo o detenerlo manualmente
+        const bufferToPlay = (this.channels === 2 && playbackDevice.channels === 1) ? this.monoBuffer : this.stereoBuffer;
+        playbackDevice.enqueue (bufferToPlay);
+        playbackDevice.play ();
+        setTimeout
+        (
+            () =>
+            {
+                if (!playbackDevice.closed) playbackDevice.close ();
+            },
+            this.durationMs + 100
+        );
+        return playbackDevice;
     };
 }
 
